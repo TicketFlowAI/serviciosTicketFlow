@@ -18,8 +18,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->smallInteger('company');
+            $table->smallInteger('company')->references('id')->on('companies')->onDelete('cascade');
             $table->rememberToken();
+            $table->softDeletes();
             $table->timestamps();
         });
 

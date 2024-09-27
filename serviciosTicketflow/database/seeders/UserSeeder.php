@@ -19,6 +19,6 @@ class UserSeeder extends Seeder
             'email' => 'dennis.ocana@mindsoft.biz',
             'password' => 'EstaEsUnaCotraseña123*',
             'company' => 1
-        ]);
+        ])->assignRole('super-admin');
     }
 }

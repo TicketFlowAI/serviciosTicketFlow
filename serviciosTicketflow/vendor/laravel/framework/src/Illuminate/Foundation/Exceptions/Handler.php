@@ -713,9 +713,11 @@ class Handler implements ExceptionHandlerContract
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        return $this->shouldReturnJson($request, $exception)
-                    ? response()->json(['message' => $exception->getMessage()], 401)
-                    : redirect()->guest($exception->redirectTo($request) ?? route('login'));
+        if ($request->expectsJson()) {
+            return response()->json(['error' => 'Unauthenticated.'], 401);
+        }
+    
+        return redirect()->guest(route('auth.login'));
     }
 
     /**
@@ -1070,4 +1072,6 @@ class Handler implements ExceptionHandlerContract
     {
         return $this->container->make(LoggerInterface::class);
     }
+
+    
 }
