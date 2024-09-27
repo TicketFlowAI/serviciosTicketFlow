@@ -9,5 +9,13 @@ class Company extends Model
 {
     use HasFactory;
 
-    
+    protected $fillable = [
+        'name',
+        'idNumber',
+        'contactEmail',
+        'phone',
+        'state',
+        'city',
+        'address'
+    ];
 }
