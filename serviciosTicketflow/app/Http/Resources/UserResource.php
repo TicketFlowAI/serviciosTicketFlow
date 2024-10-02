@@ -23,4 +23,13 @@ class UserResource extends JsonResource
             'company' => Company::where('id', $this->company)->first()
         ];
     }
+    public function aboutMe(): array {
+        return [
+            'id' => $this->id,
+            'lastname'=> $this->lastname,
+            'name' => $this->name,
+            'email' => $this->email,
+            'company' => Company::where('id', $this->company)->first()
+        ];
+    }
 }
