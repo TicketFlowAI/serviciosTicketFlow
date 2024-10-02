@@ -21,7 +21,7 @@ return [
 
     'allowed_origins' => [env('SANCTUM_STATEFUL_DOMAINS')],
 
-    'allowed_origins_patterns' => ['.mindsoftdev.com'],
+    'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['*'],
 
