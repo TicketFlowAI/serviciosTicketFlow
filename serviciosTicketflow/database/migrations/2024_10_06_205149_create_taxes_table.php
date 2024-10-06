@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('taxes', function (Blueprint $table) {
             $table->id();
+            $table->string('description',length:10);
+            $table->decimal('value');
             $table->timestamps();
         });
     }
