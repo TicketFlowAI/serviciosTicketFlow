@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TaxController;
@@ -18,4 +19,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('/companies',CompanyController::class);
     Route::apiResource('/services',ServiceController::class);
     Route::apiResource('/taxes',TaxController::class);
+    Route::apiResource('/categories',CategoryController::class);
 });
