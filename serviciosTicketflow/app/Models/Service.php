@@ -13,6 +13,7 @@ class Service extends Model
         'category',
         'description',
         'price',
-        'tax'
+        'tax',
+        'billedAnnually'
     ];
 }

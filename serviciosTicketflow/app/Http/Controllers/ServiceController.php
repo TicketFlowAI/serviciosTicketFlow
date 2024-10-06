@@ -45,7 +45,8 @@ class ServiceController extends Controller
             'category' => $request->category,
             'description' => $request->description,
             'price' => $request->price,
-            'tax' => $request->tax
+            'tax' => $request->tax,
+            'billedAnnually' => $request->billedAnnually
         ];
         DB::beginTransaction();
         try {
@@ -86,7 +87,8 @@ class ServiceController extends Controller
             'category' => $request->category,
             'description' => $request->description,
             'price' => $request->price,
-            'tax' => $request->tax
+            'tax' => $request->tax,
+            'billedAnnually' => $request->billedAnnually
         ];
         DB::beginTransaction();
         try {

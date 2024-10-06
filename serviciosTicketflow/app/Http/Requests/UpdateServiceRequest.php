@@ -27,7 +27,8 @@ class UpdateServiceRequest extends FormRequest
             'category' => 'required|numeric',
             'description' => 'required|unique|string',
             'price' => 'required|numeric',
-            'tax' => 'required|numeric'
+            'tax' => 'required|numeric',
+            'billedAnnually' => 'required|boolean'
         ];
     }
 

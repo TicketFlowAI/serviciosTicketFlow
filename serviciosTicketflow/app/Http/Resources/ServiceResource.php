@@ -20,6 +20,7 @@ class ServiceResource extends JsonResource
             'description' => $this->description,
             'price' => $this->price,
             'tax' => $this->tax,
+            'billedAnnually' => $this->billedAnnually,
         ];
     }
 }
