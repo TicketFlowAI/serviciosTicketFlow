@@ -9,11 +9,11 @@ class ServiceRepository implements ServiceRepositoryInterface
    /**
     * Create a new class instance.
     */
-
    public function __construct()
    {
       //
    }
+   
    /**
     * Retrieves all items.
     */
