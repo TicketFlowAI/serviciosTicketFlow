@@ -43,7 +43,12 @@ class CompanyController extends Controller
     {
         $details =[
             'name' => $request->name,
-            'details' => $request->details
+            'idNumber' => $request->idNumber,
+            'contactEmail' => $request->contactEmail,
+            'phone' => $request->phone,
+            'state' => $request->state,
+            'city' => $request->city,
+            'address' => $request->address
         ];
         DB::beginTransaction();
         try{
@@ -82,7 +87,12 @@ class CompanyController extends Controller
     {
         $updateDetails =[
             'name' => $request->name,
-            'details' => $request->details
+            'idNumber' => $request->idNumber,
+            'contactEmail' => $request->contactEmail,
+            'phone' => $request->phone,
+            'state' => $request->state,
+            'city' => $request->city,
+            'address' => $request->address
         ];
         DB::beginTransaction();
         try{
