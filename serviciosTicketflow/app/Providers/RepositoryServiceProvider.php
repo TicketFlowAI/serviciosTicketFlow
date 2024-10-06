@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Interfaces\CompanyRepositoryInterface;
-use App\Interfaces\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\ServiceRepositoryInterface;
 use App\Interfaces\TaxRepositoryInterface;
 use App\Repositories\CategoryRepository;
