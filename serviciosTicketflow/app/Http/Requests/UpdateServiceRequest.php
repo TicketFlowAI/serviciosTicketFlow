@@ -31,6 +31,9 @@ class UpdateServiceRequest extends FormRequest
         ];
     }
 
+    /**
+     * Sends an httpException stating what went wrong with the validation.
+     */
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
