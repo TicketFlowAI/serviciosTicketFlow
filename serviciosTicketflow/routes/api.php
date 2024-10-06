@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\TaxController;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -16,4 +17,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Protected Company API routes
     Route::apiResource('/companies',CompanyController::class);
     Route::apiResource('/services',ServiceController::class);
+    Route::apiResource('/taxes',TaxController::class);
 });
