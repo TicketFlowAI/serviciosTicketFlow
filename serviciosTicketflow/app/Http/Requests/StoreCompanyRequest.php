@@ -25,13 +25,13 @@ class StoreCompanyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'=> 'required',
-            'idNumber'=> 'required',
-            'contactEmail'=> 'required',
+            'name'=> 'required|string',
+            'idNumber'=> 'required|numeric|unique',
+            'contactEmail'=> 'required|email',
             'phone'=> 'required',
-            'state'=> 'required',
-            'city'=> 'required',
-            'address'=> 'required'
+            'state'=> 'required|string',
+            'city'=> 'required|string',
+            'address'=> 'required|string'
         ];
     }
 
