@@ -15,13 +15,13 @@ class ServiceSeeder extends Seeder
     {
         Service::create([
             'category' => '1',
-            'description' => 'Renovación Dominio .com ',
+            'description' => 'Dominio .com ',
             'price' => '60',
             'tax' => '1',
         ]);
         Service::create([
             'category' => '1',
-            'description' => 'Renovación Dominio .ec/.com.ec',
+            'description' => 'Dominio .ec/.com.ec',
             'price' => '60',
             'tax' => '1',
         ]);
