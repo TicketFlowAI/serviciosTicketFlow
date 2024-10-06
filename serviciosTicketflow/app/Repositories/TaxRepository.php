@@ -1,9 +1,10 @@
 <?php
 
 namespace App;
+use App\Interfaces\TaxRepositoryInterface;
 use App\Models\Tax;
 
-class TaxRepository
+class TaxRepository implements TaxRepositoryInterface
 {
     /**
      * Create a new class instance.
@@ -52,5 +53,4 @@ class TaxRepository
     {
         Tax::destroy($id);
     }
-
 }
