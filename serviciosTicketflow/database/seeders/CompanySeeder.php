@@ -22,5 +22,14 @@ class CompanySeeder extends Seeder
             'city' => 'Quito',
             'address' => 'Hernandez de Jirón y Av. América',
         ]);
+        Company::create([
+            'name' => 'Mindsoft1',
+            'idNumber' => '1791888944002',
+            'contactEmail' => 'info@mindsoft.biz',
+            'phone' => '+593984258842',
+            'state' => 'Pichincha',
+            'city' => 'Quito',
+            'address' => 'Hernandez de Jirón y Av. América',
+        ]);
     }
 }
