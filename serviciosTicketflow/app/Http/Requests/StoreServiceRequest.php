@@ -28,7 +28,6 @@ class StoreServiceRequest extends FormRequest
             'description' => 'required|unique|string',
             'price' => 'required|numeric',
             'tax' => 'required|numeric',
-            'billedAnnually' => 'required|boolean'
         ];
     }
 

@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('description',length:150)->unique();
             $table->decimal('price');
             $table->tinyInteger('tax')->references('id')->on('taxes');
-            $table->boolean('billedAnnually');
             $table->softDeletes();
             $table->timestamps();
         });

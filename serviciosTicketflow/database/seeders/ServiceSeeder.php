@@ -15,38 +15,40 @@ class ServiceSeeder extends Seeder
     {
         Service::create([
             'category' => '1',
-            'description' => 'Renovación Dominio .com - Anual',
+            'description' => 'Renovación Dominio .com ',
             'price' => '60',
             'tax' => '1',
-            'billedAnnually' => '1'
         ]);
         Service::create([
             'category' => '1',
-            'description' => 'Renovación Dominio .ec/.com.ec - Anual',
+            'description' => 'Renovación Dominio .ec/.com.ec',
             'price' => '60',
             'tax' => '1',
-            'billedAnnually' => '1'
         ]);
         Service::create([
             'category' => '2',
-            'description' => 'Plan Básico Hosting 5GB - Anual',
+            'description' => 'Plan Básico Hosting 5GB',
             'price' => '210',
             'tax' => '1',
-            'billedAnnually' => '1'
         ]);
         Service::create([
             'category' => '2',
-            'description' => 'Plan Básico Hosting 10GB - Anual',
+            'description' => 'Plan Básico Hosting 10GB',
             'price' => '270',
             'tax' => '1',
-            'billedAnnually' => '1'
         ]);
         Service::create([
             'category' => '2',
             'description' => 'Plan 1 Hosting Dedicado',
             'price' => '100',
             'tax' => '1',
-            'billedAnnually' => '0'
         ]);
+        Service::create([
+            'category' => '2',
+            'description' => 'Plan 1 Hosting Dedicado',
+            'price' => '100',
+            'tax' => '1',
+        ]);
+
     }
 }

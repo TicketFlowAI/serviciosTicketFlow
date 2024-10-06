@@ -14,6 +14,5 @@ class Service extends Model
         'description',
         'price',
         'tax',
-        'billedAnnually'
     ];
 }
