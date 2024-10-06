@@ -3,8 +3,7 @@
 namespace App\Providers;
 
 use App\Interfaces\CompanyRepositoryInterface;
-use App\Interfaces\Interfaces\ServiceRepositoryInterface;
-use App\Interfaces\Interfaces\UserRepositoryInterface;
+use App\Interfaces\ServiceRepositoryInterface;
 use App\Repositories\CompanyRepository;
 use App\Repositories\ServiceRepository;
 use Illuminate\Support\ServiceProvider;

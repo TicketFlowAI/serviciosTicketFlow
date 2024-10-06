@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Repositories;
-use App\Interfaces\Interfaces\ServiceRepositoryInterface;
+use App\Interfaces\ServiceRepositoryInterface;
 use App\Models\Service;
 
 class ServiceRepository implements ServiceRepositoryInterface
