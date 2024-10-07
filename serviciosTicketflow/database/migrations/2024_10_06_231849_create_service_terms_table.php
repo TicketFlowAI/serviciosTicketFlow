@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('term');
             $table->tinyInteger('months');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

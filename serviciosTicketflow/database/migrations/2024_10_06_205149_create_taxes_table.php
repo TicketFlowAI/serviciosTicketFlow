@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('description',length:10)->unique();
             $table->decimal('value');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
