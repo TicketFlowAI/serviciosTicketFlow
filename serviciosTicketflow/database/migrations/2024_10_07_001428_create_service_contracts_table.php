@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('service_contracts', function (Blueprint $table) {
             $table->id();
+            $table->smallInteger('company');
+            $table->smallInteger('service');
+            $table->smallInteger('term');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

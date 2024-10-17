@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name',length:100);
             $table->string('idNumber',length:20)->unique();;
             $table->string('contactEmail',length:100);
-            $table->string('phone',length:15);
+            $table->string('phone');
             $table->string('state',length:50);
             $table->string('city',length:50);
             $table->string('address',length:500);

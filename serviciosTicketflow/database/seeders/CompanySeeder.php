@@ -122,33 +122,6 @@ class CompanySeeder extends Seeder
             'address' => 'N33B Inglaterra E3-263 Y Av. Amazonas, Edif Centro Ejecutivo, piso 6 Oficina 602',
         ]);
         Company::create([
-            'name' => 'CORPORACION PARA LA TRANSPARENCIA FISCAL ECUATORIANA',
-            'idNumber' => '1793189967001',
-            'contactEmail' => 'cotfec@gmail.com',
-            'phone' => '022920092',
-            'state' => 'Pichincha',
-            'city' => 'Quito',
-            'address' => 'Azuay E2-36 y Yugoslavia',
-        ]);
-        Company::create([
-            'name' => 'CORPORACION PARA LA TRANSPARENCIA FISCAL ECUATORIANA',
-            'idNumber' => '1793189967001',
-            'contactEmail' => 'cotfec@gmail.com',
-            'phone' => '022920092',
-            'state' => 'Pichincha',
-            'city' => 'Quito',
-            'address' => 'Azuay E2-36 y Yugoslavia',
-        ]);
-        Company::create([
-            'name' => 'CORPORACION PARA LA TRANSPARENCIA FISCAL ECUATORIANA',
-            'idNumber' => '1793189967001',
-            'contactEmail' => 'cotfec@gmail.com',
-            'phone' => '022920092',
-            'state' => 'Pichincha',
-            'city' => 'Quito',
-            'address' => 'Azuay E2-36 y Yugoslavia',
-        ]);
-        Company::create([
             'name' => 'Corporación Valarezo Noboa',
             'idNumber' => '1791770889001',
             'contactEmail' => 'torresdelcastilloec@gmail.com',

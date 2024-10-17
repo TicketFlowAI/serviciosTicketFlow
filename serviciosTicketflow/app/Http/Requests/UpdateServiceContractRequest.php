@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
 
 class UpdateServiceContractRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class UpdateServiceContractRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +24,21 @@ class UpdateServiceContractRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'company' => 'required|numeric',
+            'service' => 'required|numeric',
+            'term' => 'required|numeric',
         ];
+    }
+
+    /**
+     * Sends an httpException stating what went wrong with the validation.
+     */
+    public function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => 'Validation errors',
+            'data'      => $validator->errors()
+        ]));
     }
 }

@@ -4,11 +4,13 @@ namespace App\Providers;
 
 use App\Interfaces\CompanyRepositoryInterface;
 use App\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\ServiceContractRepositoryInterface;
 use App\Interfaces\ServiceRepositoryInterface;
 use App\Interfaces\ServiceTermRepositoryInterface;
 use App\Interfaces\TaxRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Repositories\CompanyRepository;
+use App\Repositories\ServiceContractRepository;
 use App\Repositories\ServiceRepository;
 use App\Repositories\ServiceTermRepository;
 use App\TaxRepository;
@@ -27,6 +29,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(TaxRepositoryInterface::class,TaxRepository::class);
         $this->app->bind(CategoryRepositoryInterface::class,CategoryRepository::class);
         $this->app->bind(ServiceTermRepositoryInterface::class,ServiceTermRepository::class);
+       $this->app->bind(ServiceContractRepositoryInterface::class,ServiceContractRepository::class);
     }
 
     /**

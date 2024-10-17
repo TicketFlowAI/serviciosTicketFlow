@@ -45,7 +45,7 @@ class ServiceSeeder extends Seeder
         ]);
         Service::create([
             'category' => '2',
-            'description' => 'Plan 1 Hosting Dedicado',
+            'description' => 'Plan 2 Hosting Dedicado',
             'price' => '1800',
             'tax' => '1',
         ]);
