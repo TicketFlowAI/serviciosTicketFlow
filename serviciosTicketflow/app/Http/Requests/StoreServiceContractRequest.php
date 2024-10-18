@@ -26,7 +26,7 @@ class StoreServiceContractRequest extends FormRequest
         return [
             'company_id' => 'required|numeric',
             'service_id' => 'required|numeric',
-            'term_id' => 'required|numeric',
+            'service_term_id' => 'required|numeric',
         ];
     }
 

@@ -12,7 +12,7 @@ class ServiceContract extends Model
     protected $fillable = [
         'company_id',
         'service_id',
-        'term_id'
+        'service_term_id'
     ];
 
 }
