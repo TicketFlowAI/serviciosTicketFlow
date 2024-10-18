@@ -10,9 +10,9 @@ class ServiceContract extends Model
 {
     use HasFactory, SoftDeletes;
     protected $fillable = [
-        'company',
-        'service',
-        'term'
+        'company_id',
+        'service_id',
+        'term_id'
     ];
 
 }

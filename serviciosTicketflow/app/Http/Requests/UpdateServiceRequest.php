@@ -24,10 +24,10 @@ class UpdateServiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category' => 'required|numeric',
+            'category_id' => 'required|numeric',
             'description' => 'required|unique|string',
             'price' => 'required|numeric',
-            'tax' => 'required|numeric',
+            'tax_id' => 'required|numeric',
         ];
     }
 

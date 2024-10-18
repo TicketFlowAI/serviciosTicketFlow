@@ -42,10 +42,10 @@ class ServiceController extends Controller
     public function store(StoreServiceRequest $request)
     {
         $details = [
-            'category' => $request->category,
+            'category_id' => $request->category_id,
             'description' => $request->description,
             'price' => $request->price,
-            'tax' => $request->tax,
+            'tax_id' => $request->tax_id
         ];
         DB::beginTransaction();
         try {
@@ -83,10 +83,10 @@ class ServiceController extends Controller
     public function update(UpdateServiceRequest $request, $id)
     {
         $updateDetails = [
-            'category' => $request->category,
+            'category_id' => $request->category_id,
             'description' => $request->description,
             'price' => $request->price,
-            'tax' => $request->tax,
+            'tax_id' => $request->tax_id
         ];
         DB::beginTransaction();
         try {

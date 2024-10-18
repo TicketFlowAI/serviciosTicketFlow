@@ -24,9 +24,9 @@ class StoreServiceContractRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company' => 'required|numeric',
-            'service' => 'required|numeric',
-            'term' => 'required|numeric',
+            'company_id' => 'required|numeric',
+            'service_id' => 'required|numeric',
+            'term_id' => 'required|numeric',
         ];
     }
 

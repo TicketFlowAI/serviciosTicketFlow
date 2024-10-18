@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->tinyInteger('category')->references('id')->on('categories');
+            $table->tinyInteger('category_id')->references('id')->on('categories');
             $table->string('description',length:150)->unique();
             $table->decimal('price');
-            $table->tinyInteger('tax')->references('id')->on('taxes');
+            $table->tinyInteger('tax_id')->references('id')->on('taxes');
             $table->softDeletes();
             $table->timestamps();
         });

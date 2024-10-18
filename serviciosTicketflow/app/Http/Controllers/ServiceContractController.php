@@ -41,8 +41,9 @@ class ServiceContractController extends Controller
     public function store(StoreServiceContractRequest $request)
     {
         $details =[
-            'name' => $request->name,
-            'details' => $request->details
+            'company_id' => $request->company_id,
+            'service_id' => $request->service_id,
+            'term_id' => $request->service_id
         ];
         DB::beginTransaction();
         try{
@@ -80,9 +81,9 @@ class ServiceContractController extends Controller
     public function update(UpdateServiceContractRequest $request, $id)
     {
         $updateDetails =[
-            'company' => $request->company,
-            'service' => $request->service,
-            'term' => $request->service
+            'company_id' => $request->company_id,
+            'service_id' => $request->service_id,
+            'term_id' => $request->service_id
         ];
         DB::beginTransaction();
         try{
