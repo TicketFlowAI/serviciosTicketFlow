@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('service_contracts', function (Blueprint $table) {
             $table->id();
-            $table->smallInteger('company_id')->references('id')->on('companies');
-            $table->smallInteger('service_id')->references('id')->on('services');
-            $table->smallInteger('term_id')->references('id')->on('service_terms');
+            $table->foreignId('company_id')->constrained();
+            $table->foreignId('service_id')->constrained();
+            $table->foreignId('service_term_id')->constrained();
             $table->softDeletes();
             $table->timestamps();
         });

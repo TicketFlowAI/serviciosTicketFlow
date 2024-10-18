@@ -43,7 +43,7 @@ class ServiceContractController extends Controller
         $details =[
             'company_id' => $request->company_id,
             'service_id' => $request->service_id,
-            'term_id' => $request->service_id
+            'service_term_id' => $request->service_term_id
         ];
         DB::beginTransaction();
         try{
@@ -83,7 +83,7 @@ class ServiceContractController extends Controller
         $updateDetails =[
             'company_id' => $request->company_id,
             'service_id' => $request->service_id,
-            'term_id' => $request->service_id
+            'service_term_id' => $request->service_term_id
         ];
         DB::beginTransaction();
         try{
