@@ -31,6 +31,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ServiceSeeder::class,
         ]);
-
+        $this->call([
+            ServiceTermSeeder::class,
+        ]);
+        $this->call([
+            ServiceContractSeeder::class,
+        ]);
     }
 }

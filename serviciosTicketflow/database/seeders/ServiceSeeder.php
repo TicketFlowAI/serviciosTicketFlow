@@ -14,40 +14,40 @@ class ServiceSeeder extends Seeder
     public function run(): void
     {
         Service::create([
-            'category' => '1',
+            'category_id' => '1',
             'description' => 'Dominio .com ',
             'price' => '60',
-            'tax' => '1',
+            'tax_id' => '1',
         ]);
         Service::create([
-            'category' => '1',
+            'category_id' => '1',
             'description' => 'Dominio .ec/.com.ec',
             'price' => '60',
-            'tax' => '1',
+            'tax_id' => '1',
         ]);
         Service::create([
-            'category' => '2',
+            'category_id' => '2',
             'description' => 'Plan Básico Hosting 5GB',
             'price' => '210',
-            'tax' => '1',
+            'tax_id' => '1',
         ]);
         Service::create([
-            'category' => '2',
+            'category_id' => '2',
             'description' => 'Plan Básico Hosting 10GB',
             'price' => '270',
-            'tax' => '1',
+            'tax_id' => '1',
         ]);
         Service::create([
-            'category' => '2',
+            'category_id' => '2',
             'description' => 'Plan 1 Hosting Dedicado',
             'price' => '1200',
-            'tax' => '1',
+            'tax_id' => '1',
         ]);
         Service::create([
-            'category' => '2',
+            'category_id' => '2',
             'description' => 'Plan 2 Hosting Dedicado',
             'price' => '1800',
-            'tax' => '1',
+            'tax_id' => '1',
         ]);
 
     }
