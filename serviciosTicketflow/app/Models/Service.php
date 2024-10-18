@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -25,5 +26,9 @@ class Service extends Model
     public function tax(): HasOne
     {
         return $this->hasOne(Tax::class);
+    }
+    public function serviceContract(): HasMany
+    {
+        return $this->hasMany(ServiceContract::class);
     }
 }
