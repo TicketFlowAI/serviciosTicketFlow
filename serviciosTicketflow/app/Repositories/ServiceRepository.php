@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 use App\Interfaces\ServiceRepositoryInterface;
+use App\Models\Category;
 use App\Models\Service;
 use App\Models\ServiceTerm;
 use App\Models\Tax;
@@ -24,7 +25,7 @@ class ServiceRepository implements ServiceRepositoryInterface
       $services = Service::all();
       foreach ($services as $service) {
          $service->taxObject = Tax::where('id', $service->tax_id)->first();
-         $service->serviceTermObject = ServiceTerm::where('id', $service->service_term_id)->first();
+         $service->categoryObject = Category::where('id', $service->category_id)->first();
      }
       return $services;
    }
