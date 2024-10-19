@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ServiceContractController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceTermController;
@@ -25,4 +26,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('/serviceTerms',ServiceTermController::class);
     Route::apiResource('/servicecontracts',ServiceContractController::class);
     Route::apiResource('/tickets',TicketController::class);
+    Route::apiResource('/messages',MessageController::class);
 });

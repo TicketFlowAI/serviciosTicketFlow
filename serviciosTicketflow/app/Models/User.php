@@ -61,4 +61,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Ticket::class);
     }
+
+    public function message(): HasMany
+    {
+        return $this->hasMany(Message::class);
+    }
 }
