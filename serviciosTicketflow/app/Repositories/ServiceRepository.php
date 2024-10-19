@@ -3,6 +3,8 @@
 namespace App\Repositories;
 use App\Interfaces\ServiceRepositoryInterface;
 use App\Models\Service;
+use App\Models\ServiceTerm;
+use App\Models\Tax;
 
 class ServiceRepository implements ServiceRepositoryInterface
 {
@@ -19,7 +21,12 @@ class ServiceRepository implements ServiceRepositoryInterface
     */
    public function index()
    {
-      return Service::all();
+      $services = Service::all();
+      foreach ($services as $service) {
+         $service->taxObject = Tax::where('id', $service->tax_id)->first();
+         $service->serviceTermObject = ServiceTerm::where('id', $service->service_term_id)->first();
+     }
+      return $services;
    }
 
    /**
