@@ -6,6 +6,7 @@ use App\Http\Controllers\ServiceContractController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceTermController;
 use App\Http\Controllers\TaxController;
+use App\Http\Controllers\TicketController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,5 +23,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('/taxes',TaxController::class);
     Route::apiResource('/categories',CategoryController::class);
     Route::apiResource('/serviceTerms',ServiceTermController::class);
-    Route::apiResource('/servicecontract',ServiceContractController::class);
+    Route::apiResource('/servicecontracts',ServiceContractController::class);
+    Route::apiResource('/tickets',TicketController::class);
 });
