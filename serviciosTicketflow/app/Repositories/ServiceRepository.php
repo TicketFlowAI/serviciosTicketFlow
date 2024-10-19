@@ -35,6 +35,8 @@ class ServiceRepository implements ServiceRepositoryInterface
     */
    public function getById($id)
    {
+      $id->taxObject = Tax::where('id', $id->tax_id)->first();
+      $id->categoryObject = Category::where('id', $id->category_id)->first();
       return Service::findOrFail($id);
    }
 

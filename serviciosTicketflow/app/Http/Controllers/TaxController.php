@@ -11,7 +11,6 @@ use App\Http\Resources\TaxResource;
 use Illuminate\Support\Facades\DB;
 class TaxController extends Controller
 {
-    
     private TaxRepositoryInterface $taxRepositoryInterface;
     
     public function __construct(TaxRepositoryInterface $taxRepositoryInterface)
