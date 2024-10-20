@@ -26,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
         ]);
-        $middleware->validateCsrfTokens(['/sanctum/csrf-cookie']);
+        $middleware->validateCsrfTokens(['/sanctum/csrf-cookie', '/login']);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
