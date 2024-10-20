@@ -62,7 +62,7 @@ workflows:
   build:
     jobs:
       - buildapp
-  testapp:
+  test:
     jobs:
       - buildapp
       - testapp
