@@ -17,8 +17,10 @@ jobs:
     docker:
       # Specify the version you desire here
       - image: cimg/php:8.2.7
+    parallelism: 4
 
     steps:
+    
       - checkout
       - run:
           name: "Create Environment file and generate app key"
@@ -63,7 +65,7 @@ jobs:
     docker:
       # Specify the version you desire here
       - image: cimg/php:8.2.7
-      
+
     steps:
       - checkout
       - run:
