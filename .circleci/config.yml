@@ -1,4 +1,5 @@
 version: 2.1
+
 workflows:
   build:
     jobs:
@@ -48,8 +49,14 @@ workflows:
               php artisan db:seed
 
   test:
+  
       jobs:
+        working_directory: ~/repo
+        docker:
+        # Specify the version you desire here
+        - image: cimg/php:8.2.7
+        steps:
         # run tests with phpunit
-        - run:
-            name: "Run Tests"
-            command: php artisan test
+          - run:
+              name: "Run Tests"
+              command: php artisan test
