@@ -17,7 +17,7 @@ jobs:
     docker:
       # Specify the version you desire here
       - image: cimg/php:8.2.7
-    parallelism: 4
+
 
     steps:
     
@@ -65,7 +65,7 @@ jobs:
     docker:
       # Specify the version you desire here
       - image: cimg/php:8.2.7
-
+    parallelism: 4
     steps:
       - checkout
       - run:
@@ -109,6 +109,11 @@ jobs:
           # run tests with phpunit
       - run:
           name: "Run Tests"
-          command: php artisan test
+          command: php artisan test --filter ExampleTest
+
+      - run:
+          name: "Run Tests"
+          command: php artisan test --filter LoginTest
+
 
 
