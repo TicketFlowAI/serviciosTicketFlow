@@ -44,10 +44,7 @@ jobs:
           command: |
             touch database/database.sqlite
             php artisan migrate --env=testing
-
-      - run:
-          name: "Generate Passport encryption keys"
-          command: php artisan passport:install
+            php artisan db:seed
 
       # run tests with phpunit
       - run:
