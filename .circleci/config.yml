@@ -1,54 +1,68 @@
 version: 2.1
-workflows:
-  setup:
-    jobs:
-      build:
-        working_directory: ~/repo
-        docker:
-          # Specify the version you desire here
-          - image: cimg/php:8.2.7
+jobs:
+  buildapp:
+    working_directory: ~/repo
+    docker:
+      # Specify the version you desire here
+      - image: cimg/php:8.2.7
 
-        steps:
-          - checkout
-          - run:
-              name: "Create Environment file and generate app key"
-              command: |
-                mv .env.testing .env
+    steps:
+      - checkout
+      - run:
+          name: "Create Environment file and generate app key"
+          command: |
+            mv .env.testing .env
 
-          # Download and cache dependencies
-          - restore_cache:
-              keys:
-                # "composer.lock" can be used if it is committed to the repo
-                - v1-dependencies-{{ checksum "composer.json" }}
-                # fallback to using the latest cache if no exact match is found
-                - v1-dependencies-
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            # "composer.lock" can be used if it is committed to the repo
+            - v1-dependencies-{{ checksum "composer.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
 
-          - run:
-              name: "Install Dependencies"
-              command: composer install -n --prefer-dist
+      - run:
+          name: "Install Dependencies"
+          command: composer install -n --prefer-dist
 
-          - save_cache:
-              key: v1-dependencies-{{ checksum "composer.json" }}
-              paths:
-                - ./vendor
+      - save_cache:
+          key: v1-dependencies-{{ checksum "composer.json" }}
+          paths:
+            - ./vendor
 
-          # prepare the database
-          - run:
-              name: "Generate App key"
-              command: php artisan key:generate
+      # prepare the database
+      - run:
+          name: "Generate App key"
+          command: php artisan key:generate
 
-          - run:
-              name: "Install sqlite"
-              command: sudo apt-get install libsqlite3-dev
+      - run:
+          name: "Install sqlite"
+          command: sudo apt-get install libsqlite3-dev
 
-          - run:
-              name: "Create database and run migration"
-              command: |
-                touch database/database.sqlite
-                php artisan migrate --env=testing
-                php artisan db:seed
+      - run:
+          name: "Create database and run migration"
+          command: |
+            touch database/database.sqlite
+            php artisan migrate --env=testing
+            php artisan db:seed
 
+  testapp:
+    working_directory: ~/repo
+    docker:
+      # Specify the version you desire here
+      - image: cimg/php:8.2.7
+
+    steps:
           # run tests with phpunit
-          - run:
-              name: "Run Tests"
-              command: php artisan test
+      - run:
+          name: "Run Tests"
+          command: php artisan test
+
+workflows:
+  build:
+    jobs:
+      - buildapp
+  testapp:
+    jobs:
+      - buildapp
+      - testapp
