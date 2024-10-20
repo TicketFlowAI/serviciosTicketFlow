@@ -9,8 +9,7 @@ workflows:
       - buildapp
       - testapp:
           requires:
-          - buildapp
-
+            - buildapp
 
 jobs:
   buildapp:
