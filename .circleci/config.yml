@@ -63,13 +63,7 @@ jobs:
     docker:
       # Specify the version you desire here
       - image: cimg/php:8.2.7
-
-    steps:
-    working_directory: ~/repo
-    docker:
-      # Specify the version you desire here
-      - image: cimg/php:8.2.7
-
+      
     steps:
       - checkout
       - run:
