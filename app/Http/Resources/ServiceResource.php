@@ -16,9 +16,12 @@ class ServiceResource extends JsonResource
     {
         return [
             'id' =>$this->id,
+            'category_id' => $this->categoryObject->id,
             'category' => $this->categoryObject->category,
             'description' => $this->description,
             'price' => $this->price,
+            'tax_id' => $this->taxObject->id,
+            'tax_description' => $this->taxObject->description,
         ];
     }
 }
