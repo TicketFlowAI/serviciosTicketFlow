@@ -36,7 +36,11 @@ class ServiceContractRepository implements ServiceContractRepositoryInterface
     */
    public function getById($id)
    {
-      return ServiceContract::findOrFail($id);
+      $object = ServiceContract::findOrFail($id);
+      $object->CompanyObject = Company::where('id', $object->company_id)->first();
+      $object->serviceObject = Service::where('id', $object->service_id)->first();
+      $object->serviceTermObject = ServiceTerm::where('id', $object->service_term_id)->first();
+      return $object;  
    }
 
    /**
