@@ -28,12 +28,6 @@ jobs:
       - image: cimg/php:8.2.7
     steps:
       - checkout
-      - run:
-          name: "Crear archivo de entorno y generar clave de app"
-          command: |
-            mv .env.testing .env
-            php artisan key:generate
-
       # Descargar y cachear dependencias
       - restore_cache:
           keys:
@@ -49,7 +43,6 @@ jobs:
           paths:
             - ./vendor
 
-      # Preparar la base de datos
       - run:
           name: "Instalar SQLite"
           command: sudo apt-get install libsqlite3-dev
@@ -61,7 +54,6 @@ jobs:
             php artisan migrate --env=testing
             php artisan db:seed
 
-      # Persistir el área de trabajo para los trabajos de prueba
       - persist_to_workspace:
           root: ~/repo
           paths:
@@ -86,7 +78,6 @@ jobs:
       - run:
           name: "Ejecutar pruebas (ExampleTest)"
           command: php artisan test --filter ExampleTest --log-junit test_results1.xml
-      # Persistir los resultados de las pruebas
       - persist_to_workspace:
           root: ~/repo
           paths:
@@ -111,7 +102,6 @@ jobs:
       - run:
           name: "Ejecutar pruebas (LoginTest)"
           command: php artisan test --filter LoginTest --log-junit test_results2.xml
-      # Persistir los resultados de las pruebas
       - persist_to_workspace:
           root: ~/repo
           paths:
@@ -148,4 +138,3 @@ jobs:
           name: "Enviar resultados del testapp2 por correo"
           command: |
             echo "Resultados de LoginTest adjuntos." | mail -s "Resultados de LoginTest" -A test_results2.xml dennis.ocana@gmail.com
-
