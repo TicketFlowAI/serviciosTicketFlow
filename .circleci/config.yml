@@ -95,7 +95,7 @@ jobs:
                   "fields": [
                     {
                       "type": "plain_text",
-                      "text": "La aplicacion ServiciosTickeflow a pasado la prueba 1 correctamente."
+                      "text": "La aplicacion ServiciosTickeflow ha pasado la prueba 1 correctamente."
                     }
                   ]
                 }
@@ -104,9 +104,23 @@ jobs:
           event: pass
           channel: ci-messages
       - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "La aplicacion ServiciosTickeflow ha fallado la prueba 1."
+                    }
+                  ]
+                }
+              ]
+            }
+          channel: ci-messages
           event: fail
           mentions: "@Dennis Ocaña"
-          template: basic_fail_1
       - persist_to_workspace:
           root: ~/repo
           paths:
@@ -137,12 +151,40 @@ jobs:
           name: "Ejecutar pruebas (LoginTest)"
           command: php artisan test --filter LoginTest --log-junit test_results2.xml
       - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "La aplicacion ServiciosTickeflow ha pasado la prueba 2 correctamente."
+                    }
+                  ]
+                }
+              ]
+            }
           event: pass
-          template: success_tagged_deploy_1
+          channel: ci-messages
       - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "La aplicacion ServiciosTickeflow ha fallado la prueba 2."
+                    }
+                  ]
+                }
+              ]
+            }
+          channel: ci-messages
           event: fail
           mentions: "@Dennis Ocaña"
-          template: basic_fail_1
       - persist_to_workspace:
           root: ~/repo
           paths:
