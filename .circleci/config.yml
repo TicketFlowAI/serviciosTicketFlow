@@ -6,13 +6,13 @@ workflows:
     jobs:
       - buildapp
 
-# Workflow 2: Test (sin dependencias directas con buildapp en el workflow)
+# Workflow 2: Test
   test_workflow:
     jobs:
       - testapp1
       - testapp2
 
-# Workflow 3: Notify (sin dependencias directas con testapp en el workflow)
+# Workflow 3: Notify
   notify_workflow:
     jobs:
       - send_test_results1
@@ -20,7 +20,7 @@ workflows:
 
 # Jobs
 
-# Job 1: Build app (esto persiste el entorno para los tests)
+# Job 1: Build app
 jobs:
   buildapp:
     working_directory: ~/repo
@@ -76,6 +76,10 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/repo
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "composer.json" }}
+            - v1-dependencies-
       - run:
           name: "Generar clave para testapp1"
           command: php artisan key:generate
@@ -97,6 +101,10 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/repo
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "composer.json" }}
+            - v1-dependencies-
       - run:
           name: "Generar clave para testapp2"
           command: php artisan key:generate
@@ -140,3 +148,4 @@ jobs:
           name: "Enviar resultados del testapp2 por correo"
           command: |
             echo "Resultados de LoginTest adjuntos." | mail -s "Resultados de LoginTest" -A test_results2.xml dennis.ocana@gmail.com
+
