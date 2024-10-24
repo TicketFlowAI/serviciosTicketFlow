@@ -6,29 +6,21 @@ workflows:
     jobs:
       - buildapp
 
-# Workflow 2: Tests
+# Workflow 2: Test (sin dependencias directas con buildapp en el workflow)
   test_workflow:
     jobs:
-      - testapp1:
-          requires:
-            - buildapp
-      - testapp2:
-          requires:
-            - buildapp
+      - testapp1
+      - testapp2
 
-# Workflow 3: Notificaciones
+# Workflow 3: Notify (sin dependencias directas con testapp en el workflow)
   notify_workflow:
     jobs:
-      - send_test_results1:
-          requires:
-            - testapp1
-      - send_test_results2:
-          requires:
-            - testapp2
+      - send_test_results1
+      - send_test_results2
 
 # Jobs
 
-# Job 1: Build app
+# Job 1: Build app (esto persiste el entorno para los tests)
 jobs:
   buildapp:
     working_directory: ~/repo
@@ -75,7 +67,7 @@ jobs:
           paths:
             - .  # Persistir todo el directorio
 
-# Job 2: Test 1
+# Job 2: Test 1 (usa el workspace del build)
   testapp1:
     working_directory: ~/repo
     docker:
@@ -96,7 +88,7 @@ jobs:
           paths:
             - test_results1.xml
 
-# Job 3: Test 2
+# Job 3: Test 2 (también usa el workspace del build)
   testapp2:
     working_directory: ~/repo
     docker:
@@ -148,4 +140,3 @@ jobs:
           name: "Enviar resultados del testapp2 por correo"
           command: |
             echo "Resultados de LoginTest adjuntos." | mail -s "Resultados de LoginTest" -A test_results2.xml dennis.ocana@gmail.com
-
