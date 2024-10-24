@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  slack: circleci/slack@4.10.1
 
 # Workflow 1: Build
 workflows:
@@ -7,7 +9,7 @@ workflows:
       - buildapp
 
 # Workflow 2: Test
-  test_workflow:
+  test_and_notify_workflow:
     jobs:
       - testapp1
       - testapp2
@@ -83,9 +85,14 @@ jobs:
             php artisan key:generate
       - run:
           name: "Ejecutar pruebas (ExampleTest)"
-          command: |
-            php artisan test --filter ExampleTest --log-junit test_results1.xml
-            sudo apt-get -y update && sudo apt-get install -y mailutils
+          command: php artisan test --filter ExampleTest --log-junit test_results1.xml
+      - slack/notify:
+          event: pass
+          template: success_tagged_deploy_1
+      - slack/notify:
+          event: fail
+          mentions: "@Dennis Ocaña"
+          template: basic_fail_1
       - persist_to_workspace:
           root: ~/repo
           paths:
@@ -114,9 +121,14 @@ jobs:
             php artisan key:generate
       - run:
           name: "Ejecutar pruebas (LoginTest)"
-          command: |
-            php artisan test --filter LoginTest --log-junit test_results2.xml
-            sudo apt-get -y update && sudo apt-get install -y mailutils
+          command: php artisan test --filter LoginTest --log-junit test_results2.xml
+      - slack/notify:
+          event: pass
+          template: success_tagged_deploy_1
+      - slack/notify:
+          event: fail
+          mentions: "@Dennis Ocaña"
+          template: basic_fail_1
       - persist_to_workspace:
           root: ~/repo
           paths:
