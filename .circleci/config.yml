@@ -1,18 +1,30 @@
 version: 2.1
 
 workflows:
-  build_and_test_and_notify:
+  build_and_test1:
     jobs:
       - buildapp
       - testapp1:
           requires:
             - buildapp
+
+  build_and_test2:
+    jobs:
+      - buildapp
       - testapp2:
           requires:
             - buildapp
-      - send_test_results:
+
+  notify_test_results1:
+    jobs:
+      - send_test_results1:
           requires:
             - testapp1
+
+  notify_test_results2:
+    jobs:
+      - send_test_results2:
+          requires:
             - testapp2
 
 jobs:
@@ -26,6 +38,7 @@ jobs:
           name: "Create Environment file and generate app key"
           command: |
             mv .env.testing .env
+            php artisan key:generate  # Generar clave de aplicación
 
       # Descargar y cachear dependencias
       - restore_cache:
@@ -43,10 +56,6 @@ jobs:
             - ./vendor
 
       # Preparar la base de datos
-      - run:
-          name: "Generar la clave de la aplicación"
-          command: php artisan key:generate
-
       - run:
           name: "Instalar SQLite"
           command: sudo apt-get install libsqlite3-dev
@@ -73,6 +82,9 @@ jobs:
       - attach_workspace:
           at: ~/repo
       - run:
+          name: "Generar clave para testapp1"
+          command: php artisan key:generate  # Generar clave de nuevo en el entorno de pruebas
+      - run:
           name: "Ejecutar pruebas (ExampleTest)"
           command: php artisan test --filter ExampleTest --log-junit test_results1.xml
       # Persistir los resultados de las pruebas
@@ -90,6 +102,9 @@ jobs:
       - attach_workspace:
           at: ~/repo
       - run:
+          name: "Generar clave para testapp2"
+          command: php artisan key:generate  # Generar clave de nuevo en el entorno de pruebas
+      - run:
           name: "Ejecutar pruebas (LoginTest)"
           command: php artisan test --filter LoginTest --log-junit test_results2.xml
       # Persistir los resultados de las pruebas
@@ -98,7 +113,7 @@ jobs:
           paths:
             - test_results2.xml
 
-  send_test_results:
+  send_test_results1:
     working_directory: ~/repo
     docker:
       - image: cimg/php:8.2.7
@@ -114,9 +129,21 @@ jobs:
           command: |
             echo "Resultados de ExampleTest adjuntos." | mail -s "Resultados de ExampleTest" -A test_results1.xml dennis.ocana@gmail.com
 
+  send_test_results2:
+    working_directory: ~/repo
+    docker:
+      - image: cimg/php:8.2.7
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: "Instalar mailutils"
+          command: sudo apt-get install -y mailutils
+      
       - run:
           name: "Enviar resultados del testapp2 por correo"
           command: |
             echo "Resultados de LoginTest adjuntos." | mail -s "Resultados de LoginTest" -A test_results2.xml dennis.ocana@gmail.com
+
 
 
