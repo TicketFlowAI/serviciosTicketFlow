@@ -79,7 +79,8 @@ jobs:
             cp .env.testing .env
             touch database/database.sqlite
             php artisan migrate:fresh --env=testing
-            php artisan db:seed --forcephp artisan key:generate
+            php artisan db:seed --force
+            php artisan key:generate
       - run:
           name: "Ejecutar pruebas (ExampleTest)"
           command: php artisan test --filter ExampleTest --log-junit test_results1.xml
@@ -107,7 +108,8 @@ jobs:
             cp .env.testing .env
             touch database/database.sqlite
             php artisan migrate:fresh --env=testing
-            php artisan db:seed --forcephp artisan key:generate
+            php artisan db:seed --force
+            php artisan key:generate
       - run:
           name: "Ejecutar pruebas (LoginTest)"
           command: php artisan test --filter LoginTest --log-junit test_results2.xml
