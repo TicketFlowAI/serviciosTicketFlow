@@ -133,7 +133,7 @@ jobs:
           at: ~/repo
       - run:
           name: "Instalar mailutils"
-          command: sudo apt-get install -y mailutils
+          command: sudo add-apt-repository universe && apt-get -y update && sudo apt-get install -y mailutils
       - run:
           name: "Enviar resultados del testapp2 por correo"
           command: |
