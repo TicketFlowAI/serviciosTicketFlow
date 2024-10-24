@@ -1,15 +1,14 @@
 version: 2.1
 
+# Workflow 1: Build
 workflows:
-  # Workflow 1: Solo build
   build_workflow:
     jobs:
       - buildapp
 
-  # Workflow 2: Tests en paralelo
+# Workflow 2: Tests
   test_workflow:
     jobs:
-      - buildapp
       - testapp1:
           requires:
             - buildapp
@@ -17,7 +16,7 @@ workflows:
           requires:
             - buildapp
 
-  # Workflow 3: Enviar resultados por correo después de los tests
+# Workflow 3: Notificaciones
   notify_workflow:
     jobs:
       - send_test_results1:
@@ -27,8 +26,10 @@ workflows:
           requires:
             - testapp2
 
+# Jobs
+
+# Job 1: Build app
 jobs:
-  # Job de Build
   buildapp:
     working_directory: ~/repo
     docker:
@@ -74,7 +75,7 @@ jobs:
           paths:
             - .  # Persistir todo el directorio
 
-  # Job de Prueba 1
+# Job 2: Test 1
   testapp1:
     working_directory: ~/repo
     docker:
@@ -95,7 +96,7 @@ jobs:
           paths:
             - test_results1.xml
 
-  # Job de Prueba 2
+# Job 3: Test 2
   testapp2:
     working_directory: ~/repo
     docker:
@@ -116,7 +117,7 @@ jobs:
           paths:
             - test_results2.xml
 
-  # Job de envío de resultados de testapp1 por correo
+# Job 4: Enviar resultados testapp1 por correo
   send_test_results1:
     working_directory: ~/repo
     docker:
@@ -127,13 +128,12 @@ jobs:
       - run:
           name: "Instalar mailutils"
           command: sudo apt-get install -y mailutils
-      
       - run:
           name: "Enviar resultados del testapp1 por correo"
           command: |
             echo "Resultados de ExampleTest adjuntos." | mail -s "Resultados de ExampleTest" -A test_results1.xml dennis.ocana@gmail.com
 
-  # Job de envío de resultados de testapp2 por correo
+# Job 5: Enviar resultados testapp2 por correo
   send_test_results2:
     working_directory: ~/repo
     docker:
@@ -144,8 +144,8 @@ jobs:
       - run:
           name: "Instalar mailutils"
           command: sudo apt-get install -y mailutils
-      
       - run:
           name: "Enviar resultados del testapp2 por correo"
           command: |
             echo "Resultados de LoginTest adjuntos." | mail -s "Resultados de LoginTest" -A test_results2.xml dennis.ocana@gmail.com
+
