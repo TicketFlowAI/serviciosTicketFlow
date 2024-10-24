@@ -50,9 +50,10 @@ jobs:
       - run:
           name: "Crear base de datos y ejecutar migraciones"
           command: |
+            cp .env.testing .env
             touch database/database.sqlite
             php artisan migrate --env=testing
-            php artisan db:seed
+            php artisan db:seed --force
 
       - persist_to_workspace:
           root: ~/repo
