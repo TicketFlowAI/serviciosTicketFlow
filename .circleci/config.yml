@@ -87,7 +87,6 @@ jobs:
           name: "Ejecutar pruebas (ExampleTest)"
           command: php artisan test --filter ExampleTest --log-junit test_results1.xml
       - slack/notify:
-      - slack/notify:
           custom: |
             {
               "blocks": [
