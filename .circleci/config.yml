@@ -52,7 +52,7 @@ jobs:
           command: |
             cp .env.testing .env
             touch database/database.sqlite
-            php artisan migrate --env=testing
+            php artisan migrate:fresh --env=testing
             php artisan db:seed --force
 
       - persist_to_workspace:
@@ -75,7 +75,11 @@ jobs:
             - v1-dependencies-
       - run:
           name: "Generar clave para testapp1"
-          command: php artisan key:generate
+          command: |
+            cp .env.testing .env
+            touch database/database.sqlite
+            php artisan migrate:fresh --env=testing
+            php artisan db:seed --forcephp artisan key:generate
       - run:
           name: "Ejecutar pruebas (ExampleTest)"
           command: php artisan test --filter ExampleTest --log-junit test_results1.xml
@@ -99,7 +103,11 @@ jobs:
             - v1-dependencies-
       - run:
           name: "Generar clave para testapp2"
-          command: php artisan key:generate
+          command: |
+            cp .env.testing .env
+            touch database/database.sqlite
+            php artisan migrate:fresh --env=testing
+            php artisan db:seed --forcephp artisan key:generate
       - run:
           name: "Ejecutar pruebas (LoginTest)"
           command: php artisan test --filter LoginTest --log-junit test_results2.xml
@@ -118,7 +126,7 @@ jobs:
           at: ~/repo
       - run:
           name: "Instalar mailutils"
-          command:  apt-get -y update && sudo apt-get install -y mailutils
+          command:  sudo apt-get -y update && sudo apt-get install -y mailutils
       - run:
           name: "Enviar resultados del testapp1 por correo"
           command: |
@@ -134,7 +142,7 @@ jobs:
           at: ~/repo
       - run:
           name: "Instalar mailutils"
-          command: apt-get -y update && sudo apt-get install -y mailutils
+          command: sudo apt-get -y update && sudo apt-get install -y mailutils
       - run:
           name: "Enviar resultados del testapp2 por correo"
           command: |
