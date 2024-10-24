@@ -87,8 +87,24 @@ jobs:
           name: "Ejecutar pruebas (ExampleTest)"
           command: php artisan test --filter ExampleTest --log-junit test_results1.xml
       - slack/notify:
+      - slack/notify:
+            custom: |
+              {
+                "blocks": [
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "plain_text",
+                        "text": "La aplicacion ServiciosTickeflow a pasado la prueba 1 correctamente."
+                      }
+                    ]
+                  }
+                ]
+              }
+            event: pass
+            channel: ci-messages
           event: pass
-          template: success_tagged_deploy_1
       - slack/notify:
           event: fail
           mentions: "@Dennis Ocaña"
