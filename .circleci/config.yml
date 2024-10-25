@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  slack: circleci/slack@4.10.1
 
 # Workflow 1: Build
 workflows:
@@ -7,16 +9,16 @@ workflows:
       - buildapp
 
 # Workflow 2: Test
-  test_workflow:
+  test_and_notify_workflow:
     jobs:
       - testapp1
       - testapp2
 
 # Workflow 3: Notify
-  notify_workflow:
-    jobs:
-      - send_test_results1
-      - send_test_results2
+#  notify_workflow:
+#    jobs:
+#      - send_test_results1
+#      - send_test_results2
 
 # Jobs
 
@@ -84,6 +86,41 @@ jobs:
       - run:
           name: "Ejecutar pruebas (ExampleTest)"
           command: php artisan test --filter ExampleTest --log-junit test_results1.xml
+      - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "La aplicacion ServiciosTickeflow ha pasado la prueba 1 correctamente."
+                    }
+                  ]
+                }
+              ]
+            }
+          event: pass
+          channel: ci-messages
+      - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "La aplicacion ServiciosTickeflow ha fallado la prueba 1."
+                    }
+                  ]
+                }
+              ]
+            }
+          channel: ci-messages
+          event: fail
+          mentions: "@Dennis Ocaña"
       - persist_to_workspace:
           root: ~/repo
           paths:
@@ -113,39 +150,74 @@ jobs:
       - run:
           name: "Ejecutar pruebas (LoginTest)"
           command: php artisan test --filter LoginTest --log-junit test_results2.xml
+      - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "La aplicacion ServiciosTickeflow ha pasado la prueba 2 correctamente."
+                    }
+                  ]
+                }
+              ]
+            }
+          event: pass
+          channel: ci-messages
+      - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "La aplicacion ServiciosTickeflow ha fallado la prueba 2."
+                    }
+                  ]
+                }
+              ]
+            }
+          channel: ci-messages
+          event: fail
+          mentions: "@Dennis Ocaña"
       - persist_to_workspace:
           root: ~/repo
           paths:
             - test_results2.xml
 
 # Job 4: Enviar resultados testapp1 por correo
-  send_test_results1:
-    working_directory: ~/repo
-    docker:
-      - image: cimg/php:8.2.7
-    steps:
-      - attach_workspace:
-          at: ~/repo
-      - run:
-          name: "Instalar mailutils"
-          command:  sudo apt-get -y update && sudo apt-get install -y mailutils
-      - run:
-          name: "Enviar resultados del testapp1 por correo"
-          command: |
-            echo "Resultados de ExampleTest adjuntos." | mail -s "Resultados de ExampleTest" -A test_results1.xml dennis.ocana@gmail.com
+#  send_test_results1:
+#    working_directory: ~/repo
+#    docker:
+#      - image: cimg/php:8.2.7
+#    steps:
+#      - attach_workspace:
+#          at: ~/repo
+#      - run:
+#          name: "Instalar mailutils"
+#          command:  
+#      - run:
+#          name: "Enviar resultados del testapp1 por correo"
+#          command: |
+#            echo "Resultados de ExampleTest adjuntos." | mail -s "Resultados de ExampleTest" -A test_results1.xml dennis.ocana@gmail.com
 
 # Job 5: Enviar resultados testapp2 por correo
-  send_test_results2:
-    working_directory: ~/repo
-    docker:
-      - image: cimg/php:8.2.7
-    steps:
-      - attach_workspace:
-          at: ~/repo
-      - run:
-          name: "Instalar mailutils"
-          command: sudo apt-get -y update && sudo apt-get install -y mailutils
-      - run:
-          name: "Enviar resultados del testapp2 por correo"
-          command: |
-            echo "Resultados de LoginTest adjuntos." | mail -s "Resultados de LoginTest" -A test_results2.xml dennis.ocana@gmail.com
+#  send_test_results2:
+#    working_directory: ~/repo
+#    docker:
+#      - image: cimg/php:8.2.7
+#    steps:
+#      - attach_workspace:
+#          at: ~/repo
+#      - run:
+#          name: "Instalar mailutils"
+#          command: sudo apt-get -y update && sudo apt-get install -y mailutils
+#      - run:
+#          name: "Enviar resultados del testapp2 por correo"
+#          command: |
+#            echo "Resultados de LoginTest adjuntos." | mail -s "Resultados de LoginTest" -A test_results2.xml dennis.ocana@gmail.com
