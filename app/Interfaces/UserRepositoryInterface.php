@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-interface TaxRepositoryInterface
+interface UserRepositoryInterface
 {
     public function index();
     public function getById($id);

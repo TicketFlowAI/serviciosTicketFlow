@@ -5,8 +5,10 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\Rules\Password;
 
-class UpdateTicketRequest extends FormRequest
+
+class StoreUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,12 +26,15 @@ class UpdateTicketRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'service_contract_id' => 'required|numeric',
-            'title' => 'required|string',
-            'priority' => 'required|numeric|between:1,5',
-            'needsHumanInteraction' => 'required|boolean',
-            'complexity' => 'required|numeric|between:1,3',
-            'user_id' => 'required|numeric',
+            'mame' => 'required|string',
+            'lastNnme' => 'required|string',
+            'email' => 'required|email',
+            'password' => ['required', Password::min(8)
+            ->letters()
+            ->mixedCase()
+            ->numbers()
+            ->symbols()
+            ->uncompromised()]
         ];
     }
 

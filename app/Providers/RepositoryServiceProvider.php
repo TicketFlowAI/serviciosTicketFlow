@@ -10,14 +10,16 @@ use App\Interfaces\ServiceRepositoryInterface;
 use App\Interfaces\ServiceTermRepositoryInterface;
 use App\Interfaces\TaxRepositoryInterface;
 use App\Interfaces\TicketRepositoryInterface;
+use App\Interfaces\UserRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Repositories\CompanyRepository;
 use App\Repositories\MessageRepository;
 use App\Repositories\ServiceContractRepository;
 use App\Repositories\ServiceRepository;
 use App\Repositories\ServiceTermRepository;
+use App\Repositories\TaxRepository;
 use App\Repositories\TicketRepository;
-use App\TaxRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
 
@@ -36,6 +38,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ServiceContractRepositoryInterface::class,ServiceContractRepository::class);
         $this->app->bind(TicketRepositoryInterface::class,TicketRepository::class);
         $this->app->bind(MessageRepositoryInterface::class,MessageRepository::class);
+        $this->app->bind(UserRepositoryInterface::class,UserRepository::class);
     }
 
     /**

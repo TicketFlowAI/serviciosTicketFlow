@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Repositories;
-use App\Interfaces\TaxRepositoryInterface;
-use App\Models\Tax;
 
-class TaxRepository implements TaxRepositoryInterface
+use App\Models\Company;
+use App\Models\User;
+
+class UserRepository
 {
     /**
      * Create a new class instance.
@@ -19,7 +20,12 @@ class TaxRepository implements TaxRepositoryInterface
      */
     public function index()
     {
-        return Tax::all();
+        $users = User::all();
+        foreach ($users as $user) {
+            $user->companyObject = Company::where('id', $user->company_id)->first();
+            $user->role = $user->getRoleNames();
+        }
+        return $users;
     }
 
     /**
@@ -27,7 +33,7 @@ class TaxRepository implements TaxRepositoryInterface
      */
     public function getById($id)
     {
-        return Tax::findOrFail($id);
+        return User::findOrFail($id);
     }
 
     /**
@@ -35,7 +41,7 @@ class TaxRepository implements TaxRepositoryInterface
      */
     public function store(array $data)
     {
-        return Tax::create($data);
+        return User::create($data);
     }
 
     /**
@@ -43,7 +49,7 @@ class TaxRepository implements TaxRepositoryInterface
      */
     public function update(array $data, $id)
     {
-        return Tax::whereId($id)->update($data);
+        return User::whereId($id)->update($data);
     }
 
     /**
@@ -51,6 +57,6 @@ class TaxRepository implements TaxRepositoryInterface
      */
     public function delete($id)
     {
-        Tax::destroy($id);
+        User::destroy($id);
     }
 }
