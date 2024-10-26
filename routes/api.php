@@ -8,14 +8,9 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceTermController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-//Route::group(['middleware' => ['role:manager']], function () { ... });
-
 
 Route::middleware(['auth:sanctum'])->group(function () {
     // Protected with sanctum API routes
@@ -27,4 +22,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('/servicecontracts',ServiceContractController::class);
     Route::apiResource('/tickets',TicketController::class);
     Route::apiResource('/messages',MessageController::class);
+    Route::apiResource('/users',UserController::class);
 });
