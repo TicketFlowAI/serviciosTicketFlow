@@ -15,27 +15,15 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RoleAndPermissionSeeder::class,
-        ]);
-        $this->call([
             CompanySeeder::class,
-        ]);
-        $this->call([
             UserSeeder::class,
-        ]);
-        $this->call([
             CategorySeeder::class,
-        ]);
-        $this->call([
             TaxSeeder::class,
-        ]);
-        $this->call([
             ServiceSeeder::class,
-        ]);
-        $this->call([
             ServiceTermSeeder::class,
-        ]);
-        $this->call([
             ServiceContractSeeder::class,
+            ServiceContractSeeder::class,
+            TicketSeeder::class,
         ]);
     }
 }

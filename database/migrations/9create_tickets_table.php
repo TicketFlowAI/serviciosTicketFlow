@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->tinyInteger('priority');
             $table->boolean('needsHumanInteraction');
-            $table->tinyInteger('complaxity');
+            $table->tinyInteger('complexity');
             $table->foreignId('user_id')->constrained();
             $table->softDeletes();
             $table->timestamps();
