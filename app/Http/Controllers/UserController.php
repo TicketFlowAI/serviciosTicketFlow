@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\User;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
@@ -9,6 +10,7 @@ use App\Interfaces\UserRepositoryInterface;
 use App\Classes\ApiResponseClass;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 class UserController extends Controller
 {
     
@@ -107,8 +109,17 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-         $this->userRepositoryInterface->delete($id);
+        $this->userRepositoryInterface->delete($id);
 
         return ApiResponseClass::sendResponse('User Delete Successful','',204);
+    }
+
+    public function getAuthenticatedUser(Request $request)
+    {
+        $user = $this->userRepositoryInterface->getAuthenticatedUser($request);
+        $user->companyId = Company::where('id', $user->company_id)->first()->id;
+        $user->companyName = Company::where('id', $user->company_id)->first()->name;
+        $user->role = $user->getRoleNames();
+        return ApiResponseClass::sendResponse(new UserResource($user),'',200);
     }
 }

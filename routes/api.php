@@ -9,8 +9,14 @@ use App\Http\Controllers\ServiceTermController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
+use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+// Route::get('/user', function (Request $request, UserController $userController) {
+//     $user = $request->user(); // Get the authenticated user
+//     return response()->json($userController->getAuthenticatedUser($user));
+// })->middleware('auth:sanctum');
 
 Route::middleware(['auth:sanctum'])->group(function () {
     // Protected with sanctum API routes
@@ -23,4 +29,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('/tickets',TicketController::class);
     Route::apiResource('/messages',MessageController::class);
     Route::apiResource('/users',UserController::class);
+    Route::get('/user', [UserController::class, 'getAuthenticatedUser']);
 });

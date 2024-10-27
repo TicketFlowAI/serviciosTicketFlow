@@ -2,10 +2,11 @@
 
 namespace App\Repositories;
 
+use App\Interfaces\UserRepositoryInterface;
 use App\Models\Company;
 use App\Models\User;
 
-class UserRepository
+class UserRepository implements UserRepositoryInterface
 {
     /**
      * Create a new class instance.
@@ -58,5 +59,16 @@ class UserRepository
     public function delete($id)
     {
         User::destroy($id);
+    }
+
+    /**
+     * Brings the current user.
+     */
+    public function getAuthenticatedUser($request)
+    {
+        $user = $request->user();
+        $user->companyObject = Company::where('id', $user->company_id)->first();
+        $user->role = $user->getRoleNames();
+        return $user;
     }
 }
