@@ -27,6 +27,7 @@ class ServiceContractRepository implements ServiceContractRepositoryInterface
          $serviceContract->CompanyObject = Company::where('id', $serviceContract->company_id)->first();
          $serviceContract->serviceObject = Service::where('id', $serviceContract->service_id)->first();
          $serviceContract->serviceTermObject = ServiceTerm::where('id', $serviceContract->service_term_id)->first();
+         $serviceContract->price = $serviceContract->serviceObject->price / $serviceContract->serviceTermObject->months;
       }
       return ServiceContract::all();
    }
@@ -36,7 +37,12 @@ class ServiceContractRepository implements ServiceContractRepositoryInterface
     */
    public function getById($id)
    {
-      return ServiceContract::findOrFail($id);
+      $object = ServiceContract::findOrFail($id);
+      $object->CompanyObject = Company::where('id', $object->company_id)->first();
+      $object->serviceObject = Service::where('id', $object->service_id)->first();
+      $object->serviceTermObject = ServiceTerm::where('id', $object->service_term_id)->first();
+      $object->price = $object->serviceObject->price / $object->serviceTermObject->months;
+      return $object;  
    }
 
    /**
