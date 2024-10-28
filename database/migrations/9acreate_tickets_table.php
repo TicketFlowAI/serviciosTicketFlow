@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_contract__id')->constrained();
+            $table->foreignId('service_contract_id')->constrained();
             $table->string('title');
             $table->tinyInteger('priority');
             $table->boolean('needsHumanInteraction');

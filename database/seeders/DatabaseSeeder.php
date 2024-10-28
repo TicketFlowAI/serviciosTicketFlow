@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             ServiceContractSeeder::class,
             ServiceContractSeeder::class,
             TicketSeeder::class,
+            MessageSeeder::class,
         ]);
     }
 }
