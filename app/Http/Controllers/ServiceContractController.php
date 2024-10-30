@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
+use App\Models\Service;
 use App\Models\ServiceContract;
 use App\Http\Requests\StoreServiceContractRequest;
 use App\Http\Requests\UpdateServiceContractRequest;
 use App\Interfaces\ServiceContractRepositoryInterface;
 use App\Classes\ApiResponseClass;
 use App\Http\Resources\ServiceContractResource;
+use App\Models\ServiceTerm;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 class ServiceContractController extends Controller
@@ -24,7 +27,11 @@ class ServiceContractController extends Controller
     public function index()
     {
         $data = $this->serviceContractRepositoryInterface->index();
-
+        $data->load('company:id,name','service:id,description,price','service_term:id,months,term');
+        foreach ($data as $serviceContract) {
+            $serviceContract->price = $serviceContract->service->price / $serviceContract->service_term->months;
+        }
+        //dd($data);
         return ApiResponseClass::sendResponse(ServiceContractResource::collection($data),'',200);
     }
 
@@ -64,6 +71,7 @@ class ServiceContractController extends Controller
     public function show($id)
     {
         $serviceContract = $this->serviceContractRepositoryInterface->getById($id);
+        $serviceContract->load('company:id,name','service:id,description','service_term:id,months,term');
 
         return ApiResponseClass::sendResponse(new ServiceContractResource($serviceContract),'',200);
     }
@@ -110,11 +118,9 @@ class ServiceContractController extends Controller
 
     public function getContractsByCompany($id)
     {
-        $serviceContracts = ServiceContract::with(['company:id,name' => function (Builder $query) use($id)  {
-            $query->where('company_id', 'like', $id);
-        }])->get();
+        $data = $this->serviceContractRepositoryInterface->getContractsByCompany($id);
+        
 
-        return ApiResponseClass::sendResponse(ServiceContractResource::collection($serviceContracts),'',200);
+        return ApiResponseClass::sendResponse(ServiceContractResource::collection($data),'',200);
     }
-    
 }

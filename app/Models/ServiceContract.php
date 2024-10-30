@@ -26,9 +26,9 @@ class ServiceContract extends Model
     {
         return $this->belongsTo(Service::class);
     }
-    public function service_term(): HasOne
+    public function service_term(): BelongsTo
     {
-        return $this->hasOne(ServiceTerm::class);
+        return $this->belongsTo(ServiceTerm::class);
     }
     public function ticket(): HasMany
     {
