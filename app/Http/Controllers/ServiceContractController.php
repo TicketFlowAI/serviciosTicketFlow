@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateServiceContractRequest;
 use App\Interfaces\ServiceContractRepositoryInterface;
 use App\Classes\ApiResponseClass;
 use App\Http\Resources\ServiceContractResource;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 class ServiceContractController extends Controller
 {
@@ -106,4 +107,15 @@ class ServiceContractController extends Controller
 
         return ApiResponseClass::sendResponse('ServiceContract Delete Successful','',204);
     }
+
+    public function getContractsByCompany($id)
+    {
+        $serviceContracts = ServiceContract::with(['company:id,name'])->get();
+        $users = ServiceContract::with(['company:id,name' => function (Builder $query) use($id)  {
+            $query->where('company_id', 'like', $id);
+        }])->get();
+
+        return ApiResponseClass::sendResponse(ServiceContractResource::collection($data),'',200);
+    }
+    
 }
