@@ -24,7 +24,7 @@ class StoreTaxRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'description' => 'required|string|unique',
+            'description' => 'required|string|unique:taxes',
             'value' => 'required|numeric'
         ];
     }

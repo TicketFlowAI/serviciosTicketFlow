@@ -24,7 +24,7 @@ class UpdateCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category' => 'required|string|unique',
+            'category' => 'required|string|unique:categories',
         ];
     }
 

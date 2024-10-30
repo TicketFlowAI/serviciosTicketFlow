@@ -25,7 +25,7 @@ class UpdateServiceRequest extends FormRequest
     {
         return [
             'category_id' => 'required|numeric',
-            'description' => 'required|unique|string',
+            'description' => 'required|unique:services|string',
             'price' => 'required|numeric',
             'tax_id' => 'required|numeric',
         ];

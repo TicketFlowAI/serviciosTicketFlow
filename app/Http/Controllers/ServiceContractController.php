@@ -110,12 +110,11 @@ class ServiceContractController extends Controller
 
     public function getContractsByCompany($id)
     {
-        $serviceContracts = ServiceContract::with(['company:id,name'])->get();
-        $users = ServiceContract::with(['company:id,name' => function (Builder $query) use($id)  {
+        $serviceContracts = ServiceContract::with(['company:id,name' => function (Builder $query) use($id)  {
             $query->where('company_id', 'like', $id);
         }])->get();
 
-        return ApiResponseClass::sendResponse(ServiceContractResource::collection($data),'',200);
+        return ApiResponseClass::sendResponse(ServiceContractResource::collection($serviceContracts),'',200);
     }
     
 }

@@ -24,7 +24,7 @@ class UpdateServiceTermRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'term' => 'required|string|unique',
+            'term' => 'required|string|unique:service_terms',
             'months' => 'required|numeric'
         ];
     }

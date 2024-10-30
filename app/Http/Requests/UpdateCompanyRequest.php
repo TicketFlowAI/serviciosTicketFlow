@@ -25,7 +25,7 @@ class UpdateCompanyRequest extends FormRequest
     {
         return [
             'name'=> 'required|string',
-            'idNumber'=> 'required|numeric|unique',
+            'idNumber'=> 'required|numeric|unique:companies',
             'contactEmail'=> 'required|email',
             'phone'=> 'required',
             'state'=> 'required|string',
