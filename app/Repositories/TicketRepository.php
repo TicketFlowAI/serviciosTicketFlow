@@ -23,14 +23,7 @@ class TicketRepository implements TicketRepositoryInterface
      */
     public function index()
     {
-        $tickets = Ticket::all();
-        foreach ($tickets as $ticket) {
-         $ticket->serviceContractObject = ServiceContract::where('id', $ticket->service_contract_id)->first();
-         $ticket->serviceObject = Service::where('id', $ticket->serviceContractObject->service_id)->first();
-         $ticket->companyObject = Company::where('id', $ticket->serviceContractObject->company_id)->first();
-         $ticket->userObject = User::where('id', $ticket->user_id)->first();
-        }
-        return $tickets;
+        return Ticket::all();
     }
 
     /**

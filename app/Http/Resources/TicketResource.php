@@ -17,17 +17,17 @@ class TicketResource extends JsonResource
         return [
             'id' =>$this->id,
             'service_contract_id' => $this->service_contract_id,
-            'service_desc' => $this->serviceObject->description,
-            'service_id' => $this->serviceObject->id,
-            'company_id'=> $this->companyObject->id,
-            'company_name'=> $this->companyObject->name,
+            'service_id' => $this->service->id,
+            'service_desc' => $this->service->description,
+            'company_id'=> $this->service_contract->company_id,
+            'company_name'=> $this->company->name,
             'title' => $this->title,
             'priority' => $this->priority,
-            'needsHumanInteraction' => $this->nedsHumanInteraction,
+            'needsHumanInteraction' => $this->needsHumanInteraction,
             'complexity' => $this->complexity,
             'user_id' => $this->user_id,
-            'user_name' => $this->userObject->name,
-            'user_lastname' => $this->userObject->lastname
+            'user_name' => $this->user->name,
+            'user_lastname' => $this->user->lastname
         ];
     }
 }

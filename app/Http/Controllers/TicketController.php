@@ -7,6 +7,8 @@ use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
 use App\Http\Resources\TicketResource;
 use App\Interfaces\TicketRepositoryInterface;
+use App\Models\Company;
+use App\Models\Service;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\DB;
 
@@ -24,7 +26,12 @@ class TicketController extends Controller
     public function index()
     {
         $data = $this->ticketRepositoryInterface->index();
-
+        $data->load('user:id,name,lastname','service_contract:id,company_id,service_id');
+        foreach ($data as $ticket) {
+            $ticket->company = Company::where('id', $ticket->service_contract->company_id)->first();
+            $ticket->service = Service::where('id', $ticket->service_contract->service_id)->first();
+        }
+        
         return ApiResponseClass::sendResponse(TicketResource::collection($data),'',200);
     }
 
@@ -66,9 +73,14 @@ class TicketController extends Controller
      */
     public function show($id)
     {
-        $ticket = $this->ticketRepositoryInterface->getById($id);
+        $data = $this->ticketRepositoryInterface->getById($id);
+        $data->load('user:id,name,lastname','service_contract:id,company_id,service_id');
+        foreach ($data as $ticket) {
+            $ticket->company = Company::where('id', $ticket->service_contract->company_id)->first();
+            $ticket->service = Service::where('id', $ticket->service_contract->service_id)->first();
+        }
 
-        return ApiResponseClass::sendResponse(new TicketResource($ticket),'',200);
+        return ApiResponseClass::sendResponse(new TicketResource($data),'',200);
     }
 
     /**
