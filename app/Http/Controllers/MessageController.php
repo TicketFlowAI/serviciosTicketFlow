@@ -17,13 +17,16 @@ class MessageController extends Controller
     public function __construct(MessageRepositoryInterface $messageRepositoryInterface)
     {
         $this->messageRepositoryInterface = $messageRepositoryInterface;
+        
     }
     /**
-     * Display a listing of the resource.
+     * Display a list of messages for a specific ticket.
      */
-    public function index()
+    public function index($id)
     {
-        $data = $this->messageRepositoryInterface->index();
+        
+        $data = $this->messageRepositoryInterface->index($id);
+        $data->load('user:id,name,lastname');
 
         return ApiResponseClass::sendResponse(MessageResource::collection($data),'',200);
     }
@@ -58,51 +61,41 @@ class MessageController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show($id)
-    {
-        $message = $this->messageRepositoryInterface->getById($id);
-
-        return ApiResponseClass::sendResponse(new MessageResource($message),'',200);
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Message $message)
-    {
-        //
-    }
+    // public function edit(Message $message)
+    // {
+    //     //
+    // }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateMessageRequest $request, $id)
-    {
-        $updateDetails =[
-            'description' => $request->description,
-            'value' => $request->value
-        ];
-        DB::beginTransaction();
-        try{
-             $message = $this->messageRepositoryInterface->update($updateDetails,$id);
+    // public function update(UpdateMessageRequest $request, $id)
+    // {
+    //     $updateDetails =[
+    //         'description' => $request->description,
+    //         'value' => $request->value
+    //     ];
+    //     DB::beginTransaction();
+    //     try{
+    //          $message = $this->messageRepositoryInterface->update($updateDetails,$id);
 
-             DB::commit();
-             return ApiResponseClass::sendResponse('Message Update Successful','',201);
+    //          DB::commit();
+    //          return ApiResponseClass::sendResponse('Message Update Successful','',201);
 
-        }catch(\Exception $ex){
-            return ApiResponseClass::rollback($ex);
-        }
-    }
+    //     }catch(\Exception $ex){
+    //         return ApiResponseClass::rollback($ex);
+    //     }
+    // }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
-    {
-         $this->messageRepositoryInterface->delete($id);
+    // public function destroy($id)
+    // {
+    //      $this->messageRepositoryInterface->delete($id);
 
-        return ApiResponseClass::sendResponse('Message Delete Successful','',204);
-    }
+    //     return ApiResponseClass::sendResponse('Message Delete Successful','',204);
+    // }
 }

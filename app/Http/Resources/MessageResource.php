@@ -18,7 +18,10 @@ class MessageResource extends JsonResource
             'id' =>$this->id,
             'ticket_id' => $this->ticket_id,
             'content' => $this->content,
-            'user_id' => $this->user_id
+            'user_id' => $this->user_id,
+            'user_name'=>$this->user->name,
+            'user_lastname'=>$this->user->lastname,
+            'timestamp'=>$this->created_at,
         ];
     }
 }

@@ -16,10 +16,11 @@ class Message extends Model
         'user_id'
     ];
 
-    public function service(): BelongsTo
+    public function ticket(): BelongsTo
     {
         return $this->belongsTo(Ticket::class);
     }
+
 
     public function user(): BelongsTo
     {

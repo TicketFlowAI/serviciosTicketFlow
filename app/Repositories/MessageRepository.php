@@ -17,16 +17,16 @@ class MessageRepository implements MessageRepositoryInterface
   /**
    * Retrieves all items.
    */
-  public function index(){
-     return Message::all();
+  public function index($id){
+     return Message::where('ticket_id',$id);
   }
 
   /**
    * Retrieves an item by ID.
    */
-  public function getById($id){
-     return Message::findOrFail($id);
-  }
+//   public function getById($id){
+//      return Message::findOrFail($id);
+//   }
 
   /**
    * Creates a new item in the repository.
@@ -38,14 +38,14 @@ class MessageRepository implements MessageRepositoryInterface
   /**
    * Updates an Item by ID.
    */
-  public function update(array $data,$id){
-     return Message::whereId($id)->update($data);
-  }
+//   public function update(array $data,$id){
+//      return Message::whereId($id)->update($data);
+//   }
   
   /**
    * Deletes an Item by ID.
    */
-  public function delete($id){
-     Message::destroy($id);
-  }
+//   public function delete($id){
+//      Message::destroy($id);
+//   }
 }
