@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateCompanyRequest;
 use App\Http\Resources\CompanyResource;
 use App\Interfaces\CompanyRepositoryInterface;
 use App\Classes\ApiResponseClass;
+use App\Models\ServiceContract;
 use Illuminate\Support\Facades\DB;
 use App\Models\Company;
 
