@@ -2,11 +2,7 @@
 
 namespace App\Repositories;
 use App\Interfaces\TicketRepositoryInterface;
-use App\Models\Company;
-use App\Models\Service;
-use App\Models\ServiceContract;
 use App\Models\Ticket;
-use App\Models\User;
 
 class TicketRepository implements TicketRepositoryInterface
 {
