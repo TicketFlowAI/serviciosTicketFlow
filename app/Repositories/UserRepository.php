@@ -21,12 +21,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function index()
     {
-        $users = User::all();
-        foreach ($users as $user) {
-            $user->companyObject = Company::where('id', $user->company_id)->first();
-            $user->role = $user->getRoleNames();
-        }
-        return $users;
+        return User::all();
     }
 
     /**
@@ -66,9 +61,6 @@ class UserRepository implements UserRepositoryInterface
      */
     public function getAuthenticatedUser($request)
     {
-        $user = $request->user();
-        $user->companyObject = Company::where('id', $user->company_id)->first();
-        $user->role = $user->getRoleNames();
-        return $user;
+        return $request->user();
     }
 }

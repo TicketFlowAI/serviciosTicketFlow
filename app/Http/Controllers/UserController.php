@@ -26,6 +26,10 @@ class UserController extends Controller
     public function index()
     {
         $data = $this->userRepositoryInterface->index();
+        $data->load('company:id,name');
+        foreach ($data as $user) {
+            $user->role = $user->getRoleNames();
+        }
 
         return ApiResponseClass::sendResponse(UserResource::collection($data),'',200);
     }
@@ -117,9 +121,9 @@ class UserController extends Controller
     public function getAuthenticatedUser(Request $request)
     {
         $user = $this->userRepositoryInterface->getAuthenticatedUser($request);
-        $user->companyId = Company::where('id', $user->company_id)->first()->id;
-        $user->companyName = Company::where('id', $user->company_id)->first()->name;
+        $user->load('company:id,name');
         $user->role = $user->getRoleNames();
+        
         return ApiResponseClass::sendResponse(new UserResource($user),'',200);
     }
 }
