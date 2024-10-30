@@ -26,7 +26,7 @@ class MessageRepository implements MessageRepositoryInterface
     */
    public function getById($id)
    {
-      return Message::where('ticket_id', $id);
+      return Message::where('ticket_id', $id)->get();
    }
 
    /**

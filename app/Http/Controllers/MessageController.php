@@ -65,8 +65,8 @@ class MessageController extends Controller
      */
     public function show($id)
     {
-        $data = $this->messageRepositoryInterface->index($id);
-        $data->load('user:id,name,lastname');
+        $data = $this->messageRepositoryInterface->getById($id);
+        $data->load('user');
 
         return ApiResponseClass::sendResponse(MessageResource::collection($data),'',200);
     }
