@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Tax extends Model
@@ -15,8 +16,8 @@ class Tax extends Model
         'value'
     ];
 
-    public function service(): BelongsToMany
+    public function service(): HasMany
     {
-        return $this->belongsToMany(Service::class);
+        return $this->hasMany(Service::class);
     }
 }

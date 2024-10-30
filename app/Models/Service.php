@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -18,14 +19,14 @@ class Service extends Model
         'tax_id',
     ];
 
-    public function category(): HasOne
+    public function category(): BelongsTo
     {
-        return $this->hasOne(Category::class);
+        return $this->belongsTo(Category::class);
     }
 
-    public function tax(): HasOne
+    public function tax(): BelongsTo
     {
-        return $this->hasOne(Tax::class);
+        return $this->belongsTo(Tax::class);
     }
     public function serviceContract(): HasMany
     {

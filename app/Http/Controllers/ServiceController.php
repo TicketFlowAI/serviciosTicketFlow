@@ -24,7 +24,8 @@ class ServiceController extends Controller
     public function index()
     {
         $data = $this->serviceRepositoryInterface->index();
-
+        $data->load('tax:id,description','category:id,category');
+        
         return ApiResponseClass::sendResponse(ServiceResource::collection($data), '', 200);
     }
 
@@ -64,9 +65,10 @@ class ServiceController extends Controller
      */
     public function show($id)
     {
-        $service = $this->serviceRepositoryInterface->getById($id);
+        $data = $this->serviceRepositoryInterface->getById($id);
+        $data->load('tax:id,description','category:id,category');
 
-        return ApiResponseClass::sendResponse(new ServiceResource($service), '', 200);
+        return ApiResponseClass::sendResponse(new ServiceResource($data), '', 200);
     }
 
     /**

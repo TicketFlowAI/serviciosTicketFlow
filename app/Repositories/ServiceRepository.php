@@ -2,10 +2,7 @@
 
 namespace App\Repositories;
 use App\Interfaces\ServiceRepositoryInterface;
-use App\Models\Category;
 use App\Models\Service;
-use App\Models\ServiceTerm;
-use App\Models\Tax;
 
 class ServiceRepository implements ServiceRepositoryInterface
 {
@@ -19,15 +16,10 @@ class ServiceRepository implements ServiceRepositoryInterface
    
    /**
     * Retrieves all items.
-    */
+    */ 
    public function index()
    {
-      $services = Service::all();
-      foreach ($services as $service) {
-         $service->taxObject = Tax::where('id', $service->tax_id)->first();
-         $service->categoryObject = Category::where('id', $service->category_id)->first();
-     }
-      return $services;
+      return Service::all();
    }
 
    /**
@@ -35,10 +27,7 @@ class ServiceRepository implements ServiceRepositoryInterface
     */
    public function getById($id)
    {
-      $object = Service::findOrFail($id);
-      $object->taxObject = Tax::where('id', $object->tax_id)->first();
-      $object->categoryObject = Category::where('id', $object->category_id)->first();
-      return $object;
+      return Service::findOrFail($id);
    }
 
    /**
