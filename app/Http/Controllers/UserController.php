@@ -122,7 +122,7 @@ class UserController extends Controller
     {
         $user = $this->userRepositoryInterface->getAuthenticatedUser($request);
         $user->load('company:id,name');
-        $user->role = $user->getRoleNames();
+        $user->role = $user->getRoleNames()->first();
         
         return ApiResponseClass::sendResponse(new UserResource($user),'',200);
     }
