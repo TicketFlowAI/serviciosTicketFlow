@@ -25,7 +25,7 @@ class StoreMessageRequest extends FormRequest
     {
         return [
             'ticket_id'=> 'required|numeric',
-            'content'=> 'required|numeric',
+            'content'=> 'required|string',
             'user_id'=> 'required|numeric'
         ];
     }
