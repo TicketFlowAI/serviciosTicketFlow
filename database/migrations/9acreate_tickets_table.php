@@ -19,6 +19,9 @@ return new class extends Migration
             $table->boolean('needsHumanInteraction');
             $table->tinyInteger('complexity');
             $table->foreignId('user_id')->constrained();
+            $table->boolean('status')->default(1);
+            $table->boolean('newClientMessage')->default(0);
+            $table->boolean('newTechnicianMessage')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });

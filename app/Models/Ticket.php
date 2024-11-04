@@ -17,7 +17,10 @@ class Ticket extends Model
         'priority',
         'needsHumanInteraction',
         'complexity',
-        'user_id'
+        'user_id',
+        'status',
+        'newClientMessage',
+        'newTechnicianMessage'
     ];
 
     public function service_contract(): BelongsTo

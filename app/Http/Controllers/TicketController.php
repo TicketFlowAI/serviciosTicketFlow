@@ -102,7 +102,8 @@ class TicketController extends Controller
             'priority'=> $request->priority,
             'needsHumanInteraction'=> $request->needsHumanInteraction,
             'complexity'=> $request->complexity,
-            'user_id'=> $request->user_id
+            'user_id'=> $request->user_id,
+            'status' => $request->status
         ];
         DB::beginTransaction();
         try{

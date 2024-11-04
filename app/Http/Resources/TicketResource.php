@@ -27,7 +27,10 @@ class TicketResource extends JsonResource
             'complexity' => $this->complexity,
             'user_id' => $this->user_id,
             'user_name' => $this->user->name,
-            'user_lastname' => $this->user->lastname
+            'user_lastname' => $this->user->lastname,
+            'status' =>$this->status,
+            'newClientMessage' =>$this->newClientMessage,
+            'newTechnicianMessage' =>$this->newTechnicianMessage,
         ];
     }
 }

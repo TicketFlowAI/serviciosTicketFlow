@@ -118,6 +118,9 @@ class UserController extends Controller
         return ApiResponseClass::sendResponse('User Delete Successful','',204);
     }
 
+    /**
+     * Returns the authenticated user attributes aswell as their role.
+     */
     public function getAuthenticatedUser(Request $request)
     {
         $user = $this->userRepositoryInterface->getAuthenticatedUser($request);

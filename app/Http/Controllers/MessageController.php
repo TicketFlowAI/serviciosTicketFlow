@@ -15,19 +15,19 @@ use Illuminate\Http\Request;
 class MessageController extends Controller
 {
     private MessageRepositoryInterface $messageRepositoryInterface;
-    
+
     public function __construct(MessageRepositoryInterface $messageRepositoryInterface, UserRepositoryInterface $userRepositoryInterface)
     {
         $this->messageRepositoryInterface = $messageRepositoryInterface;
         $this->userRepositoryInterface = $userRepositoryInterface;
-        
+
     }
     /**
      * Display a list of messages for a specific ticket.
      */
     // public function index($id)
     // {
-        
+
     //     $data = $this->messageRepositoryInterface->index($id);
     //     $data->load('user:id,name,lastname');
 
@@ -47,18 +47,18 @@ class MessageController extends Controller
      */
     public function store(StoreMessageRequest $request)
     {
-        $details =[
+        $details = [
             'description' => $request->description,
             'value' => $request->value
         ];
         DB::beginTransaction();
-        try{
-             $message = $this->messageRepositoryInterface->store($details);
+        try {
+            $message = $this->messageRepositoryInterface->store($details);
 
-             DB::commit();
-             return ApiResponseClass::sendResponse(new MessageResource($message),'Message Create Successful',201);
+            DB::commit();
+            return ApiResponseClass::sendResponse(new MessageResource($message), 'Message Create Successful', 201);
 
-        }catch(\Exception $ex){
+        } catch (\Exception $ex) {
             return ApiResponseClass::rollback($ex);
         }
     }
@@ -66,17 +66,40 @@ class MessageController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id,Request $request)
+    public function show($id, Request $request)
     {
+        // $data = $this->messageRepositoryInterface->getById($id);
+        // $data->load('user:id,name,lastname');
+        // foreach ($data as $message) {
+        //     $message->userRole = $message->user->roles->first();
+        //     //dd($message);
+        // }
+        // //dd($data);
+
+        // return ApiResponseClass::sendResponse(MessageResource::collection($data),'',200);
+
+        // Fetch the messages related to the ticket
         $data = $this->messageRepositoryInterface->getById($id);
         $data->load('user:id,name,lastname');
+
+        // Determine the role of the current user
+        $user = $request->user(); // Assumes the user is authenticated
+
+        // Update the ticket based on the user's role
+        if ($user->hasRole('technician')) {
+            // If technician is viewing, mark newClientMessage as false
+            $data->first()->ticket->update(['NewClientMessage' => false]);
+        } elseif ($user->hasRole('client')) {
+            // If client is viewing, mark newTechnicianMessage as false
+            $data->first()->ticket->update(['NewTechnicianMessage' => false]);
+        }
+
+        // Load user role data for each message
         foreach ($data as $message) {
             $message->userRole = $message->user->roles->first();
-            //dd($message);
         }
-        //dd($data);
 
-        return ApiResponseClass::sendResponse(MessageResource::collection($data),'',200);
+        return ApiResponseClass::sendResponse(MessageResource::collection($data), '', 200);
     }
 
     // /**
