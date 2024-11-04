@@ -53,4 +53,12 @@ class TicketRepository implements TicketRepositoryInterface
     {
         Ticket::destroy($id);
     }
+
+    /**
+     * Retrieves tickets by company
+     */
+    public function getTicketsByCompany($id)
+    {
+       return Ticket::where('company_id',$id)->get();
+    }
 }

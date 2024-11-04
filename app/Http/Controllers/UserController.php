@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 class UserController extends Controller
 {
-    
     private UserRepositoryInterface $userRepositoryInterface;
     
     public function __construct(UserRepositoryInterface $userRepositoryInterface)

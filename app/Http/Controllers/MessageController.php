@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\TicketRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\Message;
 use App\Http\Requests\StoreMessageRequest;
@@ -9,48 +10,50 @@ use App\Http\Requests\UpdateMessageRequest;
 use App\Interfaces\MessageRepositoryInterface;
 use App\Classes\ApiResponseClass;
 use App\Http\Resources\MessageResource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class MessageController extends Controller
 {
     private MessageRepositoryInterface $messageRepositoryInterface;
+    private TicketRepositoryInterface $ticketRepositoryInterface;
 
-    public function __construct(MessageRepositoryInterface $messageRepositoryInterface, UserRepositoryInterface $userRepositoryInterface)
+    public function __construct(MessageRepositoryInterface $messageRepositoryInterface, TicketRepositoryInterface $ticketRepositoryInterface)
     {
         $this->messageRepositoryInterface = $messageRepositoryInterface;
-        $this->userRepositoryInterface = $userRepositoryInterface;
-
+        $this->ticketRepositoryInterface = $ticketRepositoryInterface;
     }
-    /**
-     * Display a list of messages for a specific ticket.
-     */
-    // public function index($id)
-    // {
-
-    //     $data = $this->messageRepositoryInterface->index($id);
-    //     $data->load('user:id,name,lastname');
-
-    //     return ApiResponseClass::sendResponse(MessageResource::collection($data),'',200);
-    // }
 
     /**
-     * Show the form for creating a new resource.
+     * Verify that the client user can access the resource.
      */
-    // public function create()
-    // {
-    //     //
-    // }
+    private function verifyCompanyAccess($ticketCompanyId)
+    {
+        $user = Auth::user();
+
+        // If user has role 'client' and the company's ID doesn't match, deny access
+        if ($user->hasRole('client') && $user->company_id !== $ticketCompanyId) {
+            abort(403, 'Unauthorized access to resource.');
+        }
+    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreMessageRequest $request)
     {
+        $ticket = $this->ticketRepositoryInterface->getById($request->ticket_id);
+
+        // Verify that the user has access to this ticket
+        $this->verifyCompanyAccess($ticket->service_contract->company_id);
+
         $details = [
-            'description' => $request->description,
-            'value' => $request->value
+            'ticket_id' => $request->ticket_id,
+            'content' => $request->description,
+            'user_id' => Auth::user()->id
         ];
+
         DB::beginTransaction();
         try {
             $message = $this->messageRepositoryInterface->store($details);
@@ -68,39 +71,112 @@ class MessageController extends Controller
      */
     public function show($id, Request $request)
     {
-        // $data = $this->messageRepositoryInterface->getById($id);
-        // $data->load('user:id,name,lastname');
-        // foreach ($data as $message) {
-        //     $message->userRole = $message->user->roles->first();
-        //     //dd($message);
-        // }
-        // //dd($data);
-
-        // return ApiResponseClass::sendResponse(MessageResource::collection($data),'',200);
-
-        // Fetch the messages related to the ticket
         $data = $this->messageRepositoryInterface->getById($id);
+
+        // Verify that the user has access to this ticket's messages
+        $this->verifyCompanyAccess($data->first()->ticket->service_contract->company_id);
+
         $data->load('user:id,name,lastname');
 
-        // Determine the role of the current user
-        $user = $request->user(); // Assumes the user is authenticated
+        $user = $request->user();
 
         // Update the ticket based on the user's role
         if ($user->hasRole('technician')) {
-            // If technician is viewing, mark newClientMessage as false
             $data->first()->ticket->update(['NewClientMessage' => false]);
         } elseif ($user->hasRole('client')) {
-            // If client is viewing, mark newTechnicianMessage as false
             $data->first()->ticket->update(['NewTechnicianMessage' => false]);
         }
 
-        // Load user role data for each message
         foreach ($data as $message) {
             $message->userRole = $message->user->roles->first();
         }
 
         return ApiResponseClass::sendResponse(MessageResource::collection($data), '', 200);
     }
+}
+
+
+
+
+// class MessageController extends Controller
+// {
+//     private MessageRepositoryInterface $messageRepositoryInterface;
+
+//     public function __construct(MessageRepositoryInterface $messageRepositoryInterface, UserRepositoryInterface $userRepositoryInterface)
+//     {
+//         $this->messageRepositoryInterface = $messageRepositoryInterface;
+
+//     }
+//     /**
+//      * Display a list of messages for a specific ticket.
+//      */
+//     // public function index($id)
+//     // {
+
+//     //     $data = $this->messageRepositoryInterface->index($id);
+//     //     $data->load('user:id,name,lastname');
+
+//     //     return ApiResponseClass::sendResponse(MessageResource::collection($data),'',200);
+//     // }
+
+//     /**
+//      * Show the form for creating a new resource.
+//      */
+//     // public function create()
+//     // {
+//     //     //
+//     // }
+
+//     /**
+//      * Store a newly created resource in storage.
+//      */
+//     public function store(StoreMessageRequest $request)
+//     {
+//         $details = [
+//             'ticket_id' => $request->ticket_id,
+//             'content' => $request->value,
+//             'user_id' => Auth::user()->id
+//         ];
+//         DB::beginTransaction();
+//         try {
+//             $message = $this->messageRepositoryInterface->store($details);
+
+//             DB::commit();
+//             return ApiResponseClass::sendResponse(new MessageResource($message), 'Message Create Successful', 201);
+
+//         } catch (\Exception $ex) {
+//             return ApiResponseClass::rollback($ex);
+//         }
+//     }
+
+//     /**
+//      * Display the specified resource.
+//      */
+//     public function show($id, Request $request)
+//     {
+//         // Fetch the messages related to the ticket
+//         $data = $this->messageRepositoryInterface->getById($id);
+//         $data->load('user:id,name,lastname');
+
+//         // Determine the role of the current user
+//         $user = $request->user(); // Assumes the user is authenticated
+
+//         // Update the ticket based on the user's role
+//         if ($user->hasRole('technician')) {
+//             // If technician is viewing, mark newClientMessage as false
+//             $data->first()->ticket->update(['NewClientMessage' => false]);
+//         } elseif ($user->hasRole('client')) {
+//             // If client is viewing, mark newTechnicianMessage as false
+//             $data->first()->ticket->update(['NewTechnicianMessage' => false]);
+//         }
+
+//         // Load user role data for each message
+//         foreach ($data as $message) {
+//             $message->userRole = $message->user->roles->first();
+//         }
+
+//         return ApiResponseClass::sendResponse(MessageResource::collection($data), '', 200);
+//     }
 
     // /**
     //  * Show the form for editing the specified resource.
@@ -140,4 +216,4 @@ class MessageController extends Controller
 
     //     return ApiResponseClass::sendResponse('Message Delete Successful','',204);
     // }
-}
+//}

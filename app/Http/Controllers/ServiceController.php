@@ -11,7 +11,6 @@ use App\Http\Resources\ServiceResource;
 use Illuminate\Support\Facades\DB;
 class ServiceController extends Controller
 {
-
     private ServiceRepositoryInterface $serviceRepositoryInterface;
 
     public function __construct(ServiceRepositoryInterface $serviceRepositoryInterface)

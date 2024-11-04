@@ -17,6 +17,7 @@ class TaxController extends Controller
     {
         $this->taxRepositoryInterface = $taxRepositoryInterface;
     }
+    
     /**
      * Display a listing of the resource.
      */

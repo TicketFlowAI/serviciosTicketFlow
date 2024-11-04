@@ -11,7 +11,6 @@ use App\Http\Resources\ServiceTermResource;
 use Illuminate\Support\Facades\DB;
 class ServiceTermController extends Controller
 {
-    
     private ServiceTermRepositoryInterface $serviceTermRepositoryInterface;
     
     public function __construct(ServiceTermRepositoryInterface $serviceTermRepositoryInterface)

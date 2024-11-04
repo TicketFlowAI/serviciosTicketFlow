@@ -11,7 +11,6 @@ use App\Http\Resources\CategoryResource;
 use Illuminate\Support\Facades\DB;
 class CategoryController extends Controller
 {
-    
     private CategoryRepositoryInterface $categoryRepositoryInterface;
     
     public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface)
