@@ -26,6 +26,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('/categories',CategoryController::class);
     Route::apiResource('/serviceTerms',ServiceTermController::class);
     Route::apiResource('/servicecontracts',ServiceContractController::class);
+    Route::get('/servicecontracts/bycompany/{id}', [ServiceContractController::class, 'getContractsByCompany']);
     Route::apiResource('/tickets',TicketController::class);
     Route::apiResource('/messages',MessageController::class);
     Route::apiResource('/users',UserController::class);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\UserRepositoryInterface;
 use App\Models\Message;
 use App\Http\Requests\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
@@ -9,14 +10,16 @@ use App\Interfaces\MessageRepositoryInterface;
 use App\Classes\ApiResponseClass;
 use App\Http\Resources\MessageResource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class MessageController extends Controller
 {
     private MessageRepositoryInterface $messageRepositoryInterface;
     
-    public function __construct(MessageRepositoryInterface $messageRepositoryInterface)
+    public function __construct(MessageRepositoryInterface $messageRepositoryInterface, UserRepositoryInterface $userRepositoryInterface)
     {
         $this->messageRepositoryInterface = $messageRepositoryInterface;
+        $this->userRepositoryInterface = $userRepositoryInterface;
         
     }
     /**
@@ -63,10 +66,15 @@ class MessageController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($id,Request $request)
     {
         $data = $this->messageRepositoryInterface->getById($id);
-        $data->load('user');
+        $data->load('user:id,name,lastname');
+        foreach ($data as $message) {
+            $message->userRole = $message->user->roles->first();
+            //dd($message);
+        }
+        //dd($data);
 
         return ApiResponseClass::sendResponse(MessageResource::collection($data),'',200);
     }
