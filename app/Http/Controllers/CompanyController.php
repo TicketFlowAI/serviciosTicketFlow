@@ -111,7 +111,7 @@ class CompanyController extends Controller
 
         DB::beginTransaction();
         try {
-            $company = $this->companyRepositoryInterface->update($updateDetails, $id);
+            $this->companyRepositoryInterface->update($updateDetails, $id);
 
             DB::commit();
             return ApiResponseClass::sendResponse('Company Update Successful', '', 201);

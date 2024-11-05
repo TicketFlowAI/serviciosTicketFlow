@@ -28,14 +28,6 @@ class CategoryController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreCategoryRequest $request)
@@ -66,14 +58,6 @@ class CategoryController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Category $category)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(UpdateCategoryRequest $request, $id)
@@ -83,7 +67,7 @@ class CategoryController extends Controller
         ];
         DB::beginTransaction();
         try{
-             $category = $this->categoryRepositoryInterface->update($updateDetails,$id);
+            $this->categoryRepositoryInterface->update($updateDetails,$id);
 
              DB::commit();
              return ApiResponseClass::sendResponse('Category Update Successful','',201);

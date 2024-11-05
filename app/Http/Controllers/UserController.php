@@ -34,14 +34,6 @@ class UserController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreUserRequest $request)
@@ -73,14 +65,6 @@ class UserController extends Controller
         $user = $this->userRepositoryInterface->getById($id);
 
         return ApiResponseClass::sendResponse(new UserResource($user),'',200);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(User $user)
-    {
-        //
     }
 
     /**
