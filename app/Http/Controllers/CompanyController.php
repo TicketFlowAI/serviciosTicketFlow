@@ -11,14 +11,30 @@ use App\Models\ServiceContract;
 use Illuminate\Support\Facades\DB;
 use App\Models\Company;
 
+use Illuminate\Support\Facades\Auth;
+
 class CompanyController extends Controller
 {
     private CompanyRepositoryInterface $companyRepositoryInterface;
-    
+
     public function __construct(CompanyRepositoryInterface $companyRepositoryInterface)
     {
         $this->companyRepositoryInterface = $companyRepositoryInterface;
     }
+
+    /**
+     * Verify that the client user can access the resource.
+     */
+    private function verifyCompanyAccess($companyId)
+    {
+        $user = Auth::user();
+
+        // If user has role 'client' and the company's ID doesn't match, deny access
+        if ($user->hasRole('client') && $user->company_id !== $companyId) {
+            abort(403, 'Unauthorized access to resource.');
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -26,15 +42,13 @@ class CompanyController extends Controller
     {
         $data = $this->companyRepositoryInterface->index();
 
-        return ApiResponseClass::sendResponse(CompanyResource::collection($data),'',200);
-    }
+        // Ensure client users only see their own company
+        $user = Auth::user();
+        if ($user->hasRole('client')) {
+            $data = $data->where('id', $user->company_id);
+        }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return ApiResponseClass::sendResponse(CompanyResource::collection($data), '', 200);
     }
 
     /**
@@ -42,7 +56,7 @@ class CompanyController extends Controller
      */
     public function store(StoreCompanyRequest $request)
     {
-        $details =[
+        $details = [
             'name' => $request->name,
             'idNumber' => $request->idNumber,
             'contactEmail' => $request->contactEmail,
@@ -51,14 +65,15 @@ class CompanyController extends Controller
             'city' => $request->city,
             'address' => $request->address
         ];
+
         DB::beginTransaction();
-        try{
-             $company = $this->companyRepositoryInterface->store($details);
+        try {
+            $company = $this->companyRepositoryInterface->store($details);
 
-             DB::commit();
-             return ApiResponseClass::sendResponse(new CompanyResource($company),'Company Create Successful',201);
+            DB::commit();
+            return ApiResponseClass::sendResponse(new CompanyResource($company), 'Company Create Successful', 201);
 
-        }catch(\Exception $ex){
+        } catch (\Exception $ex) {
             return ApiResponseClass::rollback($ex);
         }
     }
@@ -70,15 +85,10 @@ class CompanyController extends Controller
     {
         $company = $this->companyRepositoryInterface->getById($id);
 
-        return ApiResponseClass::sendResponse(new CompanyResource($company),'',200);
-    }
+        // Verify access for client users
+        $this->verifyCompanyAccess($company->id);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Company $company)
-    {
-        //
+        return ApiResponseClass::sendResponse(new CompanyResource($company), '', 200);
     }
 
     /**
@@ -86,7 +96,10 @@ class CompanyController extends Controller
      */
     public function update(UpdateCompanyRequest $request, $id)
     {
-        $updateDetails =[
+        // Verify access for client users
+        $this->verifyCompanyAccess($id);
+
+        $updateDetails = [
             'name' => $request->name,
             'idNumber' => $request->idNumber,
             'contactEmail' => $request->contactEmail,
@@ -95,14 +108,15 @@ class CompanyController extends Controller
             'city' => $request->city,
             'address' => $request->address
         ];
+
         DB::beginTransaction();
-        try{
-             $company = $this->companyRepositoryInterface->update($updateDetails,$id);
+        try {
+            $company = $this->companyRepositoryInterface->update($updateDetails, $id);
 
-             DB::commit();
-             return ApiResponseClass::sendResponse('Company Update Successful','',201);
+            DB::commit();
+            return ApiResponseClass::sendResponse('Company Update Successful', '', 201);
 
-        }catch(\Exception $ex){
+        } catch (\Exception $ex) {
             return ApiResponseClass::rollback($ex);
         }
     }
@@ -112,8 +126,11 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
-         $this->companyRepositoryInterface->delete($id);
+        // Verify access for client users
+        $this->verifyCompanyAccess($id);
 
-        return ApiResponseClass::sendResponse('Company Delete Successful','',204);
+        $this->companyRepositoryInterface->delete($id);
+
+        return ApiResponseClass::sendResponse('Company Delete Successful', '', 204);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Repositories;
 use App\Interfaces\TicketRepositoryInterface;
 use App\Models\Ticket;
+use Illuminate\Database\Eloquent\Builder;
 
 class TicketRepository implements TicketRepositoryInterface
 {
@@ -59,6 +60,9 @@ class TicketRepository implements TicketRepositoryInterface
      */
     public function getTicketsByCompany($id)
     {
-       return Ticket::where('company_id',$id)->get();
+        
+        return Ticket::whereHas('service_contract', function ($query) use ($id) {
+            $query->where('company_id', $id); // Use '=' for exact match
+        })->with('service_contract')->get();
     }
-}
+} 

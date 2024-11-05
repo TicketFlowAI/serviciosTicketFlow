@@ -147,7 +147,7 @@ class ServiceContractController extends Controller
         $user = Auth::user();
 
         // Verify that the user is accessing their own company's contracts if they are a client
-        if ($user->hasRole('client') && $user->company_id !== $id) {
+        if ($user->hasRole('client') && $user->company_id != $id) {
             abort(403, 'Unauthorized access to resource.');
         }
 

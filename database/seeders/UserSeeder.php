@@ -32,7 +32,7 @@ class UserSeeder extends Seeder
             'lastname' => 'Montero',
             'email' => 'jmontero@siegfried.com.ec',
             'password' => 'EstaEsUnaCotraseña123*',
-            'company_id' => 1
+            'company_id' => 2
         ])->assignRole('client');
     }
 }
