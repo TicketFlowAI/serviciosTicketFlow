@@ -1,4 +1,4 @@
-version: 2.1
+version: 1.0
 orbs:
   slack: circleci/slack@4.10.1
 
@@ -189,4 +189,3 @@ jobs:
           root: ~/repo
           paths:
             - test_results2.xml
-            
