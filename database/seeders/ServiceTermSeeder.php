@@ -13,21 +13,38 @@ class ServiceTermSeeder extends Seeder
      */
     public function run(): void
     {
+        // ServiceTerm::create([
+        //     'term' => 'Mensual',
+        //     'months' => '1'
+        // ]);
+        // ServiceTerm::create([
+        //     'term' => 'Trimestral',
+        //     'months' => '3'
+        // ]);
+        // ServiceTerm::create([
+        //     'term' => 'Semestral',
+        //     'months' => '6'
+        // ]);
+        // ServiceTerm::create([
+        //     'term' => 'Anual',
+        //     'months' => '12'
+        // ]);
+
         ServiceTerm::create([
             'term' => 'Mensual',
             'months' => '1'
         ]);
         ServiceTerm::create([
             'term' => 'Trimestral',
-            'months' => '3'
+            'months' => '1'
         ]);
         ServiceTerm::create([
             'term' => 'Semestral',
-            'months' => '6'
+            'months' => '1'
         ]);
         ServiceTerm::create([
             'term' => 'Anual',
-            'months' => '12'
+            'months' => '1'
         ]);
     }
 }

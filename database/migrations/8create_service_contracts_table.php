@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained();
             $table->foreignId('service_id')->constrained();
             $table->foreignId('service_term_id')->constrained();
+            $table->string('last_notification_type')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

@@ -34,18 +34,18 @@ class Message extends Model
      * on the role of the use who wrote it
      * @return void
      */
-    protected static function booted()
-    {
-        static::created(function ($message) {
-            $user = Auth::user(); // Get the currently authenticated user
+    // protected static function booted()
+    // {
+    //     static::created(function ($message) {
+    //         $user = Auth::user(); // Get the currently authenticated user
 
-            if ($user->hasRole('technician' ) || $user->hasRole('super-admin')) {
-                // Set NewTechnicianMessage if the message is from a technician
-                $message->ticket->update(['NewTechnicianMessage' => true]);
-            } elseif ($user->hasRole('client')) {
-                // Set NewClientMessage if the message is from a client
-                $message->ticket->update(['NewClientMessage' => true]);
-            }
-        });
-    }
+    //         if ($user->hasRole('technician' ) || $user->hasRole('super-admin')) {
+    //             // Set NewTechnicianMessage if the message is from a technician
+    //             $message->ticket->update(['NewTechnicianMessage' => true]);
+    //         } elseif ($user->hasRole('client')) {
+    //             // Set NewClientMessage if the message is from a client
+    //             $message->ticket->update(['NewClientMessage' => true]);
+    //         }
+    //     });
+    // }
 }

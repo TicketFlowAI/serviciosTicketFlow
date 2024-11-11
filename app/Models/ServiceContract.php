@@ -25,7 +25,7 @@ class ServiceContract extends Model
     {
         return $this->belongsTo(Service::class);
     }
-    public function service_term(): BelongsTo
+    public function serviceTerm(): BelongsTo
     {
         return $this->belongsTo(ServiceTerm::class);
     }

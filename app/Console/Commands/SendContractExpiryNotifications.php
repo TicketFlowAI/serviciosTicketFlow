@@ -2,78 +2,87 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\ContractEndingNotification;
+use App\Models\ServiceContract;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
 
 class SendContractExpiryNotifications extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'app:send-contract-expiry-notifications';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Command description';
+    protected $description = 'Send contract expiry notifications to clients based on expiration date proximity';
 
     public function __construct()
     {
         parent::__construct();
     }
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
         $now = Carbon::now();
-    
-        // Check for contracts expiring in specific timeframes
-        $expiringContracts = ServiceContract::where(function ($query) use ($now) {
-            $query->whereDate('end_date', $now->copy()->addDay())
-                  ->orWhereDate('end_date', $now->copy()->addWeek())
-                  ->orWhereDate('end_date', $now->copy()->addWeeks(2))
-                  ->orWhereDate('end_date', $now->copy()->addMonth());
-        })->get();
-    
+
+        // Retrieve contracts and calculate expiration dates dynamically
+        $expiringContracts = ServiceContract::with('serviceTerm')
+            ->whereDoesntHave('serviceTerm', function ($query) {
+                $query->where('months', 2); // Exclude monthly ServiceTerms
+            })
+            ->get()
+            ->filter(function ($contract) use ($now) {
+                // Calculate dynamic expiration date
+                $expirationDate = $contract->created_at->copy()->addMonths($contract->serviceTerm->months);
+
+                // Filter contracts based on expiration proximity
+                return $expirationDate->isSameDay($now->copy()->addDay()) ||
+                    $expirationDate->isSameDay($now->copy()->addWeek()) ||
+                    $expirationDate->isSameDay($now->copy()->addWeeks(2)) ||
+                    $expirationDate->isSameDay($now->copy()->addMonth());
+            });
+
         foreach ($expiringContracts as $contract) {
-            // Calculate days remaining until expiration
-            $daysRemaining = $now->diffInDays($contract->end_date, false);
-            
-            // Set dynamic content based on days remaining
-            if ($daysRemaining <= 1) {
-                $viewTemplate = 'emails.services.expiring_soon';
-                $subjectLine = "Urgent: Your " . $contract->service_name . " Service Expires Tomorrow";
-            } elseif ($daysRemaining <= 7) {
-                $viewTemplate = 'emails.services.expiring_week';
-                $subjectLine = "Reminder: Your " . $contract->service_name . " Service Expires in 1 Week";
-            } elseif ($daysRemaining <= 14) {
-                $viewTemplate = 'emails.services.expiring_two_weeks';
-                $subjectLine = "Friendly Reminder: Your " . $contract->service_name . " Service Expires in 2 Weeks";
+            $expirationDate = $contract->created_at->copy()->addMonths($contract->serviceTerm->months);
+            $daysRemaining = $now->diffInDays($expirationDate, false);
+
+            // Determine the notification type based on days remaining
+            if ($daysRemaining <= 1 && $contract->last_notification_type !== 'day') {
+                $viewTemplate = 'emails.expiring_soon';
+                $subjectLine = "Urgente, su servicio de " . $contract->service_name . " expira mañana!";
+                $notificationType = 'day';
+            } elseif ($daysRemaining <= 7 && $contract->last_notification_type !== 'week') {
+                $viewTemplate = 'emails.expiring_week';
+                $subjectLine = "Recordatorio, su servicio " . $contract->service_name . " expira en una semana";
+                $notificationType = 'week';
+            } elseif ($daysRemaining <= 14 && $contract->last_notification_type !== 'two_weeks') {
+                $viewTemplate = 'emails.expiring_two_weeks';
+                $subjectLine = "Recordatorio, su servicio " . $contract->service_name . " expira en 2 semanas";
+                $notificationType = 'two_weeks';
+            } elseif ($daysRemaining <= 30 && $contract->last_notification_type !== 'month') {
+                $viewTemplate = 'emails.expiring_month';
+                $subjectLine = "Su servicio " . $contract->service_name . " expira en 1 mes";
+                $notificationType = 'month';
             } else {
-                $viewTemplate = 'emails.services.expiring_month';
-                $subjectLine = "Advance Notice: Your " . $contract->service_name . " Service Expires in 1 Month";
+                continue; // Skip if notification of this type was already sent
             }
-    
+
             // Prepare service data for the email
             $serviceData = [
                 'company' => $contract->company_name,
                 'serviceName' => $contract->service_name,
-                'endDate' => $contract->end_date->format('Y-m-d'),
+                'endDate' => $expirationDate->format('Y-m-d'),
                 'serviceType' => $contract->service_type,
             ];
-    
+
             // Send the email
             Mail::to($contract->contact_email)->send(
                 new ContractEndingNotification($serviceData, $viewTemplate, $subjectLine)
             );
-    
+
+            // Update the last notification type sent
+            $contract->last_notification_type = $notificationType;
+            $contract->save();
+
             // Output to console (optional)
-            $this->info("Notification sent to {$contract->contact_email} for contract ending on {$contract->end_date}");
+            $this->info("Notification sent to {$contract->contact_email} for contract ending on {$expirationDate}");
         }
-    }    
+    }
 }
