@@ -91,7 +91,7 @@
             <!-- Body -->
             <div class="email-body">
                 <p>Fecha: {{ date('l, d F Y H:i') }}</p>
-                <h2>Estimado(a) {{ $serviceData['company'] }},</h2>
+                <h2>Estimados {{ $serviceData['company'] }},</h2>
                 <p>De parte de Mindsoft, deseamos recordarle que su servicio <strong>{{ $serviceData['serviceName'] }}</strong> caduca el día <strong>{{ $serviceData['endDate'] }}</strong>.</p>
                 <p class="urgent">Es urgente tomar acción para renovar su servicio y evitar cualquier interrupción.</p>
                 <p class="urgent">Si el servicio no se renueva a tiempo, existe el riesgo de <span style="text-decoration: underline;">pérdida de datos</span> y otros efectos en la continuidad de su cuenta.</p>

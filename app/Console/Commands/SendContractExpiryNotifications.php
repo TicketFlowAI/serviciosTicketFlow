@@ -23,7 +23,7 @@ class SendContractExpiryNotifications extends Command
         $now = Carbon::now();
 
         // Retrieve contracts and calculate expiration dates dynamically
-        $expiringContracts = ServiceContract::with('serviceTerm')
+        $expiringContracts = ServiceContract::with('serviceTerm','company','service')
             ->whereDoesntHave('serviceTerm', function ($query) {
                 $query->where('months', 2); // Exclude monthly ServiceTerms
             })
@@ -66,14 +66,14 @@ class SendContractExpiryNotifications extends Command
 
             // Prepare service data for the email
             $serviceData = [
-                'company' => $contract->company_name,
-                'serviceName' => $contract->service_name,
+                'company' => $contract->company->name,
+                'serviceName' => $contract->service->description,
                 'endDate' => $expirationDate->format('Y-m-d'),
                 'serviceType' => $contract->service_type,
             ];
 
             // Send the email
-            Mail::to($contract->contact_email)->send(
+            Mail::to($contract->company->contactEmail)->send(
                 new ContractEndingNotification($serviceData, $viewTemplate, $subjectLine)
             );
 
@@ -82,7 +82,7 @@ class SendContractExpiryNotifications extends Command
             $contract->save();
 
             // Output to console (optional)
-            $this->info("Notification sent to {$contract->contact_email} for contract ending on {$expirationDate}");
+            $this->info("Notification sent to {$contract->company->contactEmail} for contract ending on {$expirationDate}");
         }
     }
 }

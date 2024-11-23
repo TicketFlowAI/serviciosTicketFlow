@@ -88,7 +88,7 @@
             </div>
             <div class="email-body">
                 <p>Fecha: {{ date('l, d F Y H:i') }}</p>
-                <h2>Estimado(a) {{ $serviceData['company'] }},</h2>
+                <h2>Estimados {{ $serviceData['company'] }},</h2>
                 <p>Le recordamos que su servicio <strong>{{ $serviceData['serviceName'] }}</strong> caduca el día <strong>{{ $serviceData['endDate'] }}</strong>.</p>
                 <p>Queda un mes antes de su expiración, por lo que le recomendamos planificar la renovación para evitar cualquier interrupción.</p>
                 <p>Para renovar, puede contactarnos:</p>
