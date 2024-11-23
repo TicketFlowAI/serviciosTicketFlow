@@ -47,10 +47,10 @@ class ServiceContractController extends Controller
             $data = $this->serviceContractRepositoryInterface->index();
         }
 
-        $data->load('company:id,name', 'service:id,description,price', 'service_term:id,months,term');
+        $data->load('company:id,name', 'service:id,description,price', 'serviceterm:id,months,term');
         
         foreach ($data as $serviceContract) {
-            $serviceContract->price = $serviceContract->service->price / $serviceContract->service_term->months;
+            $serviceContract->price = $serviceContract->service->price / $serviceContract->serviceterm->months;
         }
 
         return ApiResponseClass::sendResponse(ServiceContractResource::collection($data), '', 200);
@@ -91,7 +91,7 @@ class ServiceContractController extends Controller
         // Verify that the user has access to this resource
         $this->verifyCompanyAccess($serviceContract->company_id);
 
-        $serviceContract->load('company:id,name', 'service:id,description', 'service_term:id,months,term');
+        $serviceContract->load('company:id,name', 'service:id,description', 'serviceterm:id,months,term');
 
         return ApiResponseClass::sendResponse(new ServiceContractResource($serviceContract), '', 200);
     }
