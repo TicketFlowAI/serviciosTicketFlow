@@ -414,7 +414,7 @@
                                                             <tr>
                                                                 <td align="center"
                                                                     style="padding:0;Margin:0;font-size:0px"><a
-                                                                        target="_blank" href="https://viewstripo.email"
+                                                                        target="_blank" href="https://mindsoft.biz"
                                                                         style="mso-line-height-rule:exactly;text-decoration:underline;color:#2D3142;font-size:14px"><img
                                                                             src="https://servicios.mindsoftdev.com/Mindsoft.png"
                                                                             alt="Logo" height="60" title="Logo"
@@ -453,7 +453,7 @@
                                                             <tr>
                                                                 <td align="left" class="es-m-txt-c"
                                                                     style="padding:0;Margin:0;font-size:0px"><a
-                                                                        target="_blank" href="https://viewstripo.email"
+                                                                        target="_blank" href="https://mindsoft.biz"
                                                                         style="mso-line-height-rule:exactly;text-decoration:underline;color:#2D3142;font-size:18px"><img
                                                                             src="https://eljuldi.stripocdn.email/content/guids/CABINET_ee77850a5a9f3068d9355050e69c76d26d58c3ea2927fa145f0d7a894e624758/images/group_4076323.png"
                                                                             alt="Contactanos" width="100"
@@ -611,7 +611,7 @@
                                                                             <td align="center" class="es-m-txt-l"
                                                                                 style="padding:0;Margin:0;font-size:0px">
                                                                                 <a target="_blank"
-                                                                                    href="https://viewstripo.email"
+                                                                                    href="https://mindsoft.biz"
                                                                                     style="mso-line-height-rule:exactly;text-decoration:underline;color:#2D3142;font-size:18px"><img
                                                                                         src="https://eljuldi.stripocdn.email/content/guids/CABINET_ee77850a5a9f3068d9355050e69c76d26d58c3ea2927fa145f0d7a894e624758/images/group_4076325.png"
                                                                                         alt="Demo" width="47"
