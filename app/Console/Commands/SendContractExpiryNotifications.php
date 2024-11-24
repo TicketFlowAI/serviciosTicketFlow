@@ -68,7 +68,7 @@ class SendContractExpiryNotifications extends Command
             $serviceData = [
                 'company' => $contract->company->name,
                 'serviceName' => $contract->service->description,
-                'endDate' => $expirationDate->format('Y-m-d'),
+                'endDate' => $expirationDate->format('d-m-y'),
                 'serviceType' => $contract->service_type,
             ];
 
