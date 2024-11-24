@@ -30,7 +30,7 @@ class Message extends Model
 
     /**
      * Sets automatically a flag in the ticket
-     * that states that a new message has been registered depending 
+     * that states that a new message has been registered depending
      * on the role of the use who wrote it
      * @return void
      */

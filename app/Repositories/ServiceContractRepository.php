@@ -27,7 +27,7 @@ class ServiceContractRepository implements ServiceContractRepositoryInterface
     */
    public function getById($id)
    {
-      return ServiceContract::findOrFail($id);  
+      return ServiceContract::findOrFail($id);
    }
 
    /**

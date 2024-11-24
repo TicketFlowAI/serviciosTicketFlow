@@ -13,11 +13,6 @@ class SendContractExpiryNotifications extends Command
     protected $signature = 'app:send-contract-expiry-notifications';
     protected $description = 'Send contract expiry notifications to clients based on expiration date proximity';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function handle()
     {
         $now = Carbon::now();
@@ -46,19 +41,19 @@ class SendContractExpiryNotifications extends Command
             // Determine the notification type based on days remaining
             if ($daysRemaining <= 1 && $contract->last_notification_type !== 'day') {
                 $viewTemplate = 'emails.expiring_soon';
-                $subjectLine = "Urgente, su servicio de " . $contract->service_name . " expira mañana!";
+                $subjectLine = "Urgente, su servicio de " . $contract->service->description . " expira mañana!";
                 $notificationType = 'day';
             } elseif ($daysRemaining <= 7 && $contract->last_notification_type !== 'week') {
                 $viewTemplate = 'emails.expiring_week';
-                $subjectLine = "Recordatorio, su servicio " . $contract->service_name . " expira en una semana";
+                $subjectLine = "Recordatorio, su servicio " . $contract->service->description . " expira en una semana";
                 $notificationType = 'week';
             } elseif ($daysRemaining <= 14 && $contract->last_notification_type !== 'two_weeks') {
                 $viewTemplate = 'emails.expiring_two_weeks';
-                $subjectLine = "Recordatorio, su servicio " . $contract->service_name . " expira en 2 semanas";
+                $subjectLine = "Recordatorio, su servicio " . $contract->service->description . " expira en 2 semanas";
                 $notificationType = 'two_weeks';
             } elseif ($daysRemaining <= 30 && $contract->last_notification_type !== 'month') {
                 $viewTemplate = 'emails.expiring_month';
-                $subjectLine = "Su servicio " . $contract->service_name . " expira en 1 mes";
+                $subjectLine = "Su servicio " . $contract->service->description . " expira en 1 mes";
                 $notificationType = 'month';
             } else {
                 continue; // Skip if notification of this type was already sent

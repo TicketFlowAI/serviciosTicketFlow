@@ -15,13 +15,6 @@ class MessageRepository implements MessageRepositoryInterface
    }
 
    /**
-    * Retrieves all items.
-    */
-   //   public function index($id){
-
-   //   }
-
-   /**
     * Retrieves an item by ID.
     */
    public function getById($id)
@@ -36,18 +29,4 @@ class MessageRepository implements MessageRepositoryInterface
    {
       return Message::create($data);
    }
-
-   /**
-    * Updates an Item by ID.
-    */
-   //   public function update(array $data,$id){
-//      return Message::whereId($id)->update($data);
-//   }
-
-   /**
-    * Deletes an Item by ID.
-    */
-   //   public function delete($id){
-//      Message::destroy($id);
-//   }
 }

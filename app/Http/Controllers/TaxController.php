@@ -12,12 +12,12 @@ use Illuminate\Support\Facades\DB;
 class TaxController extends Controller
 {
     private TaxRepositoryInterface $taxRepositoryInterface;
-    
+
     public function __construct(TaxRepositoryInterface $taxRepositoryInterface)
     {
         $this->taxRepositoryInterface = $taxRepositoryInterface;
     }
-    
+
     /**
      * Display a listing of the resource.
      */
@@ -25,7 +25,7 @@ class TaxController extends Controller
     {
         $data = $this->taxRepositoryInterface->index();
 
-        return ApiResponseClass::sendResponse(TaxResource::collection($data),'',200);
+        return ApiResponseClass::sendResponse(TaxResource::collection($data), '', 200);
     }
 
     /**
@@ -33,18 +33,18 @@ class TaxController extends Controller
      */
     public function store(StoreTaxRequest $request)
     {
-        $details =[
+        $details = [
             'description' => $request->description,
             'value' => $request->value
         ];
         DB::beginTransaction();
-        try{
-             $tax = $this->taxRepositoryInterface->store($details);
+        try {
+            $tax = $this->taxRepositoryInterface->store($details);
 
-             DB::commit();
-             return ApiResponseClass::sendResponse(new TaxResource($tax),'Tax Create Successful',201);
+            DB::commit();
+            return ApiResponseClass::sendResponse(new TaxResource($tax), 'Tax Create Successful', 201);
 
-        }catch(\Exception $ex){
+        } catch (\Exception $ex) {
             return ApiResponseClass::rollback($ex);
         }
     }
@@ -56,7 +56,7 @@ class TaxController extends Controller
     {
         $tax = $this->taxRepositoryInterface->getById($id);
 
-        return ApiResponseClass::sendResponse(new TaxResource($tax),'',200);
+        return ApiResponseClass::sendResponse(new TaxResource($tax), '', 200);
     }
 
     /**
@@ -64,18 +64,18 @@ class TaxController extends Controller
      */
     public function update(UpdateTaxRequest $request, $id)
     {
-        $updateDetails =[
+        $updateDetails = [
             'description' => $request->description,
             'value' => $request->value
         ];
         DB::beginTransaction();
-        try{
-             $tax = $this->taxRepositoryInterface->update($updateDetails,$id);
+        try {
+            $this->taxRepositoryInterface->update($updateDetails, $id);
 
-             DB::commit();
-             return ApiResponseClass::sendResponse('Tax Update Successful','',201);
+            DB::commit();
+            return ApiResponseClass::sendResponse('Tax Update Successful', '', 201);
 
-        }catch(\Exception $ex){
+        } catch (\Exception $ex) {
             return ApiResponseClass::rollback($ex);
         }
     }
@@ -85,8 +85,8 @@ class TaxController extends Controller
      */
     public function destroy($id)
     {
-         $this->taxRepositoryInterface->delete($id);
+        $this->taxRepositoryInterface->delete($id);
 
-        return ApiResponseClass::sendResponse('Tax Delete Successful','',204);
+        return ApiResponseClass::sendResponse('Tax Delete Successful', '', 204);
     }
 }

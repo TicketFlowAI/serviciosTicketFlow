@@ -47,15 +47,12 @@ class TicketController extends Controller
 
         // Filter data based on company for client users
         if ($user->hasRole('client')) {
-            //dd($user->company_id);
             $data = $this->ticketRepositoryInterface->getTicketsByCompany($user->company_id);
-            //dd($data);
         } else {
             $data = $this->ticketRepositoryInterface->index();
-        } 
+        }
 
         $data->load('user:id,name,lastname', 'service_contract:id,company_id,service_id');
-
         foreach ($data as $ticket) {
             $ticket->company = Company::where('id', $ticket->service_contract->company_id)->first();
             $ticket->service = Service::where('id', $ticket->service_contract->service_id)->first();
@@ -69,8 +66,6 @@ class TicketController extends Controller
      */
     public function store(StoreTicketRequest $request)
     {
-        $user = Auth::user();
-        
         $serviceContract = $this->ticketRepositoryInterface->getById($request->service_contract_id);
 
         // Verify that the user has access to this service contract

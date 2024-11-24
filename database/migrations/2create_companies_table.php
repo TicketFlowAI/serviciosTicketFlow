@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
             $table->string('name',length:100);
-            $table->string('idNumber',length:20)->unique();;
+            $table->string('idNumber',length:20)->unique();
             $table->string('contactEmail',length:100);
             $table->string('phone');
             $table->string('state',length:50);

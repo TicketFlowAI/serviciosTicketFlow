@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 class UserController extends Controller
 {
     private UserRepositoryInterface $userRepositoryInterface;
-    
+
     public function __construct(UserRepositoryInterface $userRepositoryInterface)
     {
         $this->userRepositoryInterface = $userRepositoryInterface;
@@ -30,7 +30,7 @@ class UserController extends Controller
             $user->role = $user->getRoleNames();
         }
 
-        return ApiResponseClass::sendResponse(UserResource::collection($data),'',200);
+        return ApiResponseClass::sendResponse(UserResource::collection($data), '', 200);
     }
 
     /**
@@ -38,7 +38,7 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        $details =[
+        $details = [
             'name' => $request->name,
             'lastname' => $request->lastname,
             'email' => $request->email,
@@ -46,13 +46,13 @@ class UserController extends Controller
             'company_id' => $request->company_id
         ];
         DB::beginTransaction();
-        try{
-             $user = $this->userRepositoryInterface->store($details);
+        try {
+            $user = $this->userRepositoryInterface->store($details);
 
-             DB::commit();
-             return ApiResponseClass::sendResponse(new UserResource($user),'User Create Successful',201);
+            DB::commit();
+            return ApiResponseClass::sendResponse(new UserResource($user), 'User Create Successful', 201);
 
-        }catch(\Exception $ex){
+        } catch (\Exception $ex) {
             return ApiResponseClass::rollback($ex);
         }
     }
@@ -64,7 +64,7 @@ class UserController extends Controller
     {
         $user = $this->userRepositoryInterface->getById($id);
 
-        return ApiResponseClass::sendResponse(new UserResource($user),'',200);
+        return ApiResponseClass::sendResponse(new UserResource($user), '', 200);
     }
 
     /**
@@ -72,7 +72,7 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, $id)
     {
-        $updateDetails =[
+        $updateDetails = [
             'name' => $request->name,
             'lastname' => $request->lastname,
             'email' => $request->email,
@@ -80,13 +80,13 @@ class UserController extends Controller
             'company_id' => $request->company_id
         ];
         DB::beginTransaction();
-        try{
-             $user = $this->userRepositoryInterface->update($updateDetails,$id);
+        try {
+            $this->userRepositoryInterface->update($updateDetails, $id);
 
-             DB::commit();
-             return ApiResponseClass::sendResponse('User Update Successful','',201);
+            DB::commit();
+            return ApiResponseClass::sendResponse('User Update Successful', '', 201);
 
-        }catch(\Exception $ex){
+        } catch (\Exception $ex) {
             return ApiResponseClass::rollback($ex);
         }
     }
@@ -98,7 +98,7 @@ class UserController extends Controller
     {
         $this->userRepositoryInterface->delete($id);
 
-        return ApiResponseClass::sendResponse('User Delete Successful','',204);
+        return ApiResponseClass::sendResponse('User Delete Successful', '', 204);
     }
 
     /**
@@ -109,7 +109,7 @@ class UserController extends Controller
         $user = $this->userRepositoryInterface->getAuthenticatedUser($request);
         $user->load('company:id,name');
         $user->role = $user->getRoleNames()->first();
-        
-        return ApiResponseClass::sendResponse(new UserResource($user),'',200);
+
+        return ApiResponseClass::sendResponse(new UserResource($user), '', 200);
     }
 }

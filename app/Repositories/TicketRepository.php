@@ -65,4 +65,4 @@ class TicketRepository implements TicketRepositoryInterface
             $query->where('company_id', $id); // Use '=' for exact match
         })->with('service_contract')->get();
     }
-} 
+}

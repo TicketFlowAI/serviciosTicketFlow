@@ -16,7 +16,7 @@ class ServiceRepository implements ServiceRepositoryInterface
    
    /**
     * Retrieves all items.
-    */ 
+    */
    public function index()
    {
       return Service::all();
