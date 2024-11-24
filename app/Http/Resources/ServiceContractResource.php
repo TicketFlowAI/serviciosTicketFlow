@@ -21,7 +21,7 @@ class ServiceContractResource extends JsonResource
             'service_id' => $this->service_id,
             'service' => $this->service->description,
             'service_term_id' => $this->service_term_id,
-            'service_term' => $this->service_term->term,
+            'service_term' => $this->serviceterm->term,
             'price' => $this->price
         ];
     }
