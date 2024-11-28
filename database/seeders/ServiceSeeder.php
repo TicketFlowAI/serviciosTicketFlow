@@ -15,7 +15,7 @@ class ServiceSeeder extends Seeder
     {
         Service::create([
             'category_id' => '1',
-            'description' => 'Dominio .com ',
+            'description' => 'Dominio .com',
             'price' => '60',
             'tax_id' => '1',
         ]);
