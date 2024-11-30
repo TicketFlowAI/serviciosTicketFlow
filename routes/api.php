@@ -1,15 +1,6 @@
 <?php
 
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\MessageController;
-use App\Http\Controllers\ServiceContractController;
-use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\ServiceTermController;
-use App\Http\Controllers\TaxController;
-use App\Http\Controllers\TicketController;
-use App\Http\Controllers\UserController;
-use App\Repositories\UserRepository;
+use App\Http\Controllers as Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,15 +11,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum'])->group(function () {
     // Protected with sanctum API routes
-    Route::apiResource('/companies',CompanyController::class);
-    Route::apiResource('/services',ServiceController::class);
-    Route::apiResource('/taxes',TaxController::class);
-    Route::apiResource('/categories',CategoryController::class);
-    Route::apiResource('/serviceTerms',ServiceTermController::class);
-    Route::apiResource('/servicecontracts',ServiceContractController::class);
-    Route::get('/servicecontracts/bycompany/{id}', [ServiceContractController::class, 'getContractsByCompany']);
-    Route::apiResource('/tickets',TicketController::class);
-    Route::apiResource('/messages',MessageController::class);
-    Route::apiResource('/users',UserController::class);
-    Route::get('/user', [UserController::class, 'getAuthenticatedUser']);
+    Route::apiResource('/companies',Controllers\CompanyController::class);
+    Route::apiResource('/services',Controllers\ServiceController::class);
+    Route::apiResource('/taxes',Controllers\TaxController::class);
+    Route::apiResource('/categories',Controllers\CategoryController::class);
+    Route::apiResource('/serviceTerms',Controllers\ServiceTermController::class);
+    Route::apiResource('/servicecontracts',Controllers\ServiceContractController::class);
+    Route::get('/servicecontracts/bycompany/{id}', [Controllers\ServiceContractController::class, 'getContractsByCompany']);
+    Route::apiResource('/tickets',Controllers\TicketController::class);
+    Route::apiResource('/messages',Controllers\MessageController::class);
+    Route::apiResource('/users',Controllers\UserController::class);
+    Route::get('/user', [Controllers\UserController::class, 'getAuthenticatedUser']);
+    Route::apiResource('/emails',Controllers\EmailController::class);
 });

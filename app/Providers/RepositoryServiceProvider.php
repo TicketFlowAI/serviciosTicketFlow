@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Interfaces\CompanyRepositoryInterface;
 use App\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\EmailRepositoryInterface;
 use App\Interfaces\MessageRepositoryInterface;
 use App\Interfaces\ServiceContractRepositoryInterface;
 use App\Interfaces\ServiceRepositoryInterface;
@@ -13,6 +14,7 @@ use App\Interfaces\TicketRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Repositories\CompanyRepository;
+use App\Repositories\EmailRepository;
 use App\Repositories\MessageRepository;
 use App\Repositories\ServiceContractRepository;
 use App\Repositories\ServiceRepository;
@@ -30,15 +32,22 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(CompanyRepositoryInterface::class,CompanyRepository::class);
-        $this->app->bind(ServiceRepositoryInterface::class,ServiceRepository::class);
-        $this->app->bind(TaxRepositoryInterface::class,TaxRepository::class);
-        $this->app->bind(CategoryRepositoryInterface::class,CategoryRepository::class);
-        $this->app->bind(ServiceTermRepositoryInterface::class,ServiceTermRepository::class);
-        $this->app->bind(ServiceContractRepositoryInterface::class,ServiceContractRepository::class);
-        $this->app->bind(TicketRepositoryInterface::class,TicketRepository::class);
-        $this->app->bind(MessageRepositoryInterface::class,MessageRepository::class);
-        $this->app->bind(UserRepositoryInterface::class,UserRepository::class);
+        $repositories = [
+            CompanyRepositoryInterface::class => CompanyRepository::class,
+            ServiceRepositoryInterface::class => ServiceRepository::class,
+            TaxRepositoryInterface::class => TaxRepository::class,
+            CategoryRepositoryInterface::class => CategoryRepository::class,
+            ServiceTermRepositoryInterface::class => ServiceTermRepository::class,
+            ServiceContractRepositoryInterface::class => ServiceContractRepository::class,
+            TicketRepositoryInterface::class => TicketRepository::class,
+            MessageRepositoryInterface::class => MessageRepository::class,
+            UserRepositoryInterface::class => UserRepository::class,
+            EmailRepositoryInterface::class => EmailRepository::class,
+        ];
+    
+        foreach ($repositories as $interface => $implementation) {
+            $this->app->bind($interface, $implementation);
+        }
     }
 
     /**
