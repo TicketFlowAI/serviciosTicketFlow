@@ -13,6 +13,7 @@ class ContractEndingNotification extends Mailable
     use Queueable, SerializesModels;
 
     public $serviceData;
+    public $content; // Added property to store email content
     protected $viewTemplate;
     protected $subjectLine;
 
@@ -22,12 +23,14 @@ class ContractEndingNotification extends Mailable
      * @param array $serviceData Data related to the service
      * @param string $viewTemplate View template name
      * @param string $subjectLine Dynamic subject
+     * @param string $content Email content
      */
-    public function __construct($serviceData, $viewTemplate, $subjectLine)
+    public function __construct($serviceData, $viewTemplate, $subjectLine, $content)
     {
         $this->serviceData = $serviceData;
         $this->viewTemplate = $viewTemplate;
         $this->subjectLine = $subjectLine;
+        $this->content = $content; // Assign the content to the property
     }
 
     /**
@@ -47,7 +50,10 @@ class ContractEndingNotification extends Mailable
     {
         return new Content(
             view: $this->viewTemplate,
-            with: ['serviceData' => $this->serviceData], // Pass data to view
+            with: [
+                'serviceData' => $this->serviceData, 
+                'content' => $this->content // Pass content to view
+            ],
         );
     }
 

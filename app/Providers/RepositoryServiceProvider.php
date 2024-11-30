@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Interfaces\CompanyRepositoryInterface;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\EmailRepositoryInterface;
+use App\Interfaces\IntervalRepositoryInterface;
 use App\Interfaces\MessageRepositoryInterface;
 use App\Interfaces\ServiceContractRepositoryInterface;
 use App\Interfaces\ServiceRepositoryInterface;
@@ -15,6 +16,7 @@ use App\Interfaces\UserRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Repositories\CompanyRepository;
 use App\Repositories\EmailRepository;
+use App\Repositories\IntervalRepository;
 use App\Repositories\MessageRepository;
 use App\Repositories\ServiceContractRepository;
 use App\Repositories\ServiceRepository;
@@ -43,6 +45,7 @@ class RepositoryServiceProvider extends ServiceProvider
             MessageRepositoryInterface::class => MessageRepository::class,
             UserRepositoryInterface::class => UserRepository::class,
             EmailRepositoryInterface::class => EmailRepository::class,
+            IntervalRepositoryInterface::class => IntervalRepository::class,
         ];
     
         foreach ($repositories as $interface => $implementation) {

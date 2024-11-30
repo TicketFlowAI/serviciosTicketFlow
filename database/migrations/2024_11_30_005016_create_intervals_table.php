@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('emails', function (Blueprint $table) {
+        Schema::create('intervals', function (Blueprint $table) {
             $table->id();
-            $table->string('template_name')->unique();
-            $table->string('subject');
-            $table->longText('body'); // Store HTML content of the email
+            $table->smallInteger('days');
+            $table->string('type');
+            $table->foreignId('email_id')->constrained();
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('emails');
+        Schema::dropIfExists('intervals');
     }
 };

@@ -6,10 +6,11 @@ namespace App\Console\Commands;
 
 use App\Mail\ContractEndingNotification;
 use App\Models\ServiceContract;
-use App\Models\NotificationInterval;
+use App\Models\Interval;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\View;
 
 class SendContractExpiryNotifications extends Command
 {
@@ -21,8 +22,7 @@ class SendContractExpiryNotifications extends Command
         $now = Carbon::now();
 
         // Retrieve notification intervals from the database
-        $intervals = NotificationInterval::all();
-
+        $intervals = Interval::with('email')->get();
         // Retrieve contracts and calculate expiration dates dynamically
         $expiringContracts = ServiceContract::with('serviceTerm', 'company', 'service')
             ->whereDoesntHave('serviceTerm', function ($query) {
@@ -33,11 +33,10 @@ class SendContractExpiryNotifications extends Command
         foreach ($expiringContracts as $contract) {
             $expirationDate = $contract->created_at->copy()->addMonths($contract->serviceTerm->months);
             $daysRemaining = $now->diffInDays($expirationDate, false);
-
+            
             foreach ($intervals as $interval) {
                 if ($daysRemaining <= $interval->days && $contract->last_notification_type !== $interval->type) {
-                    $template = $interval->template_name;
-                    $subjectLine = str_replace(['{service}', '{days}'], [$contract->service->description, $interval->days], $interval->subject_template);
+                    $subjectLine = str_replace(['{service}', '{days}'], [$contract->service->description, $interval->days], $interval->email->subject);
                     $notificationType = $interval->type;
 
                     // Prepare service data for the email
@@ -48,9 +47,15 @@ class SendContractExpiryNotifications extends Command
                         'serviceType' => $contract->service_type,
                     ];
 
+                    // Render the email content using the view template and pass service data to the view
+                    $emailBody = $interval->email->body;
+                    foreach ($serviceData as $key => $value) {
+                        $emailBody = str_replace('{{ $serviceData[\'' . $key . '\'] }}', $value, $emailBody);
+                    }
+                    
                     // Send the email
                     Mail::to($contract->company->contactEmail)->send(
-                        new ContractEndingNotification($serviceData, $template, $subjectLine)
+                        new ContractEndingNotification($serviceData, 'emails.custom_template', $subjectLine, $emailBody)
                     );
 
                     // Update the last notification type sent

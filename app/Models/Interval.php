@@ -7,18 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Email extends Model
+class Interval extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'template_name',
-        'subject',
-        'body'
+        'days',
+        'type',
+        'email_id',
     ];
 
-    public function interval(): HasOne
+
+
+    public function email(): BelongsTo
     {
-        return $this->hasOne(Interval::class);
+        return $this->belongsTo(Email::class);
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Repositories;
 
-use App\Interfaces\EmailRepositoryInterface;
-use App\Models\Email;
+use App\Interfaces\IntervalRepositoryInterface;
+use App\Models\Interval;
 
-class EmailRepository implements EmailRepositoryInterface
+class IntervalRepository implements IntervalRepositoryInterface
 {
     /**
      * Create a new class instance.
@@ -20,7 +20,7 @@ class EmailRepository implements EmailRepositoryInterface
      */
     public function index()
     {
-        return Email::all();
+        return Interval::all();
     }
 
     /**
@@ -28,7 +28,7 @@ class EmailRepository implements EmailRepositoryInterface
      */
     public function getById($id)
     {
-        return Email::findOrFail($id);
+        return Interval::findOrFail($id);
     }
 
     /**
@@ -36,7 +36,7 @@ class EmailRepository implements EmailRepositoryInterface
      */
     public function store(array $data)
     {
-        return Email::create($data);
+        return Interval::create($data);
     }
 
     /**
@@ -44,7 +44,7 @@ class EmailRepository implements EmailRepositoryInterface
      */
     public function update(array $data, $id)
     {
-        return Email::whereId($id)->update($data);
+        return Interval::whereId($id)->update($data);
     }
 
     /**
@@ -52,6 +52,6 @@ class EmailRepository implements EmailRepositoryInterface
      */
     public function delete($id)
     {
-        Email::destroy($id);
+        Interval::destroy($id);
     }
 }

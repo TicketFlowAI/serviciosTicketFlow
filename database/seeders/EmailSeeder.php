@@ -14,17 +14,30 @@ class EmailSeeder extends Seeder
     public function run(): void
     {
         $emailTemplates = [
-            'Expirando Mes' => 'emails/expiring_month.blade.php',
-            'Expirando 2 semanas' => 'emails/expiring_two_weeks.blade.php',
-            'Expirando 1 semana' => 'emails/expiring_week.blade.php',
-            'Expirando 1 día' => 'emails/expiring_soon.blade.php',
+            [
+                'template_name' => 'Expirando Mes',
+                'subject' => 'Notificación temprana - Su {service} caduca en {days} días',
+                'body' => file_get_contents(resource_path('views/emails/expiring_month.blade.php')),
+            ],
+            [
+                'template_name' => 'Expirando 2 semanas',
+                'subject' => 'Su {service} caduca en {days} días',
+                'body' => file_get_contents(resource_path('views/emails/expiring_two_weeks.blade.php')),
+            ],
+            [
+                'template_name' => 'Expirando 1 semana',
+                'subject' => 'Su {service} caduca en {days} días',
+                'body' => file_get_contents(resource_path('views/emails/expiring_week.blade.php')),
+            ],
+            [
+                'template_name' => 'Expirando 1 día',
+                'subject' => 'Urgente - Su {service} caduca en {days} días',
+                'body' => file_get_contents(resource_path('views/emails/expiring_soon.blade.php')),
+            ],
         ];
-        
-        foreach ($emailTemplates as $templateName => $templatePath) {
-            Email::create([
-                'template_name' => $templateName,
-                'body' => file_get_contents(resource_path("views/$templatePath")),
-            ]);
+
+        foreach ($emailTemplates as $template) {
+            Email::create($template);
         }
     }
 }
