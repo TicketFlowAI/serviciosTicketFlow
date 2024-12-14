@@ -23,14 +23,17 @@ class UpdateCompanyRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Get the ID of the resource being updated from the route
+        $id = $this->route('company'); // 'company' is the default parameter for apiResource
+
         return [
-            'name'=> 'required|string',
-            'idNumber'=> 'required|numeric|unique:companies',
-            'contactEmail'=> 'required|email',
-            'phone'=> 'required',
-            'state'=> 'required|string',
-            'city'=> 'required|string',
-            'address'=> 'required|string'
+            'name' => 'required|string|unique:companies,name,' . $id,
+            'idNumber' => 'required|numeric|unique:companies,idNumber,' . $id,
+            'contactEmail' => 'required|email',
+            'phone' => 'required',
+            'state' => 'required|string',
+            'city' => 'required|string',
+            'address' => 'required|string',
         ];
     }
 
@@ -46,3 +49,4 @@ class UpdateCompanyRequest extends FormRequest
         ]));
     }
 }
+

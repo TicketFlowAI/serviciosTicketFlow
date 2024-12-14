@@ -24,7 +24,7 @@ class StoreEmailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'template_name'=> 'required|string|unique',
+            'template_name'=> 'required|string|unique:emails',
             'body'=> 'required'
         ];
     }

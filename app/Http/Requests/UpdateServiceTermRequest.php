@@ -23,9 +23,12 @@ class UpdateServiceTermRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Get the ID of the resource being updated from the route
+        $id = $this->route('serviceterm'); // Ensure 'serviceterm' matches the route parameter
+
         return [
-            'term' => 'required|string',
-            'months' => 'required|numeric'
+            'term' => "required|string|unique:serviceterms,term,{$id}",
+            'months' => "required|numeric|unique:serviceterms,months,{$id}",
         ];
     }
 
@@ -37,7 +40,7 @@ class UpdateServiceTermRequest extends FormRequest
         throw new HttpResponseException(response()->json([
             'success'   => false,
             'message'   => 'Validation errors',
-            'data'      => $validator->errors()
+            'data'      => $validator->errors(),
         ]));
     }
 }

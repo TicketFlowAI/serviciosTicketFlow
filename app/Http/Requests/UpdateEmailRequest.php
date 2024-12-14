@@ -23,9 +23,12 @@ class UpdateEmailRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Get the ID of the resource being updated from the route
+        $id = $this->route('email'); // 'email' is the default parameter for apiResource
+
         return [
-            'template_name'=> 'required|string|unique',
-            'body'=> 'required'
+            'template_name' => "required|string|unique:emails,template_name,{$id}",
+            'body' => 'required',
         ];
     }
 
@@ -37,7 +40,7 @@ class UpdateEmailRequest extends FormRequest
         throw new HttpResponseException(response()->json([
             'success'   => false,
             'message'   => 'Validation errors',
-            'data'      => $validator->errors()
+            'data'      => $validator->errors(),
         ]));
     }
 }

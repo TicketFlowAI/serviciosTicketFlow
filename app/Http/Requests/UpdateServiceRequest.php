@@ -23,9 +23,12 @@ class UpdateServiceRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Get the ID of the resource being updated from the route
+        $id = $this->route('service'); // Ensure 'service' matches the route parameter
+
         return [
             'category_id' => 'required|numeric',
-            'description' => 'required|unique:services|string',
+            'description' => "required|string|unique:services,description,{$id}",
             'price' => 'required|numeric',
             'tax_id' => 'required|numeric',
         ];
@@ -37,9 +40,9 @@ class UpdateServiceRequest extends FormRequest
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
-            'success'   => false,
-            'message'   => 'Validation errors',
-            'data'      => $validator->errors()
+            'success' => false,
+            'message' => 'Validation errors',
+            'data' => $validator->errors(),
         ]));
     }
 }

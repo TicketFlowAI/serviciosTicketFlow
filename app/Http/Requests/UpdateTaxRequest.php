@@ -23,9 +23,12 @@ class UpdateTaxRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Get the ID of the resource being updated from the route
+        $id = $this->route('tax'); // Ensure 'tax' matches your route parameter
+
         return [
-            'description' => 'required|string|unique:taxes',
-            'value' => 'required|numeric'
+            'description' => "required|string|unique:taxes,description,{$id}",
+            'value' => 'required|numeric',
         ];
     }
 
@@ -37,7 +40,7 @@ class UpdateTaxRequest extends FormRequest
         throw new HttpResponseException(response()->json([
             'success'   => false,
             'message'   => 'Validation errors',
-            'data'      => $validator->errors()
+            'data'      => $validator->errors(),
         ]));
     }
 }

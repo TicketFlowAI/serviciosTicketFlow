@@ -23,15 +23,17 @@ class UpdateCategoryRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Get the ID of the resource being updated from the route
+        $id = $this->route('category'); // 'category' is the default parameter for apiResource
+
         return [
-            'category' => 'required|string|unique:categories',
+            'category' => 'required|string|unique:categories,category,' . $id,
         ];
     }
 
     /**
      * Sends an httpException stating what went wrong with the validation.
      */
-
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([

@@ -23,9 +23,12 @@ class UpdateIntervalRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Get the ID of the resource being updated from the route
+        $id = $this->route('interval');
+
         return [
             'days' => 'required|integer',
-            'type' => 'required|string|unique:intervals',
+            'type' => 'required|string|unique:intervals,type,' . $id,
             'template_name' => 'required|string',
             'subject_template' => 'required|string',
         ];
@@ -37,9 +40,9 @@ class UpdateIntervalRequest extends FormRequest
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
-            'success'   => false,
-            'message'   => 'Validation errors',
-            'data'      => $validator->errors()
+            'success' => false,
+            'message' => 'Validation errors',
+            'data' => $validator->errors()
         ]));
     }
 }
