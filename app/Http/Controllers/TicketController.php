@@ -9,10 +9,7 @@ use App\Http\Resources\TicketResource;
 use App\Interfaces\TicketRepositoryInterface;
 use App\Models\Company;
 use App\Models\Service;
-use App\Models\Ticket;
 use Illuminate\Support\Facades\DB;
-
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TicketController extends Controller
@@ -25,37 +22,21 @@ class TicketController extends Controller
     }
 
     /**
-     * Verify that the client user can access the resource.
-     */
-    private function verifyCompanyAccess($resourceCompanyId)
-    {
-        $user = Auth::user();
-
-        // If user has role 'client' and the company's ID doesn't match, deny access
-        if ($user->hasRole('client') && $user->company_id !== $resourceCompanyId) {
-            abort(403, 'Unauthorized access to resource.');
-        }
-    }
-
-    /**
      * Display a listing of the resource.
      */
     public function index()
     {
         $user = Auth::user();
 
-
         // Filter data based on company for client users
-        if ($user->hasRole('client')) {
-            $data = $this->ticketRepositoryInterface->getTicketsByCompany($user->company_id);
-        } else {
-            $data = $this->ticketRepositoryInterface->index();
-        }
+        $data = $user->hasRole('client') 
+            ? $this->ticketRepositoryInterface->getTicketsByCompany($user->company_id)
+            : $this->ticketRepositoryInterface->index();
 
         $data->load('user:id,name,lastname', 'service_contract:id,company_id,service_id');
         foreach ($data as $ticket) {
-            $ticket->company = Company::where('id', $ticket->service_contract->company_id)->first();
-            $ticket->service = Service::where('id', $ticket->service_contract->service_id)->first();
+            $ticket->company = Company::find($ticket->service_contract->company_id);
+            $ticket->service = Service::find($ticket->service_contract->service_id);
         }
 
         return ApiResponseClass::sendResponse(TicketResource::collection($data), '', 200);
@@ -66,19 +47,7 @@ class TicketController extends Controller
      */
     public function store(StoreTicketRequest $request)
     {
-        $serviceContract = $this->ticketRepositoryInterface->getById($request->service_contract_id);
-
-        // Verify that the user has access to this service contract
-        $this->verifyCompanyAccess($serviceContract->company_id);
-
-        $details = [
-            'service_contract_id' => $request->service_contract_id,
-            'title' => $request->title,
-            'priority' => $request->priority,
-            'needsHumanInteraction' => $request->needsHumanInteraction,
-            'complexity' => $request->complexity,
-            'user_id' => $request->user_id
-        ];
+        $details = $request->validated();
 
         DB::beginTransaction();
         try {
@@ -86,7 +55,6 @@ class TicketController extends Controller
 
             DB::commit();
             return ApiResponseClass::sendResponse(new TicketResource($ticket), 'Ticket Create Successful', 201);
-
         } catch (\Exception $ex) {
             return ApiResponseClass::rollback($ex);
         }
@@ -99,13 +67,9 @@ class TicketController extends Controller
     {
         $data = $this->ticketRepositoryInterface->getById($id);
 
-        // Verify that the user has access to this ticket
-        $this->verifyCompanyAccess($data->service_contract->company_id);
-
         $data->load('user:id,name,lastname', 'service_contract:id,company_id,service_id');
-
-        $data->company = Company::where('id', $data->service_contract->company_id)->first();
-        $data->service = Service::where('id', $data->service_contract->service_id)->first();
+        $data->company = Company::find($data->service_contract->company_id);
+        $data->service = Service::find($data->service_contract->service_id);
 
         return ApiResponseClass::sendResponse(new TicketResource($data), '', 200);
     }
@@ -115,20 +79,7 @@ class TicketController extends Controller
      */
     public function update(UpdateTicketRequest $request, $id)
     {
-        $ticket = $this->ticketRepositoryInterface->getById($id);
-
-        // Verify that the user has access to this ticket
-        $this->verifyCompanyAccess($ticket->service_contract->company_id);
-
-        $updateDetails = [
-            'service_contract_id' => $request->service_contract_id,
-            'title' => $request->title,
-            'priority' => $request->priority,
-            'needsHumanInteraction' => $request->needsHumanInteraction,
-            'complexity' => $request->complexity,
-            'user_id' => $request->user_id,
-            'status' => $request->status
-        ];
+        $updateDetails = $request->validated();
 
         DB::beginTransaction();
         try {
@@ -136,7 +87,6 @@ class TicketController extends Controller
 
             DB::commit();
             return ApiResponseClass::sendResponse('Ticket Update Successful', '', 201);
-
         } catch (\Exception $ex) {
             return ApiResponseClass::rollback($ex);
         }
@@ -147,11 +97,6 @@ class TicketController extends Controller
      */
     public function destroy($id)
     {
-        $ticket = $this->ticketRepositoryInterface->getById($id);
-
-        // Verify that the user has access to this ticket
-        $this->verifyCompanyAccess($ticket->service_contract->company_id);
-
         $this->ticketRepositoryInterface->delete($id);
 
         return ApiResponseClass::sendResponse('Ticket Delete Successful', '', 204);

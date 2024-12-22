@@ -13,20 +13,27 @@ class UpdateServiceContractRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $user = $this->user();
+        $serviceContract = $this->route('service_contract'); // Use route binding
+
+        // Allow non-client roles to proceed
+        if (!$user->hasRole('client')) {
+            return true;
+        }
+
+        // For client users, ensure the service contract belongs to their company
+        return $serviceContract && $serviceContract->company_id === $user->company_id;
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'company_id' => 'required|numeric',
-            'service_id' => 'required|numeric',
-            'service_term_id' => 'required|numeric',
+            'company_id' => 'required|numeric|exists:companies,id',
+            'service_id' => 'required|numeric|exists:services,id',
+            'service_term_id' => 'required|numeric|exists:service_terms,id',
         ];
     }
 

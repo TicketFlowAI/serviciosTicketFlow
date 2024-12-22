@@ -13,30 +13,48 @@ class UpdateCompanyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $user = $this->user();
+        $companyId = $this->route('company');
+
+        // Allow access if the user is not a client
+        if (!$user->hasRole('client')) {
+            return true;
+        }
+
+        // For client users, ensure they own the company
+        return $user->company_id === (int) $companyId;
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        // Get the ID of the resource being updated from the route
-        $id = $this->route('company'); // 'company' is the default parameter for apiResource
+        $id = $this->route('company'); // Company ID from the route
 
+        // Restrict rules for client users
+        if ($this->user()->hasRole('client')) {
+            return [
+                'contactEmail' => 'required|email',
+                'phone' => 'required|string',
+                'state' => 'required|string',
+                'city' => 'required|string',
+                'address' => 'required|string',
+            ];
+        }
+
+        // Default rules for other roles
         return [
             'name' => 'required|string|unique:companies,name,' . $id,
             'idNumber' => 'required|numeric|unique:companies,idNumber,' . $id,
             'contactEmail' => 'required|email',
-            'phone' => 'required',
+            'phone' => 'required|string',
             'state' => 'required|string',
             'city' => 'required|string',
             'address' => 'required|string',
         ];
     }
-
+    
     /**
      * Sends an httpException stating what went wrong with the validation.
      */

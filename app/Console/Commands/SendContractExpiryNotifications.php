@@ -64,7 +64,7 @@ class SendContractExpiryNotifications extends Command
 
                     // Output to console (optional)
                     $this->info("Notification sent to {$contract->company->contactEmail} for contract ending on {$expirationDate}");
-                    break; // Break after sending the appropriate notification
+                    break;
                 }
             }
         }

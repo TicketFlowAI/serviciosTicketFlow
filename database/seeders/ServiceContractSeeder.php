@@ -35,22 +35,22 @@ class ServiceContractSeeder extends Seeder
         // ]);
 
         ServiceContract::create([
-            'company_id' => '1',
+            'company_id' => '2',
             'service_id' => '1',
             'service_term_id' => '1'
         ]);
         ServiceContract::create([
-            'company_id' => '1',
+            'company_id' => '2',
             'service_id' => '1',
             'service_term_id' => '3'
         ]);
         ServiceContract::create([
-            'company_id' => '1',
+            'company_id' => '2',
             'service_id' => '4',
             'service_term_id' => '2'
         ]);
         ServiceContract::create([
-            'company_id' => '1',
+            'company_id' => '2',
             'service_id' => '5',
             'service_term_id' => '3'
         ]);

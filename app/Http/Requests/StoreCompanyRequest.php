@@ -14,7 +14,8 @@ class StoreCompanyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        // Only allow users with appropriate roles to create companies
+        return !$this->user()->hasRole('client');
     }
 
     /**

@@ -13,20 +13,28 @@ class StoreServiceContractRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $user = $this->user();
+
+        // Allow non-client roles to create service contracts
+        if (!$user->hasRole('client')) {
+            return true;
+        }
+
+        // For client users, ensure the company_id matches their company
+        $companyId = $this->input('company_id', $user->company_id);
+
+        return $companyId == $user->company_id;
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'company_id' => 'required|numeric',
-            'service_id' => 'required|numeric',
-            'service_term_id' => 'required|numeric',
+            'company_id' => 'required|numeric|exists:companies,id',
+            'service_id' => 'required|numeric|exists:services,id',
+            'service_term_id' => 'required|numeric|exists:service_terms,id',
         ];
     }
 

@@ -21,19 +21,6 @@ class ServiceContractController extends Controller
     }
 
     /**
-     * Verify that the client user can access the resource.
-     */
-    private function verifyCompanyAccess($resourceCompanyId)
-    {
-        $user = Auth::user();
-
-        // If user has role 'client' and the company's ID doesn't match, deny access
-        if ($user->hasRole('client') && $user->company_id !== $resourceCompanyId) {
-            abort(403, 'Unauthorized access to resource.');
-        }
-    }
-
-    /**
      * Display a listing of the resource.
      */
     public function index()
@@ -88,9 +75,6 @@ class ServiceContractController extends Controller
     {
         $serviceContract = $this->serviceContractRepositoryInterface->getById($id);
 
-        // Verify that the user has access to this resource
-        $this->verifyCompanyAccess($serviceContract->company_id);
-
         $serviceContract->load('company:id,name', 'service:id,description', 'serviceterm:id,months,term');
 
         return ApiResponseClass::sendResponse(new ServiceContractResource($serviceContract), '', 200);
@@ -101,11 +85,6 @@ class ServiceContractController extends Controller
      */
     public function update(UpdateServiceContractRequest $request, $id)
     {
-        $serviceContract = $this->serviceContractRepositoryInterface->getById($id);
-
-        // Verify that the user has access to this resource
-        $this->verifyCompanyAccess($serviceContract->company_id);
-
         $updateDetails = [
             'company_id' => $request->company_id,
             'service_id' => $request->service_id,
@@ -129,11 +108,6 @@ class ServiceContractController extends Controller
      */
     public function destroy($id)
     {
-        $serviceContract = $this->serviceContractRepositoryInterface->getById($id);
-
-        // Verify that the user has access to this resource
-        $this->verifyCompanyAccess($serviceContract->company_id);
-
         $this->serviceContractRepositoryInterface->delete($id);
 
         return ApiResponseClass::sendResponse('ServiceContract Delete Successful', '', 204);
