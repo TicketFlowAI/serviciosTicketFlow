@@ -24,4 +24,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [Controllers\UserController::class, 'getAuthenticatedUser']);
     Route::apiResource('/emails',Controllers\EmailController::class);
     Route::apiResource('/intervals',Controllers\IntervalController::class);
+    Route::post('/tickets/close/{id}', [Controllers\TicketController::class, 'closeTicket']);
+    Route::post('/tickets/reassign/{id}', [Controllers\TicketController::class, 'reassignTicket']);
 });

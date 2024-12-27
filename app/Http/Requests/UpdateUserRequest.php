@@ -28,11 +28,9 @@ class UpdateUserRequest extends FormRequest
         $id = $this->route('user'); // Ensure 'user' matches your route parameter
 
         return [
-            'name' => "required|string|unique:users,name,{$id}",
-            'lastName' => 'required|string',
-            'email' => 'required|email',
+            'email' => "required|email|unique:users,email,{$id}",
             'password' => [
-                'required',
+                'nullable',
                 Password::min(8)
                     ->letters()
                     ->mixedCase()
