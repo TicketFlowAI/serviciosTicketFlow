@@ -2,28 +2,35 @@
 
 namespace App\Providers;
 
-use App\Interfaces\CompanyRepositoryInterface;
-use App\Interfaces\CategoryRepositoryInterface;
-use App\Interfaces\EmailRepositoryInterface;
-use App\Interfaces\IntervalRepositoryInterface;
-use App\Interfaces\MessageRepositoryInterface;
-use App\Interfaces\ServiceContractRepositoryInterface;
-use App\Interfaces\ServiceRepositoryInterface;
-use App\Interfaces\ServiceTermRepositoryInterface;
-use App\Interfaces\TaxRepositoryInterface;
-use App\Interfaces\TicketRepositoryInterface;
-use App\Interfaces\UserRepositoryInterface;
-use App\Repositories\CategoryRepository;
-use App\Repositories\CompanyRepository;
-use App\Repositories\EmailRepository;
-use App\Repositories\IntervalRepository;
-use App\Repositories\MessageRepository;
-use App\Repositories\ServiceContractRepository;
-use App\Repositories\ServiceRepository;
-use App\Repositories\ServiceTermRepository;
-use App\Repositories\TaxRepository;
-use App\Repositories\TicketRepository;
-use App\Repositories\UserRepository;
+use App\Interfaces\{
+    CompanyRepositoryInterface,
+    CategoryRepositoryInterface,
+    EmailRepositoryInterface,
+    IntervalRepositoryInterface,
+    MessageRepositoryInterface,
+    RoleRepositoryInterface,
+    ServiceContractRepositoryInterface,
+    ServiceRepositoryInterface,
+    ServiceTermRepositoryInterface,
+    TaxRepositoryInterface,
+    TicketRepositoryInterface,
+    UserRepositoryInterface
+};
+
+use App\Repositories\{
+    CategoryRepository,
+    CompanyRepository,
+    EmailRepository,
+    IntervalRepository,
+    MessageRepository,
+    RoleRepository,
+    ServiceContractRepository,
+    ServiceRepository,
+    ServiceTermRepository,
+    TaxRepository,
+    TicketRepository,
+    UserRepository
+};
 use Illuminate\Support\ServiceProvider;
 
 
@@ -46,6 +53,7 @@ class RepositoryServiceProvider extends ServiceProvider
             UserRepositoryInterface::class => UserRepository::class,
             EmailRepositoryInterface::class => EmailRepository::class,
             IntervalRepositoryInterface::class => IntervalRepository::class,
+            RoleRepositoryInterface::class => RoleRepository::class,
         ];
     
         foreach ($repositories as $interface => $implementation) {

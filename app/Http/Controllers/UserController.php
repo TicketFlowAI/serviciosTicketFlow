@@ -1,9 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Models\Company;
-use App\Models\User;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Interfaces\UserRepositoryInterface;
@@ -11,6 +8,7 @@ use App\Classes\ApiResponseClass;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+
 class UserController extends Controller
 {
     private UserRepositoryInterface $userRepositoryInterface;
@@ -19,6 +17,7 @@ class UserController extends Controller
     {
         $this->userRepositoryInterface = $userRepositoryInterface;
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -46,16 +45,16 @@ class UserController extends Controller
             'company_id' => $request->company_id
         ];
 
-        $role = $request->role; // Obtener el rol desde el request
+        $role = $request->role; // Retrieve the role from the request
 
         DB::beginTransaction();
         try {
-            // Crear el usuario
+            // Create the user
             $user = $this->userRepositoryInterface->store($details);
 
-            // Asignar el rol al usuario si está presente
+            // Assign the role to the user if present
             if ($role) {
-                $user->assignRole($role); // Utiliza Spatie para asignar el rol
+                $user->assignRole($role); // Use Spatie to assign the role
             }
 
             DB::commit();
@@ -66,7 +65,6 @@ class UserController extends Controller
             return ApiResponseClass::rollback($ex);
         }
     }
-
 
     /**
      * Display the specified resource.
@@ -83,43 +81,42 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, $id)
     {
-        // Construir los detalles de actualización sin incluir la contraseña inicialmente
+        // Build the update details without including the password initially
         $updateDetails = [
             'name' => $request->name,
             'lastname' => $request->lastname,
             'email' => $request->email,
             'company_id' => $request->company_id
         ];
-    
-        // Solo agregar la contraseña si está presente
+
+        // Only add the password if it is present
         if ($request->filled('password')) {
-            $updateDetails['password'] = bcrypt($request->password); // Encriptar la contraseña
+            $updateDetails['password'] = bcrypt($request->password); // Encrypt the password
         }
-    
-        $role = $request->role; // Obtener el rol desde el request
-    
+
+        $role = $request->role; // Retrieve the role from the request
+
         DB::beginTransaction();
         try {
-            // Actualizar los detalles del usuario
+            // Update the user details
             $this->userRepositoryInterface->update($updateDetails, $id);
-    
-            // Obtener el usuario actualizado
+
+            // Get the updated user
             $user = $this->userRepositoryInterface->getById($id);
-    
-            // Asignar el nuevo rol al usuario si está presente
+
+            // Assign the new role to the user if present
             if ($role) {
-                $user->syncRoles([$role]); // Utiliza Spatie para actualizar los roles
+                $user->syncRoles([$role]); // Use Spatie to update the roles
             }
-    
+
             DB::commit();
             return ApiResponseClass::sendResponse('User Update Successful', '', 201);
-    
+
         } catch (\Exception $ex) {
             DB::rollback();
             return ApiResponseClass::rollback($ex);
         }
     }
-    
 
     /**
      * Remove the specified resource from storage.
@@ -132,7 +129,7 @@ class UserController extends Controller
     }
 
     /**
-     * Returns the authenticated user attributes aswell as their role.
+     * Returns the authenticated user attributes as well as their role.
      */
     public function getAuthenticatedUser(Request $request)
     {
@@ -141,5 +138,33 @@ class UserController extends Controller
         $user->role = $user->getRoleNames()->first();
 
         return ApiResponseClass::sendResponse(new UserResource($user), '', 200);
+    }
+
+        /**
+     * Retrieve users with a specific role.
+     */
+    public function getUsersByRole(Request $request)
+    {
+        $role = $request->input('role');
+
+        // Validate the role parameter
+        if (!$role) {
+            return ApiResponseClass::sendResponse(null, 'Role parameter is required.', 400);
+        }
+
+        try {
+            // Fetch users with the specified role
+            $users = $this->userRepositoryInterface->index()
+                ->filter(fn($user) => $user->hasRole($role));
+
+            // Add role to each user for clarity
+            foreach ($users as $user) {
+                $user->role = $user->getRoleNames()->first();
+            }
+
+            return ApiResponseClass::sendResponse(UserResource::collection($users), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::rollback($ex);
+        }
     }
 }
