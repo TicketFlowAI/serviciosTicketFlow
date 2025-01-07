@@ -15,14 +15,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('service_contract_id')->constrained();
             $table->string('title');
-            $table->tinyInteger('priority');
-            $table->boolean('needsHumanInteraction');
-            $table->tinyInteger('complexity');
+            $table->tinyInteger('priority')->nullable();
+            $table->boolean('needsHumanInteraction')->nullable();
+            $table->tinyInteger('complexity')->nullable();
             $table->foreignId('user_id')->constrained();
             $table->boolean('status')->default(1);
             $table->boolean('newClientMessage')->default(0);
             $table->boolean('newTechnicianMessage')->default(0);
-            $table->boolean('job_id')->nullable();
+            $table->string('job_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
