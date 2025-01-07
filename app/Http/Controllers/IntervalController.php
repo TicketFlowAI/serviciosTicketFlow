@@ -47,7 +47,7 @@ class IntervalController extends Controller
         return ApiResponseClass::sendResponse(IntervalResource::collection($data), '', 200);
     }
 
-    /**
+        /**
      * @OA\Post(
      *     path="/intervals",
      *     summary="Create a new interval",
@@ -55,9 +55,10 @@ class IntervalController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name", "details"},
-     *             @OA\Property(property="name", example="Weekly"),
-     *             @OA\Property(property="details", example="Every 7 days")
+     *             required={"days", "type", "email_id"},
+     *             @OA\Property(property="days", type="integer", example=7, description="Number of days for the interval"),
+     *             @OA\Property(property="type", type="string", example="Weekly", description="Type of the interval"),
+     *             @OA\Property(property="email_id", type="integer", example=1, description="ID of the associated email template")
      *         )
      *     ),
      *     @OA\Response(
@@ -71,8 +72,9 @@ class IntervalController extends Controller
     public function store(StoreIntervalRequest $request)
     {
         $details = [
-            'name' => $request->name,
-            'details' => $request->details,
+            'days' => $request->days, 
+            'type' => $request->type,
+            'email_id' => $request->email_id,
         ];
         DB::beginTransaction();
         try {
@@ -83,6 +85,7 @@ class IntervalController extends Controller
             return ApiResponseClass::rollback($ex);
         }
     }
+
 
     /**
      * @OA\Get(
@@ -109,7 +112,7 @@ class IntervalController extends Controller
         return ApiResponseClass::sendResponse(new IntervalResource($interval), '', 200);
     }
 
-    /**
+        /**
      * @OA\Put(
      *     path="/intervals/{id}",
      *     summary="Update an interval",
@@ -118,25 +121,29 @@ class IntervalController extends Controller
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="ID of the interval"
+     *         description="ID of the interval",
+     *         @OA\Schema(type="integer", example=1)
      *     ),
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name", "details"},
-     *             @OA\Property(property="name", example="Updated Interval"),
-     *             @OA\Property(property="details", example="Updated details")
+     *             required={"days", "type", "email_id"},
+     *             @OA\Property(property="days", type="integer", example=10, description="Updated number of days for the interval"),
+     *             @OA\Property(property="type", type="string", example="Monthly", description="Updated type of the interval"),
+     *             @OA\Property(property="email_id", type="integer", example=2, description="Updated ID of the associated email template")
      *         )
      *     ),
      *     @OA\Response(response=200, description="Interval updated successfully"),
-     *     @OA\Response(response=400, description="Invalid request")
+     *     @OA\Response(response=400, description="Invalid request"),
+     *     @OA\Response(response=404, description="Interval not found")
      * )
      */
     public function update(UpdateIntervalRequest $request, $id)
     {
         $updateDetails = [
-            'name' => $request->name,
-            'details' => $request->details,
+            'days' => $request->days, 
+            'type' => $request->type,
+            'email_id' => $request->email_id,
         ];
         DB::beginTransaction();
         try {
@@ -147,6 +154,7 @@ class IntervalController extends Controller
             return ApiResponseClass::rollback($ex);
         }
     }
+
 
     /**
      * @OA\Delete(
