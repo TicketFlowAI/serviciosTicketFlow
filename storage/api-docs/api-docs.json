@@ -418,15 +418,25 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "name",
-                                    "details"
+                                    "template_name",
+                                    "subject",
+                                    "body"
                                 ],
                                 "properties": {
-                                    "name": {
+                                    "template_name": {
+                                        "description": "The name of the email template",
+                                        "type": "string",
                                         "example": "Welcome Email"
                                     },
-                                    "details": {
-                                        "example": "Template details"
+                                    "subject": {
+                                        "description": "The subject of the email template",
+                                        "type": "string",
+                                        "example": "Welcome to Our Service"
+                                    },
+                                    "body": {
+                                        "description": "The body content of the email template",
+                                        "type": "string",
+                                        "example": "<p>Dear User, Welcome to our service!</p>"
                                     }
                                 },
                                 "type": "object"
@@ -493,7 +503,11 @@
                         "name": "id",
                         "in": "path",
                         "description": "ID of the email template",
-                        "required": true
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
                     }
                 ],
                 "requestBody": {
@@ -502,15 +516,25 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "name",
-                                    "details"
+                                    "template_name",
+                                    "subject",
+                                    "body"
                                 ],
                                 "properties": {
-                                    "name": {
+                                    "template_name": {
+                                        "description": "Updated name of the email template",
+                                        "type": "string",
                                         "example": "Updated Email Template"
                                     },
-                                    "details": {
-                                        "example": "Updated template details"
+                                    "subject": {
+                                        "description": "Updated subject of the email template",
+                                        "type": "string",
+                                        "example": "Updated Subject"
+                                    },
+                                    "body": {
+                                        "description": "Updated HTML body of the email template",
+                                        "type": "string",
+                                        "example": "<p>Updated email body content.</p>"
                                     }
                                 },
                                 "type": "object"
@@ -524,6 +548,9 @@
                     },
                     "400": {
                         "description": "Invalid request"
+                    },
+                    "404": {
+                        "description": "Email template not found"
                     }
                 }
             },
@@ -589,15 +616,25 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "name",
-                                    "details"
+                                    "days",
+                                    "type",
+                                    "email_id"
                                 ],
                                 "properties": {
-                                    "name": {
+                                    "days": {
+                                        "description": "Number of days for the interval",
+                                        "type": "integer",
+                                        "example": 7
+                                    },
+                                    "type": {
+                                        "description": "Type of the interval",
+                                        "type": "string",
                                         "example": "Weekly"
                                     },
-                                    "details": {
-                                        "example": "Every 7 days"
+                                    "email_id": {
+                                        "description": "ID of the associated email template",
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"
@@ -664,7 +701,11 @@
                         "name": "id",
                         "in": "path",
                         "description": "ID of the interval",
-                        "required": true
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
                     }
                 ],
                 "requestBody": {
@@ -673,15 +714,25 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "name",
-                                    "details"
+                                    "days",
+                                    "type",
+                                    "email_id"
                                 ],
                                 "properties": {
-                                    "name": {
-                                        "example": "Updated Interval"
+                                    "days": {
+                                        "description": "Updated number of days for the interval",
+                                        "type": "integer",
+                                        "example": 10
                                     },
-                                    "details": {
-                                        "example": "Updated details"
+                                    "type": {
+                                        "description": "Updated type of the interval",
+                                        "type": "string",
+                                        "example": "Monthly"
+                                    },
+                                    "email_id": {
+                                        "description": "Updated ID of the associated email template",
+                                        "type": "integer",
+                                        "example": 2
                                     }
                                 },
                                 "type": "object"
@@ -695,6 +746,9 @@
                     },
                     "400": {
                         "description": "Invalid request"
+                    },
+                    "404": {
+                        "description": "Interval not found"
                     }
                 }
             },
