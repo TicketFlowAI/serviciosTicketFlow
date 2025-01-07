@@ -38,7 +38,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('/emails', EmailController::class);
     Route::apiResource('/intervals', IntervalController::class);
     Route::post('/tickets/close/{id}', [TicketController::class, 'closeTicket']);
-    Route::post('/tickets/reassign/{id}', [TicketController::class, 'reassignTicket']);
+    Route::post('/tickets/reassign/{id}', [TicketController::class, 'assignTicket']);
     Route::get('/users/byrole/{role}', [UserController::class, 'getUsersByRole']);
     Route::apiResource('roles', RolesController::class);
     Route::get('roles/permissions', [RolesController::class, 'listPermissions']);

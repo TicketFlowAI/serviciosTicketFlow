@@ -60,9 +60,15 @@ class TicketRepository implements TicketRepositoryInterface
      */
     public function getTicketsByCompany($id)
     {
-        
+
         return Ticket::whereHas('service_contract', function ($query) use ($id) {
             $query->where('company_id', $id); // Use '=' for exact match
         })->with('service_contract')->get();
     }
+
+    public function getTicketsByTechnician($technicianId)
+    {
+        return Ticket::where('user_id', $technicianId)->get();
+    }
+
 }
