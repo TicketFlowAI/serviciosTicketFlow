@@ -11,19 +11,45 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
+/**
+ * @OA\Tag(
+ *     name="Messages",
+ *     description="API Endpoints for managing ticket messages"
+ * )
+ */
 class MessageController extends Controller
 {
     private MessageRepositoryInterface $messageRepositoryInterface;
     private TicketRepositoryInterface $ticketRepositoryInterface;
 
-    public function __construct(MessageRepositoryInterface $messageRepositoryInterface, TicketRepositoryInterface $ticketRepositoryInterface)
-    {
+    public function __construct(
+        MessageRepositoryInterface $messageRepositoryInterface,
+        TicketRepositoryInterface $ticketRepositoryInterface
+    ) {
         $this->messageRepositoryInterface = $messageRepositoryInterface;
         $this->ticketRepositoryInterface = $ticketRepositoryInterface;
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/messages",
+     *     summary="Create a new message for a ticket",
+     *     tags={"Messages"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"ticket_id", "content"},
+     *             @OA\Property(property="ticket_id", example=123),
+     *             @OA\Property(property="content", example="This is a message content.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Message created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/MessageResource")
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
      */
     public function store(StoreMessageRequest $request)
     {
@@ -47,7 +73,27 @@ class MessageController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/messages/{id}",
+     *     summary="Get messages for a specific ticket",
+     *     tags={"Messages"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the message",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Message details retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/MessageResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Message not found")
+     * )
      */
     public function show($id, Request $request)
     {
@@ -57,7 +103,6 @@ class MessageController extends Controller
 
         $user = $request->user();
 
-        // Update the ticket based on the user's role
         if ($user->hasRole('technician')) {
             $data->first()->ticket->update(['NewClientMessage' => false]);
         } elseif ($user->hasRole('client')) {
@@ -66,9 +111,8 @@ class MessageController extends Controller
 
         foreach ($data as $message) {
             $message->userRole = $message->user->roles->first()->name;
-            
         }
-        info($data);
+
         return ApiResponseClass::sendResponse(MessageResource::collection($data), '', 200);
     }
 }

@@ -22,6 +22,7 @@ return new class extends Migration
             $table->boolean('status')->default(1);
             $table->boolean('newClientMessage')->default(0);
             $table->boolean('newTechnicianMessage')->default(0);
+            $table->boolean('job_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

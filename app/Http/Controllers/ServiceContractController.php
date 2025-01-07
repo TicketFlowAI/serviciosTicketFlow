@@ -11,6 +11,12 @@ use App\Http\Resources\ServiceContractResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @OA\Tag(
+ *     name="Service Contracts",
+ *     description="API Endpoints for managing service contracts"
+ * )
+ */
 class ServiceContractController extends Controller
 {
     private ServiceContractRepositoryInterface $serviceContractRepositoryInterface;
@@ -21,13 +27,25 @@ class ServiceContractController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/service-contracts",
+     *     summary="Get a list of service contracts",
+     *     tags={"Service Contracts"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of service contracts",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/ServiceContractResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
      */
     public function index()
     {
         $user = Auth::user();
 
-        // Filter data based on company for client users
         if ($user->hasRole('client')) {
             $data = $this->serviceContractRepositoryInterface->getContractsByCompany($user->company_id);
         } else {
@@ -35,7 +53,7 @@ class ServiceContractController extends Controller
         }
 
         $data->load('company:id,name', 'service:id,description,price', 'serviceterm:id,months,term');
-        
+
         foreach ($data as $serviceContract) {
             $serviceContract->price = $serviceContract->service->price / $serviceContract->serviceterm->months;
         }
@@ -44,7 +62,26 @@ class ServiceContractController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/service-contracts",
+     *     summary="Create a new service contract",
+     *     tags={"Service Contracts"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"company_id", "service_id", "service_term_id"},
+     *             @OA\Property(property="company_id", type="integer", example=1),
+     *             @OA\Property(property="service_id", type="integer", example=10),
+     *             @OA\Property(property="service_term_id", type="integer", example=2)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Service contract created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/ServiceContractResource")
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
      */
     public function store(StoreServiceContractRequest $request)
     {
@@ -62,14 +99,30 @@ class ServiceContractController extends Controller
 
             DB::commit();
             return ApiResponseClass::sendResponse(new ServiceContractResource($serviceContract), 'ServiceContract Create Successful', 201);
-
         } catch (\Exception $ex) {
             return ApiResponseClass::rollback($ex);
         }
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/service-contracts/{id}",
+     *     summary="Get details of a specific service contract",
+     *     tags={"Service Contracts"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the service contract",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Service contract details retrieved successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/ServiceContractResource")
+     *     ),
+     *     @OA\Response(response=404, description="Service contract not found")
+     * )
      */
     public function show($id)
     {
@@ -81,7 +134,29 @@ class ServiceContractController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/service-contracts/{id}",
+     *     summary="Update a service contract",
+     *     tags={"Service Contracts"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the service contract",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"company_id", "service_id", "service_term_id"},
+     *             @OA\Property(property="company_id", type="integer", example=1),
+     *             @OA\Property(property="service_id", type="integer", example=10),
+     *             @OA\Property(property="service_term_id", type="integer", example=2)
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Service contract updated successfully"),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
      */
     public function update(UpdateServiceContractRequest $request, $id)
     {
@@ -97,14 +172,26 @@ class ServiceContractController extends Controller
 
             DB::commit();
             return ApiResponseClass::sendResponse('ServiceContract Update Successful', '', 201);
-
         } catch (\Exception $ex) {
             return ApiResponseClass::rollback($ex);
         }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/service-contracts/{id}",
+     *     summary="Delete a service contract",
+     *     tags={"Service Contracts"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the service contract",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=204, description="Service contract deleted successfully"),
+     *     @OA\Response(response=404, description="Service contract not found")
+     * )
      */
     public function destroy($id)
     {
@@ -114,13 +201,32 @@ class ServiceContractController extends Controller
     }
 
     /**
-     * Display contracts by company.
+     * @OA\Get(
+     *     path="/service-contracts/company/{id}",
+     *     summary="Get service contracts for a specific company",
+     *     tags={"Service Contracts"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the company",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of service contracts for the company",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/ServiceContractResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Company not found")
+     * )
      */
     public function getContractsByCompany($id)
     {
         $user = Auth::user();
 
-        // Verify that the user is accessing their own company's contracts if they are a client
         if ($user->hasRole('client') && $user->company_id != $id) {
             abort(403, 'Unauthorized access to resource.');
         }

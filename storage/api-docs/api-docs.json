@@ -1,0 +1,2515 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "TicketflowAI API",
+        "version": "0.5"
+    },
+    "paths": {
+        "/api/categories": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Get all categories",
+                "operationId": "3f5817a34833d0a1f4af4548dd3aeaba",
+                "responses": {
+                    "200": {
+                        "description": "List of categories",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CategoryResource"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Create a new category",
+                "operationId": "71fcad552bb0eaba9fb191fd8d8dcab0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "category"
+                                ],
+                                "properties": {
+                                    "category": {
+                                        "type": "string",
+                                        "example": "Electronics"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Category created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CategoryResource"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/categories/{id}": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Get a specific category",
+                "operationId": "c68e76d323c008827a9e47398b1583de",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Category ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CategoryResource"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Update a category",
+                "operationId": "0e686b2748211cc688333ed705dc111f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Category ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "category"
+                                ],
+                                "properties": {
+                                    "category": {
+                                        "type": "string",
+                                        "example": "Updated Category"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Category updated successfully"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Delete a category",
+                "operationId": "4c12e22a7f8c617bd83bfa1fdc05428d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Category ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Category deleted successfully"
+                    }
+                }
+            }
+        },
+        "/companies": {
+            "get": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Get a list of companies",
+                "operationId": "8af1177352a157e9228c00f023616d87",
+                "responses": {
+                    "200": {
+                        "description": "List of companies",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CompanyResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Create a new company",
+                "operationId": "dd2ae66c40ea62cd8f20d49bc08e4b21",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "idNumber",
+                                    "contactEmail",
+                                    "phone",
+                                    "state",
+                                    "city",
+                                    "address"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "MindSoft Inc."
+                                    },
+                                    "idNumber": {
+                                        "type": "string",
+                                        "example": "123456789"
+                                    },
+                                    "contactEmail": {
+                                        "type": "string",
+                                        "example": "contact@mindsoft.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+1-555-1234"
+                                    },
+                                    "state": {
+                                        "type": "string",
+                                        "example": "California"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "San Francisco"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "1234 Market Street"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Company created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CompanyResource"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/companies/{id}": {
+            "get": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Get details of a specific company",
+                "operationId": "662432d4be675d549b84ca1bf7e56b8d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the company",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Company details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CompanyResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Company not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Update a company",
+                "operationId": "00dbc7963c0f6ac45bd2b2595fb1f88e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the company",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Updated Name"
+                                    },
+                                    "idNumber": {
+                                        "type": "string",
+                                        "example": "987654321"
+                                    },
+                                    "contactEmail": {
+                                        "type": "string",
+                                        "example": "updated@mindsoft.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+1-555-6789"
+                                    },
+                                    "state": {
+                                        "type": "string",
+                                        "example": "New York"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "Brooklyn"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "5678 Main Street"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Company updated successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Delete a company",
+                "operationId": "00a9e816ead34effffa2a6378e1cde4b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the company",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Company deleted successfully"
+                    },
+                    "404": {
+                        "description": "Company not found"
+                    }
+                }
+            }
+        },
+        "/emails": {
+            "get": {
+                "tags": [
+                    "Emails"
+                ],
+                "summary": "Get a list of email templates",
+                "operationId": "4b589bf01c020b4a8207f9a86c230db2",
+                "responses": {
+                    "200": {
+                        "description": "List of email templates",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/EmailResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Emails"
+                ],
+                "summary": "Create a new email template",
+                "operationId": "34b5c98c256fa75b183b3c6fb6fbeeff",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "details"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "example": "Welcome Email"
+                                    },
+                                    "details": {
+                                        "example": "Template details"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Email template created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailResource"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/emails/{id}": {
+            "get": {
+                "tags": [
+                    "Emails"
+                ],
+                "summary": "Get details of a specific email template",
+                "operationId": "d124c34922c8747cbeffaf20d7dab6c2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the email template",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email template details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Emails"
+                ],
+                "summary": "Update an email template",
+                "operationId": "88748dccaeb8adc1e21bf84296a24f79",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the email template",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "details"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "example": "Updated Email Template"
+                                    },
+                                    "details": {
+                                        "example": "Updated template details"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Email template updated successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Emails"
+                ],
+                "summary": "Delete an email template",
+                "operationId": "446e0939f44930e70665d4a7a3ba2998",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the email template",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Email template deleted successfully"
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    }
+                }
+            }
+        },
+        "/intervals": {
+            "get": {
+                "tags": [
+                    "Intervals"
+                ],
+                "summary": "Get a list of intervals",
+                "operationId": "b3c2b6306ca2993bf2d7eeca6fea3123",
+                "responses": {
+                    "200": {
+                        "description": "List of intervals",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/IntervalResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Intervals"
+                ],
+                "summary": "Create a new interval",
+                "operationId": "49922ac2e96a30e322b125a7a922d91b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "details"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "example": "Weekly"
+                                    },
+                                    "details": {
+                                        "example": "Every 7 days"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Interval created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IntervalResource"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/intervals/{id}": {
+            "get": {
+                "tags": [
+                    "Intervals"
+                ],
+                "summary": "Get details of a specific interval",
+                "operationId": "eff07503cbc9d7cf14727c6e3b137517",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the interval",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Interval details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IntervalResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Interval not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Intervals"
+                ],
+                "summary": "Update an interval",
+                "operationId": "3ff8e50c2402a00bf79121acbb0c39ec",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the interval",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "details"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "example": "Updated Interval"
+                                    },
+                                    "details": {
+                                        "example": "Updated details"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Interval updated successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Intervals"
+                ],
+                "summary": "Delete an interval",
+                "operationId": "98c9593305e7a2bd87e6c9f14eb1256b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the interval",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Interval deleted successfully"
+                    },
+                    "404": {
+                        "description": "Interval not found"
+                    }
+                }
+            }
+        },
+        "/messages": {
+            "post": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Create a new message for a ticket",
+                "operationId": "941d583a09ed64becb2c2f4753c22501",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "ticket_id",
+                                    "content"
+                                ],
+                                "properties": {
+                                    "ticket_id": {
+                                        "example": 123
+                                    },
+                                    "content": {
+                                        "example": "This is a message content."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Message created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MessageResource"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/messages/{id}": {
+            "get": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Get messages for a specific ticket",
+                "operationId": "abaddc21ac1f3e46b3cf1527df9bad66",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the message",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MessageResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Message not found"
+                    }
+                }
+            }
+        },
+        "/roles": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Get a list of roles",
+                "operationId": "e6026ae04415323ab56861ddc085bc7c",
+                "responses": {
+                    "200": {
+                        "description": "List of roles",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/RoleResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Create a new role",
+                "operationId": "a39d43e405902d707bd48570d2d39c68",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "permissions"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Admin"
+                                    },
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "view_users"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Role created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RoleResource"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/roles/{id}": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Get details of a specific role",
+                "operationId": "b6b00639ca7853cc291bb69bdccf43ae",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the role",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Role details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RoleResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Role not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Update a role",
+                "operationId": "4b94cf854abed3012d035a211c1c10d4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the role",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "permissions"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Updated Role"
+                                    },
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "edit_users"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Role updated successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Delete a role",
+                "operationId": "df13d2b88c93242dcce58a2e1805b294",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the role",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Role deleted successfully"
+                    },
+                    "404": {
+                        "description": "Role not found"
+                    }
+                }
+            }
+        },
+        "/roles/permissions": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Get a list of all permissions",
+                "operationId": "009cd026f276441fa44af2743ef99284",
+                "responses": {
+                    "200": {
+                        "description": "List of permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "example": "view_users"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/service-contracts": {
+            "get": {
+                "tags": [
+                    "Service Contracts"
+                ],
+                "summary": "Get a list of service contracts",
+                "operationId": "c74777af89f5f82cf7ae9061c3f87c63",
+                "responses": {
+                    "200": {
+                        "description": "List of service contracts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ServiceContractResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Service Contracts"
+                ],
+                "summary": "Create a new service contract",
+                "operationId": "dafb3f10e5c1e227fe0b2e58439059ff",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "company_id",
+                                    "service_id",
+                                    "service_term_id"
+                                ],
+                                "properties": {
+                                    "company_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "service_id": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "service_term_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Service contract created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServiceContractResource"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/service-contracts/{id}": {
+            "get": {
+                "tags": [
+                    "Service Contracts"
+                ],
+                "summary": "Get details of a specific service contract",
+                "operationId": "b92130dc6e2e5b76eff6116560b3f1e3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the service contract",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Service contract details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServiceContractResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Service contract not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Service Contracts"
+                ],
+                "summary": "Update a service contract",
+                "operationId": "0b0efe19814d0396b8effe1ab1a5ea32",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the service contract",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "company_id",
+                                    "service_id",
+                                    "service_term_id"
+                                ],
+                                "properties": {
+                                    "company_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "service_id": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "service_term_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Service contract updated successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Service Contracts"
+                ],
+                "summary": "Delete a service contract",
+                "operationId": "1b742a656a0c0beea147a3c791eb1f1b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the service contract",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Service contract deleted successfully"
+                    },
+                    "404": {
+                        "description": "Service contract not found"
+                    }
+                }
+            }
+        },
+        "/service-contracts/company/{id}": {
+            "get": {
+                "tags": [
+                    "Service Contracts"
+                ],
+                "summary": "Get service contracts for a specific company",
+                "operationId": "bf50f1a812acc1a64d289ab59c47ba1c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the company",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of service contracts for the company",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ServiceContractResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Company not found"
+                    }
+                }
+            }
+        },
+        "/services": {
+            "get": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Get a list of services",
+                "operationId": "96950feb4aaa0ea9dd7db3b3838bd669",
+                "responses": {
+                    "200": {
+                        "description": "List of services",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ServiceResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Create a new service",
+                "operationId": "712dc5ef305b550f23a52b0c47606882",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "category_id",
+                                    "description",
+                                    "price",
+                                    "tax_id"
+                                ],
+                                "properties": {
+                                    "category_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Premium Support Service"
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 99.99
+                                    },
+                                    "tax_id": {
+                                        "type": "integer",
+                                        "example": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Service created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServiceResource"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/services/{id}": {
+            "get": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Get details of a specific service",
+                "operationId": "95c29468312a2180cbbd984d8a78956a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the service",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Service details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServiceResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Service not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Update a service",
+                "operationId": "d86b5903ff77772f3c6964f7f7b8bea5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the service",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "category_id",
+                                    "description",
+                                    "price",
+                                    "tax_id"
+                                ],
+                                "properties": {
+                                    "category_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Updated Support Service"
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 89.99
+                                    },
+                                    "tax_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Service updated successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Delete a service",
+                "operationId": "fd9c6358cc2bcf0bbc38ddf9a6b658cf",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the service",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Service deleted successfully"
+                    },
+                    "404": {
+                        "description": "Service not found"
+                    }
+                }
+            }
+        },
+        "/service-terms": {
+            "get": {
+                "tags": [
+                    "Service Terms"
+                ],
+                "summary": "Get a list of service terms",
+                "operationId": "b506a850b3fac0051951599f0b336de0",
+                "responses": {
+                    "200": {
+                        "description": "List of service terms",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ServiceTermResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Service Terms"
+                ],
+                "summary": "Create a new service term",
+                "operationId": "2867fce262a233d68755c3803caf776a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "term",
+                                    "months"
+                                ],
+                                "properties": {
+                                    "term": {
+                                        "type": "string",
+                                        "example": "Annual"
+                                    },
+                                    "months": {
+                                        "type": "integer",
+                                        "example": 12
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Service term created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServiceTermResource"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/service-terms/{id}": {
+            "get": {
+                "tags": [
+                    "Service Terms"
+                ],
+                "summary": "Get details of a specific service term",
+                "operationId": "fdebc3dc9cdcf116a258a3f84a1eced9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the service term",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Service term details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServiceTermResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Service term not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Service Terms"
+                ],
+                "summary": "Update a service term",
+                "operationId": "de5fce996f15f00370436a874858ab29",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the service term",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "term",
+                                    "months"
+                                ],
+                                "properties": {
+                                    "term": {
+                                        "type": "string",
+                                        "example": "Updated Term"
+                                    },
+                                    "months": {
+                                        "type": "integer",
+                                        "example": 6
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Service term updated successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Service Terms"
+                ],
+                "summary": "Delete a service term",
+                "operationId": "c7641b20485a43d3f6b0d770dc55dd21",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the service term",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Service term deleted successfully"
+                    },
+                    "404": {
+                        "description": "Service term not found"
+                    }
+                }
+            }
+        },
+        "/taxes": {
+            "get": {
+                "tags": [
+                    "Taxes"
+                ],
+                "summary": "Get a list of taxes",
+                "operationId": "76fe8d70c208007f6e25333e21ddaf33",
+                "responses": {
+                    "200": {
+                        "description": "List of taxes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/TaxResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Taxes"
+                ],
+                "summary": "Create a new tax",
+                "operationId": "cd548cce3cb0aee08d3b1cf6ededeb38",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "description",
+                                    "value"
+                                ],
+                                "properties": {
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Value Added Tax (VAT)"
+                                    },
+                                    "value": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 15
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Tax created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TaxResource"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/taxes/{id}": {
+            "get": {
+                "tags": [
+                    "Taxes"
+                ],
+                "summary": "Get details of a specific tax",
+                "operationId": "40cda3aa9b6f734e8b1696fd3d8e744d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the tax",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tax details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TaxResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tax not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Taxes"
+                ],
+                "summary": "Update a tax",
+                "operationId": "18852141c6a8391b10eef2adf9dc59d6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the tax",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "description",
+                                    "value"
+                                ],
+                                "properties": {
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Updated Tax Description"
+                                    },
+                                    "value": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 18
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tax updated successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Taxes"
+                ],
+                "summary": "Delete a tax",
+                "operationId": "9e19dcc7c4b2a1c6726f5650208fd8dc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the tax",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Tax deleted successfully"
+                    },
+                    "404": {
+                        "description": "Tax not found"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get a list of users",
+                "operationId": "7e2f5799553ec93c9c43e2a58490d447",
+                "responses": {
+                    "200": {
+                        "description": "List of users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UserResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a new user",
+                "operationId": "a1fce870c566eb5fc0cf3178ec5d2fed",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "lastname",
+                                    "email",
+                                    "password",
+                                    "company_id",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "lastname": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john.doe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "securepassword123"
+                                    },
+                                    "company_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "admin"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResource"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get details of a specific user",
+                "operationId": "910a0c7cf580e1c605648d82a4e57f46",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update a user",
+                "operationId": "ddfe232db1870b82493bf8bd25596d37",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "lastname",
+                                    "email",
+                                    "company_id"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "lastname": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john.doe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "newsecurepassword123"
+                                    },
+                                    "company_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "editor"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User updated successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete a user",
+                "operationId": "43dd20becb1f47444e484cbb18ce345c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User deleted successfully"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/users/authenticated": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get details of the authenticated user",
+                "operationId": "ed98cef0014a89630f79a37b6a82c4b4",
+                "responses": {
+                    "200": {
+                        "description": "Authenticated user details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResource"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/role": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Retrieve users with a specific role",
+                "operationId": "73102594b8e2093fa7e1fa99e9db1645",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "description": "Role of the users to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "admin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of users with the specified role",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UserResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Role parameter is required"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CategoryResource": {
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the category",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "category": {
+                        "description": "Name of the category",
+                        "type": "string",
+                        "example": "Electronics"
+                    }
+                },
+                "type": "object"
+            },
+            "CompanyResource": {
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the company",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Name of the company",
+                        "type": "string",
+                        "example": "MindSoft Inc."
+                    },
+                    "idNumber": {
+                        "description": "Identification number of the company",
+                        "type": "string",
+                        "example": "123456789"
+                    },
+                    "contactEmail": {
+                        "description": "Contact email of the company",
+                        "type": "string",
+                        "example": "contact@mindsoft.com"
+                    },
+                    "phone": {
+                        "description": "Contact phone number of the company",
+                        "type": "string",
+                        "example": "+1-555-1234"
+                    },
+                    "state": {
+                        "description": "State where the company is located",
+                        "type": "string",
+                        "example": "California"
+                    },
+                    "city": {
+                        "description": "City where the company is located",
+                        "type": "string",
+                        "example": "San Francisco"
+                    },
+                    "address": {
+                        "description": "Address of the company",
+                        "type": "string",
+                        "example": "1234 Market Street"
+                    }
+                },
+                "type": "object"
+            },
+            "EmailResource": {
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the email template",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "template_name": {
+                        "description": "Name of the email template",
+                        "type": "string",
+                        "example": "Welcome Email"
+                    },
+                    "body": {
+                        "description": "Body of the email template",
+                        "type": "string",
+                        "example": "Welcome to our service!"
+                    }
+                },
+                "type": "object"
+            },
+            "IntervalResource": {
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the interval",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "days": {
+                        "description": "Number of days for the interval",
+                        "type": "integer",
+                        "example": 7
+                    },
+                    "type": {
+                        "description": "Type of interval (e.g., weekly, monthly)",
+                        "type": "string",
+                        "example": "Weekly"
+                    },
+                    "template_name": {
+                        "description": "Name of the associated template",
+                        "type": "string",
+                        "example": "Weekly Report Template"
+                    },
+                    "subject_template": {
+                        "description": "Subject template for the interval",
+                        "type": "string",
+                        "example": "Weekly Summary"
+                    }
+                },
+                "type": "object"
+            },
+            "MessageResource": {
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the message",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "ticket_id": {
+                        "description": "ID of the associated ticket",
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "content": {
+                        "description": "Content of the message",
+                        "type": "string",
+                        "example": "This is a message content."
+                    },
+                    "user_id": {
+                        "description": "ID of the user who created the message",
+                        "type": "integer",
+                        "example": 45
+                    },
+                    "user_name": {
+                        "description": "First name of the user who created the message",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "user_lastname": {
+                        "description": "Last name of the user who created the message",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "user_role": {
+                        "description": "Role of the user who created the message",
+                        "type": "string",
+                        "example": "technician"
+                    },
+                    "timestamp": {
+                        "description": "Timestamp of when the message was created",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T12:34:56Z"
+                    }
+                },
+                "type": "object"
+            },
+            "RoleResource": {
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the role",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Name of the role",
+                        "type": "string",
+                        "example": "Admin"
+                    },
+                    "permissions": {
+                        "description": "List of permissions associated with the role",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "view_users"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ServiceContractResource": {
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the service contract",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "company_id": {
+                        "description": "ID of the associated company",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "company": {
+                        "description": "Name of the associated company",
+                        "type": "string",
+                        "example": "MindSoft Inc."
+                    },
+                    "service_id": {
+                        "description": "ID of the associated service",
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "service": {
+                        "description": "Description of the associated service",
+                        "type": "string",
+                        "example": "Premium Support"
+                    },
+                    "service_term_id": {
+                        "description": "ID of the associated service term",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "service_term": {
+                        "description": "Term duration for the service",
+                        "type": "string",
+                        "example": "12 months"
+                    },
+                    "price": {
+                        "description": "Calculated monthly price for the service",
+                        "type": "number",
+                        "format": "float",
+                        "example": 100.5
+                    }
+                },
+                "type": "object"
+            },
+            "ServiceResource": {
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the service",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "category_id": {
+                        "description": "ID of the associated category",
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "category": {
+                        "description": "Name of the category",
+                        "type": "string",
+                        "example": "Software"
+                    },
+                    "description": {
+                        "description": "Description of the service",
+                        "type": "string",
+                        "example": "Premium Support Service"
+                    },
+                    "price": {
+                        "description": "Price of the service",
+                        "type": "number",
+                        "format": "float",
+                        "example": 99.99
+                    },
+                    "tax_id": {
+                        "description": "ID of the associated tax",
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "tax_description": {
+                        "description": "Description of the tax",
+                        "type": "string",
+                        "example": "VAT 15%"
+                    }
+                },
+                "type": "object"
+            },
+            "ServiceTermResource": {
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the service term",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "term": {
+                        "description": "Name or description of the service term",
+                        "type": "string",
+                        "example": "Annual"
+                    },
+                    "months": {
+                        "description": "Number of months for the service term",
+                        "type": "integer",
+                        "example": 12
+                    }
+                },
+                "type": "object"
+            },
+            "TaxResource": {
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the tax",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "description": {
+                        "description": "Description of the tax",
+                        "type": "string",
+                        "example": "Value Added Tax (VAT)"
+                    },
+                    "value": {
+                        "description": "Percentage value of the tax",
+                        "type": "number",
+                        "format": "float",
+                        "example": 15
+                    }
+                },
+                "type": "object"
+            },
+            "UserResource": {
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the user",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "First name of the user",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "lastname": {
+                        "description": "Last name of the user",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "email": {
+                        "description": "Email address of the user",
+                        "type": "string",
+                        "format": "email",
+                        "example": "john.doe@example.com"
+                    },
+                    "role": {
+                        "description": "Role assigned to the user",
+                        "type": "string",
+                        "example": "admin"
+                    },
+                    "company_id": {
+                        "description": "ID of the company associated with the user",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "company_name": {
+                        "description": "Name of the company associated with the user",
+                        "type": "string",
+                        "example": "TechCorp"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Category",
+            "description": "Endpoints for managing categories"
+        },
+        {
+            "name": "Companies",
+            "description": "API Endpoints for managing companies"
+        },
+        {
+            "name": "Emails",
+            "description": "API Endpoints for managing email templates"
+        },
+        {
+            "name": "Intervals",
+            "description": "API Endpoints for managing intervals"
+        },
+        {
+            "name": "Messages",
+            "description": "API Endpoints for managing ticket messages"
+        },
+        {
+            "name": "Roles",
+            "description": "API Endpoints for managing roles"
+        },
+        {
+            "name": "Service Contracts",
+            "description": "API Endpoints for managing service contracts"
+        },
+        {
+            "name": "Services",
+            "description": "API Endpoints for managing services"
+        },
+        {
+            "name": "Service Terms",
+            "description": "API Endpoints for managing service terms"
+        },
+        {
+            "name": "Taxes",
+            "description": "API Endpoints for managing taxes"
+        },
+        {
+            "name": "Users",
+            "description": "API Endpoints for managing users"
+        }
+    ]
+}
