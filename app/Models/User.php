@@ -56,7 +56,7 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Company::class);
     }
-    
+
     public function ticket(): HasMany
     {
         return $this->hasMany(Ticket::class);
@@ -66,4 +66,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Message::class);
     }
+
+    public function ticketHistories()
+    {
+        return $this->hasMany(TicketHistory::class);
+    }
+
 }

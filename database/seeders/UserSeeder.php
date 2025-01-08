@@ -21,17 +21,31 @@ class UserSeeder extends Seeder
             'company_id' => 1
         ])->assignRole('super-admin');
         User::create([
-            'name' => 'Mindsoft',
-            'lastname' => 'technician',
-            'email' => 'dennis.ocana@mindsoft.biz',
-            'password' => 'EstaEsUnaCotraseña123*',
+            'name' => 'Technician',
+            'lastname' => 'Level1',
+            'email' => 'tecnico1@mindsoft.biz',
+            'password' => 'EstaEsUnaContraseña123*',
             'company_id' => 1
-        ])->assignRole('technician');
+        ])->assignRole('technician','1');
+        User::create([
+            'name' => 'Technician',
+            'lastname' => 'Level2',
+            'email' => 'tecnico2@mindsoft.biz',
+            'password' => 'EstaEsUnaContraseña123*',
+            'company_id' => 1
+        ])->assignRole('technician','2');
+        User::create([
+            'name' => 'Technician',
+            'lastname' => 'Level3',
+            'email' => 'tecnico3@mindsoft.biz',
+            'password' => 'EstaEsUnaContraseña123*',
+            'company_id' => 1
+        ])->assignRole('technician','3');
         User::create([
             'name' => 'Jessica',
             'lastname' => 'Montero',
             'email' => 'jmontero@siegfried.com.ec',
-            'password' => 'EstaEsUnaCotraseña123*',
+            'password' => 'EstaEsUnaContraseña123*',
             'company_id' => 2
         ])->assignRole('client');
     }

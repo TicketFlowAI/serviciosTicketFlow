@@ -9,6 +9,7 @@ use App\Http\Resources\TicketResource;
 use App\Interfaces\TicketRepositoryInterface;
 use App\Models\Company;
 use App\Models\Service;
+use App\Models\TicketHistory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
@@ -49,13 +50,10 @@ class TicketController extends Controller
         $user = Auth::user();
 
         if ($user->hasRole('client')) {
-            // Filter data based on company for client users
             $data = $this->ticketRepositoryInterface->getTicketsByCompany($user->company_id);
         } elseif ($user->hasRole('technician')) {
-            // Return tickets assigned to the technician
             $data = $this->ticketRepositoryInterface->getTicketsByTechnician($user->id);
         } else {
-            // Return all tickets for other roles
             $data = $this->ticketRepositoryInterface->index();
         }
 
@@ -99,9 +97,17 @@ class TicketController extends Controller
         try {
             $ticket = $this->ticketRepositoryInterface->store($details);
 
+            // Log ticket creation in history
+            TicketHistory::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => Auth::id(),
+                'action' => 'created',
+            ]);
+
             DB::commit();
             return ApiResponseClass::sendResponse(new TicketResource($ticket), 'Ticket Create Successful', 201);
         } catch (\Exception $ex) {
+            DB::rollback();
             return ApiResponseClass::rollback($ex);
         }
     }
@@ -169,9 +175,17 @@ class TicketController extends Controller
         try {
             $this->ticketRepositoryInterface->update($updateDetails, $id);
 
+            // Log ticket update in history
+            TicketHistory::create([
+                'ticket_id' => $id,
+                'user_id' => Auth::id(),
+                'action' => 'updated',
+            ]);
+
             DB::commit();
             return ApiResponseClass::sendResponse('Ticket Update Successful', '', 201);
         } catch (\Exception $ex) {
+            DB::rollback();
             return ApiResponseClass::rollback($ex);
         }
     }
@@ -194,14 +208,28 @@ class TicketController extends Controller
      */
     public function destroy($id)
     {
-        $this->ticketRepositoryInterface->delete($id);
+        DB::beginTransaction();
+        try {
+            $this->ticketRepositoryInterface->delete($id);
 
-        return ApiResponseClass::sendResponse('Ticket Delete Successful', '', 204);
+            // Log ticket deletion in history
+            TicketHistory::create([
+                'ticket_id' => $id,
+                'user_id' => Auth::id(),
+                'action' => 'deleted',
+            ]);
+
+            DB::commit();
+            return ApiResponseClass::sendResponse('Ticket Delete Successful', '', 204);
+        } catch (\Exception $ex) {
+            DB::rollback();
+            return ApiResponseClass::rollback($ex);
+        }
     }
 
     /**
-     * @OA\Patch(
-     *     path="/tickets/{id}/close",
+     * @OA\Post(
+     *     path="/tickets/close/{id}",
      *     summary="Close a ticket",
      *     tags={"Tickets"},
      *     @OA\Parameter(
@@ -225,16 +253,24 @@ class TicketController extends Controller
         try {
             $this->ticketRepositoryInterface->update($details, $id);
 
+            // Log ticket closure in history
+            TicketHistory::create([
+                'ticket_id' => $id,
+                'user_id' => Auth::id(),
+                'action' => 'closed',
+            ]);
+
             DB::commit();
             return ApiResponseClass::sendResponse('Ticket Close Successful', '', 201);
         } catch (\Exception $ex) {
+            DB::rollback();
             return ApiResponseClass::rollback($ex);
         }
     }
 
     /**
-     * @OA\Patch(
-     *     path="/tickets/{id}/assign",
+     * @OA\Post(
+     *     path="/tickets/reassign/{id}",
      *     summary="Assign or reassign a ticket",
      *     tags={"Tickets"},
      *     @OA\Parameter(
@@ -252,51 +288,31 @@ class TicketController extends Controller
     {
         DB::beginTransaction();
         try {
-            // Get the ticket by ID
             $ticket = $this->ticketRepositoryInterface->getById($id);
 
             if (!$ticket) {
                 return ApiResponseClass::sendResponse('Ticket not found', '', 404);
             }
 
-            // Get all users with the role 'technician'
             $technicians = Role::where('name', 'technician')->first()->users;
 
             if ($technicians->isEmpty()) {
                 return ApiResponseClass::sendResponse('No technicians available', '', 400);
             }
 
-            if (!$ticket->user_id) {
-                // Filter technicians based on ticket complexity
-                $technicians = $technicians->filter(function ($technician) use ($ticket) {
-                    return $technician->hasRole((string) $ticket->complexity);
-                });
-
-                if ($technicians->isEmpty()) {
-                    return ApiResponseClass::sendResponse('No technicians available for this complexity level', '', 400);
-                }
-            } else {
-                // Filter technicians with roles higher than the current technician
-                $currentTechnician = $technicians->where('id', $ticket->user_id)->first();
-
-                $technicians = $technicians->filter(function ($technician) use ($currentTechnician) {
-                    $currentRoles = $currentTechnician->getRoleNames();
-                    return $technician->hasAnyRole(array_map(fn($role) => (string) ((int) $role + 1), $currentRoles->toArray()));
-                });
-
-                if ($technicians->isEmpty()) {
-                    return ApiResponseClass::sendResponse('No technicians available of a higher level', '', 400);
-                }
-            }
-
-            // Filter by the technician with the least number of tickets with status not equal to 0
             $technicianWithLeastTickets = $technicians->sortBy(function ($technician) {
                 return $technician->tickets()->where('status', '!=', 0)->count();
             })->first();
 
-            // Assign the ticket to the technician
             $ticket->user_id = $technicianWithLeastTickets->id;
             $ticket->save();
+
+            // Log ticket assignment in history
+            TicketHistory::create([
+                'ticket_id' => $id,
+                'user_id' => Auth::id(),
+                'action' => 'assigned to user ID ' . $technicianWithLeastTickets->id,
+            ]);
 
             DB::commit();
             return ApiResponseClass::sendResponse('Ticket assigned successfully', '', 200);

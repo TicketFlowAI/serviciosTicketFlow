@@ -1883,6 +1883,256 @@
                 }
             }
         },
+        "/tickets": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Get a list of tickets",
+                "operationId": "aa5e80a6f31951862c4554396ce1b1fd",
+                "responses": {
+                    "200": {
+                        "description": "List of tickets",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/TicketResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Create a new ticket",
+                "operationId": "f9282cd452389d3cc5d06f0cf782b672",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "description",
+                                    "company_id",
+                                    "service_id"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Ticket Title"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Detailed description of the issue"
+                                    },
+                                    "company_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "service_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Ticket created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TicketResource"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/tickets/{id}": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Get details of a specific ticket",
+                "operationId": "58c0560497a0fe53498de3da53eee228",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the ticket",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ticket details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TicketResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Ticket not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Update a ticket",
+                "operationId": "c1fed2bc5f00f4279c3d38565e671762",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the ticket",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "description"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Updated Ticket Title"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Updated description of the issue"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Ticket updated successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Delete a ticket",
+                "operationId": "cec7be57c0153e6b94020ab492e0ab2b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the ticket",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Ticket deleted successfully"
+                    },
+                    "404": {
+                        "description": "Ticket not found"
+                    }
+                }
+            }
+        },
+        "/tickets/close/{id}": {
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Close a ticket",
+                "operationId": "359aad7afdeb76ab1448090210b5c1f2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the ticket",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ticket closed successfully"
+                    },
+                    "404": {
+                        "description": "Ticket not found"
+                    }
+                }
+            }
+        },
+        "/tickets/reassign/{id}": {
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Assign or reassign a ticket",
+                "operationId": "0d843d61daebede9b972cda876fe6030",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the ticket",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ticket assigned successfully"
+                    },
+                    "404": {
+                        "description": "Ticket not found"
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "tags": [
@@ -2477,6 +2727,92 @@
                 },
                 "type": "object"
             },
+            "TicketResource": {
+                "description": "Ticket resource schema",
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier of the ticket",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "service_contract_id": {
+                        "description": "ID of the associated service contract",
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "service_id": {
+                        "description": "ID of the service",
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "service_desc": {
+                        "description": "Description of the service",
+                        "type": "string",
+                        "example": "Technical Support"
+                    },
+                    "company_id": {
+                        "description": "ID of the associated company",
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "company_name": {
+                        "description": "Name of the company",
+                        "type": "string",
+                        "example": "TechCorp"
+                    },
+                    "title": {
+                        "description": "Title of the ticket",
+                        "type": "string",
+                        "example": "System Outage"
+                    },
+                    "priority": {
+                        "description": "Priority of the ticket",
+                        "type": "string",
+                        "example": "High"
+                    },
+                    "needsHumanInteraction": {
+                        "description": "Whether the ticket requires human interaction",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "complexity": {
+                        "description": "Complexity level of the ticket",
+                        "type": "string",
+                        "example": "Medium"
+                    },
+                    "user_id": {
+                        "description": "ID of the user who created the ticket",
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "user_name": {
+                        "description": "Name of the user who created the ticket",
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "user_lastname": {
+                        "description": "Lastname of the user who created the ticket",
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "status": {
+                        "description": "Current status of the ticket",
+                        "type": "string",
+                        "example": "Open"
+                    },
+                    "newClientMessage": {
+                        "description": "Indicates if there's a new message from the client",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "newTechnicianMessage": {
+                        "description": "Indicates if there's a new message from the technician",
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
             "UserResource": {
                 "properties": {
                     "id": {
@@ -2560,6 +2896,10 @@
         {
             "name": "Taxes",
             "description": "API Endpoints for managing taxes"
+        },
+        {
+            "name": "Tickets",
+            "description": "API Endpoints for managing tickets"
         },
         {
             "name": "Users",
