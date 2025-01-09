@@ -12,7 +12,8 @@ use App\Http\Controllers\{
     UserController,
     EmailController,
     IntervalController,
-    RolesController
+    RolesController,
+    ReportController
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -43,4 +44,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('/roles', RolesController::class);
     Route::get('/permissions', [RolesController::class, 'listPermissions']);
     Route::post('/tickets/history/{id}', [TicketController::class, 'retrieveTicketHistory']);
+    Route::get('/reports/tickets-solved', [ReportController::class, 'getTicketsSolved']);
+    Route::get('/reports/average-time-to-close', [ReportController::class, 'getAverageTimeToClose']);
+    Route::get('/reports/tickets-escalations', [ReportController::class, 'getTicketsEscalations']);
+    Route::get('/reports/tickets-per-complexity', [ReportController::class, 'getTicketsPerComplexity']);
+    Route::get('/reports/tickets-human-interaction', [ReportController::class, 'getTicketsHumanInteraction']);
+    Route::get('/reports/technician/{user_id}/tickets-solved', [ReportController::class, 'getTechnicianTicketsSolved']);
+    Route::get('/reports/technician/{user_id}/average-time-to-solve', [ReportController::class, 'getTechnicianAverageTimeToSolve']);
+    Route::get('/reports/technician/{user_id}/tickets-assigned-reassigned', [ReportController::class, 'getTechnicianTicketsAssignedAndReassigned']);
+    Route::get('/reports/technician/{user_id}/current-tickets', [ReportController::class, 'getTechnicianCurrentTickets']);
+    Route::get('/reports/technician/{user_id}/weekly-comparison', [ReportController::class, 'getTechnicianWeeklyComparison']);
 });

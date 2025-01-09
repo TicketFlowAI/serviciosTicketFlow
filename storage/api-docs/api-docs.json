@@ -1065,10 +1065,20 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "object",
-                                        "example": "view_users"
+                                        "$ref": "#/components/schemas/PermissionResource"
                                     }
                                 }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No permissions found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "No permissions found"
                             }
                         }
                     }
@@ -2049,32 +2059,6 @@
                         "description": "Invalid request"
                     }
                 }
-            },
-            "delete": {
-                "tags": [
-                    "Tickets"
-                ],
-                "summary": "Delete a ticket",
-                "operationId": "cec7be57c0153e6b94020ab492e0ab2b",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID of the ticket",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Ticket deleted successfully"
-                    },
-                    "404": {
-                        "description": "Ticket not found"
-                    }
-                }
             }
         },
         "/tickets/close/{id}": {
@@ -2126,6 +2110,44 @@
                 "responses": {
                     "200": {
                         "description": "Ticket assigned successfully"
+                    },
+                    "404": {
+                        "description": "Ticket not found"
+                    }
+                }
+            }
+        },
+        "/tickets/{id}/history": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Retrieve the history of a specific ticket",
+                "operationId": "7c87bac94b203e42e70f242b7779abc8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the ticket",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ticket history retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/TicketHistoryResource"
+                                    }
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Ticket not found"
@@ -2739,6 +2761,37 @@
                         "type": "number",
                         "format": "float",
                         "example": 15
+                    }
+                },
+                "type": "object"
+            },
+            "TicketHistoryResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "ticket_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "action": {
+                        "type": "string",
+                        "example": "created"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-10-01T00:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-10-01T00:00:00Z"
                     }
                 },
                 "type": "object"
