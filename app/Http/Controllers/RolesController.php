@@ -194,7 +194,15 @@ class RolesController extends Controller
      *         description="List of permissions",
      *         @OA\JsonContent(
      *             type="array",
-     *             @OA\Items(type="string", example="view_users")
+     *             @OA\Items(ref="#/components/schemas/PermissionResource")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No permissions found",
+     *         @OA\JsonContent(
+     *             type="string",
+     *             example="No permissions found"
      *         )
      *     )
      * )
@@ -208,4 +216,5 @@ class RolesController extends Controller
         }
         return ApiResponseClass::sendResponse(PermissionResource::collection($permissions), '', 200);
     }
+
 }

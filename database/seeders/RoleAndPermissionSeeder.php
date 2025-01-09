@@ -14,16 +14,25 @@ class RoleAndPermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::create(['name' => 'client']);
-        Role::create(['name' => 'technician']);
-        Role::create(['name' => 'super-admin']);
-        Role::create(['name' => '1']);
-        Role::create(['name' => '2']);
-        Role::create(['name' => '3']);
+        // Create roles
+        $roles = [
+            'client',
+            'technician',
+            'super-admin',
+            '1',
+            '2',
+            '3'
+        ];
 
+        foreach ($roles as $roleName) {
+            Role::create(['name' => $roleName]);
+        }
 
-        Permission::create(['name' => 'view-users']);
-
-        
+        // Create permissions
+        $viewUsersPermission = Permission::create(['name' => 'view-users']);
+        Permission::create(['name' => 'modify-roles']);
+        // Assign permission to the super-admin role
+        $superAdminRole = Role::where('name', 'super-admin')->first();
+        $superAdminRole->givePermissionTo($viewUsersPermission);
     }
 }

@@ -1050,13 +1050,13 @@
                 }
             }
         },
-        "/roles/permissions": {
+        "/permissions": {
             "get": {
                 "tags": [
                     "Roles"
                 ],
                 "summary": "Get a list of all permissions",
-                "operationId": "009cd026f276441fa44af2743ef99284",
+                "operationId": "b98c25c2061e3a53bbc391cfe63951c3",
                 "responses": {
                     "200": {
                         "description": "List of permissions",
@@ -1065,7 +1065,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string",
+                                        "type": "object",
                                         "example": "view_users"
                                     }
                                 }
@@ -2572,6 +2572,22 @@
                         "type": "string",
                         "format": "date-time",
                         "example": "2024-01-01T12:34:56Z"
+                    }
+                },
+                "type": "object"
+            },
+            "PermissionResource": {
+                "description": "Permission resource schema",
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier of the permission",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Name of the permission",
+                        "type": "string",
+                        "example": "view_users"
                     }
                 },
                 "type": "object"
