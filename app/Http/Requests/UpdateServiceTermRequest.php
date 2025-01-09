@@ -6,6 +6,8 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
 
+use Illuminate\Validation\Rule;
+
 class UpdateServiceTermRequest extends FormRequest
 {
     /**
@@ -21,16 +23,27 @@ class UpdateServiceTermRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
+
     public function rules(): array
     {
         // Get the ID of the resource being updated from the route
-        $id = $this->route('serviceterm'); // Ensure 'serviceterm' matches the route parameter
-
+        $id = $this->route('serviceTerm'); // Ensure 'serviceTerm' matches the route parameter name
+    
         return [
-            'term' => "required|string|unique:serviceterms,term,{$id}",
-            'months' => "required|numeric|unique:serviceterms,months,{$id}",
+            'term' => [
+                'required',
+                'string',
+                Rule::unique('service_terms', 'term')->ignore($id),
+            ],
+            'months' => [
+                'required',
+                'numeric',
+                Rule::unique('service_terms', 'months')->ignore($id),
+            ],
         ];
     }
+    
+
 
     /**
      * Sends an httpException stating what went wrong with the validation.
@@ -38,9 +51,9 @@ class UpdateServiceTermRequest extends FormRequest
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
-            'success'   => false,
-            'message'   => 'Validation errors',
-            'data'      => $validator->errors(),
+            'success' => false,
+            'message' => 'Validation errors',
+            'data' => $validator->errors(),
         ]));
     }
 }

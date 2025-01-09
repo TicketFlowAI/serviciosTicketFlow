@@ -19,4 +19,6 @@ class ServiceTerm extends Model
     {
         return $this->hasMany(ServiceContract::class);
     }
+
+    protected $table = 'service_terms';
 }

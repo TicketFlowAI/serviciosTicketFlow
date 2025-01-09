@@ -25,7 +25,7 @@ class StoreServiceTermRequest extends FormRequest
     {
         return [
             'term' => 'required|string|unique:service_terms',
-            'months' => 'required|numeric'
+            'months' => 'required|numeric|unique:service_terms'
         ];
     }
 

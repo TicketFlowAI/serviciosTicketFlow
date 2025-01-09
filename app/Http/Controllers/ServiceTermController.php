@@ -143,7 +143,7 @@ class ServiceTermController extends Controller
         ];
         DB::beginTransaction();
         try {
-            $serviceTerm = $this->serviceTermRepositoryInterface->update($updateDetails, $id);
+            $this->serviceTermRepositoryInterface->update($updateDetails, $id);
 
             DB::commit();
             return ApiResponseClass::sendResponse('ServiceTerm Update Successful', '', 201);
