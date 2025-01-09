@@ -46,15 +46,7 @@ class TicketRepository implements TicketRepositoryInterface
     {
         return Ticket::whereId($id)->update($data);
     }
-
-    /**
-     * Deletes an Item by ID.
-     */
-    public function delete($id)
-    {
-        Ticket::destroy($id);
-    }
-
+    
     /**
      * Retrieves tickets by company
      */

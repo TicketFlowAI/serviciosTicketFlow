@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Classes\ApiResponseClass;
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
+use App\Http\Resources\TicketHistoryResource;
 use App\Http\Resources\TicketResource;
 use App\Interfaces\TicketRepositoryInterface;
 use App\Models\Company;
@@ -12,6 +13,7 @@ use App\Models\Service;
 use App\Models\TicketHistory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
 /**
@@ -98,11 +100,7 @@ class TicketController extends Controller
             $ticket = $this->ticketRepositoryInterface->store($details);
 
             // Log ticket creation in history
-            TicketHistory::create([
-                'ticket_id' => $ticket->id,
-                'user_id' => Auth::id(),
-                'action' => 'created',
-            ]);
+            $this->recordHistory($ticket->id, 'created');
 
             DB::commit();
             return ApiResponseClass::sendResponse(new TicketResource($ticket), 'Ticket Create Successful', 201);
@@ -176,51 +174,10 @@ class TicketController extends Controller
             $this->ticketRepositoryInterface->update($updateDetails, $id);
 
             // Log ticket update in history
-            TicketHistory::create([
-                'ticket_id' => $id,
-                'user_id' => Auth::id(),
-                'action' => 'updated',
-            ]);
+            $this->recordHistory($id, 'updated');
 
             DB::commit();
             return ApiResponseClass::sendResponse('Ticket Update Successful', '', 201);
-        } catch (\Exception $ex) {
-            DB::rollback();
-            return ApiResponseClass::rollback($ex);
-        }
-    }
-
-    /**
-     * @OA\Delete(
-     *     path="/tickets/{id}",
-     *     summary="Delete a ticket",
-     *     tags={"Tickets"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="ID of the ticket",
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(response=204, description="Ticket deleted successfully"),
-     *     @OA\Response(response=404, description="Ticket not found")
-     * )
-     */
-    public function destroy($id)
-    {
-        DB::beginTransaction();
-        try {
-            $this->ticketRepositoryInterface->delete($id);
-
-            // Log ticket deletion in history
-            TicketHistory::create([
-                'ticket_id' => $id,
-                'user_id' => Auth::id(),
-                'action' => 'deleted',
-            ]);
-
-            DB::commit();
-            return ApiResponseClass::sendResponse('Ticket Delete Successful', '', 204);
         } catch (\Exception $ex) {
             DB::rollback();
             return ApiResponseClass::rollback($ex);
@@ -254,11 +211,7 @@ class TicketController extends Controller
             $this->ticketRepositoryInterface->update($details, $id);
 
             // Log ticket closure in history
-            TicketHistory::create([
-                'ticket_id' => $id,
-                'user_id' => Auth::id(),
-                'action' => 'closed',
-            ]);
+            $this->recordHistory($id, 'closed');
 
             DB::commit();
             return ApiResponseClass::sendResponse('Ticket Close Successful', '', 201);
@@ -288,48 +241,90 @@ class TicketController extends Controller
     {
         DB::beginTransaction();
         try {
-            // Obtener el ticket por ID
+            // Get the ticket by ID
             $ticket = $this->ticketRepositoryInterface->getById($id);
-    
+
             if (!$ticket) {
                 return ApiResponseClass::sendResponse('Ticket not found', '', 404);
             }
-    
-            // Obtener todos los usuarios con el rol 'technician'
-            $technicians = Role::where('name', 'technician')->first()->users;
-    
+
+            // Get all users with the role 'technician' and roles 1, 2, or 3 that match the ticket's complexity
+            $technicians = Role::where('name', 'technician')->first()->users->filter(function ($technician) use ($ticket) {
+                return $technician->roles->pluck('name')->intersect(['1', '2', '3'])->isNotEmpty() && $technician->roles->pluck('name')->contains($ticket->complexity);
+            });
+            Log::info($technicians);
             if ($technicians->isEmpty()) {
                 return ApiResponseClass::sendResponse('No technicians available', '', 400);
             }
-    
-            // Filtrar para excluir al técnico actualmente asignado
-            $technicians = $technicians->filter(function ($technician) use ($ticket) {
-                return $technician->id !== $ticket->user_id;
-            });
-    
-            if ($technicians->isEmpty()) {
-                return ApiResponseClass::sendResponse('No available technicians other than the current assignee', '', 400);
+
+            if ($ticket->user_id) {
+                // If there is already a user_id, modify the ticket's complexity and reassign
+                $ticket->complexity += 1;
+                $technicians = Role::where('name', 'technician')->first()->users->filter(function ($technician) use ($ticket) {
+                    return $technician->roles->pluck('name')->contains($ticket->complexity) && $technician->id !== $ticket->user_id;
+                });
+
+                if ($technicians->isEmpty()) {
+                    return ApiResponseClass::sendResponse('No available technicians other than the current assignee', '', 400);
+                }
+
+                // Log ticket reassignment in history
+                $this->recordHistory($id, 'reassigned');
             }
-    
-            // Encontrar al técnico con menos tickets asignados
+
+            // Find the technician with the fewest assigned tickets
             $technicianWithLeastTickets = $technicians->sortBy(function ($technician) {
-                return $technician->tickets()->count();
+                return $technician->ticket()->count();
             })->first();
-    
-            // Reasignar el ticket al técnico
+
+            // Assign or reassign the ticket to the technician
             $ticket->user_id = $technicianWithLeastTickets->id;
             $ticket->save();
-    
+
+            // Log new assignee in history
+            $this->recordHistory($id, 'assigned to user ' . $technicianWithLeastTickets->id);
+
             DB::commit();
-            return ApiResponseClass::sendResponse('Ticket reassigned successfully', '', 200);
+            return ApiResponseClass::sendResponse('Ticket assigned/reassigned successfully', '', 200);
         } catch (\Exception $ex) {
             DB::rollback();
             return ApiResponseClass::rollback($ex);
         }
     }
 
-    public function retrieveTicketHistory($id){
+    /**
+     * @OA\Get(
+     *     path="/tickets/{id}/history",
+     *     summary="Retrieve the history of a specific ticket",
+     *     tags={"Tickets"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the ticket",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Ticket history retrieved successfully",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/TicketHistoryResource"))
+     *     ),
+     *     @OA\Response(response=404, description="Ticket not found")
+     * )
+     */
+    public function retrieveTicketHistory($id)
+    {
         $history = TicketHistory::where('ticket_id', $id)->latest();
         $history->load('user:id,name,lastname');
+        return ApiResponseClass::sendResponse(TicketHistoryResource::collection($history), '', 200);
+    }
+
+    public function recordHistory($ticketId, $action)
+    {
+        TicketHistory::create([
+            'ticket_id' => $ticketId,
+            'user_id' => Auth::id(),
+            'action' => $action,
+        ]);
     }
 }
