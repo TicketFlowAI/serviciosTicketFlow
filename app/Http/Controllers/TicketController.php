@@ -288,37 +288,48 @@ class TicketController extends Controller
     {
         DB::beginTransaction();
         try {
+            // Obtener el ticket por ID
             $ticket = $this->ticketRepositoryInterface->getById($id);
-
+    
             if (!$ticket) {
                 return ApiResponseClass::sendResponse('Ticket not found', '', 404);
             }
-
+    
+            // Obtener todos los usuarios con el rol 'technician'
             $technicians = Role::where('name', 'technician')->first()->users;
-
+    
             if ($technicians->isEmpty()) {
                 return ApiResponseClass::sendResponse('No technicians available', '', 400);
             }
-
+    
+            // Filtrar para excluir al técnico actualmente asignado
+            $technicians = $technicians->filter(function ($technician) use ($ticket) {
+                return $technician->id !== $ticket->user_id;
+            });
+    
+            if ($technicians->isEmpty()) {
+                return ApiResponseClass::sendResponse('No available technicians other than the current assignee', '', 400);
+            }
+    
+            // Encontrar al técnico con menos tickets asignados
             $technicianWithLeastTickets = $technicians->sortBy(function ($technician) {
-                return $technician->tickets()->where('status', '!=', 0)->count();
+                return $technician->tickets()->count();
             })->first();
-
+    
+            // Reasignar el ticket al técnico
             $ticket->user_id = $technicianWithLeastTickets->id;
             $ticket->save();
-
-            // Log ticket assignment in history
-            TicketHistory::create([
-                'ticket_id' => $id,
-                'user_id' => Auth::id(),
-                'action' => 'assigned to user ID ' . $technicianWithLeastTickets->id,
-            ]);
-
+    
             DB::commit();
-            return ApiResponseClass::sendResponse('Ticket assigned successfully', '', 200);
+            return ApiResponseClass::sendResponse('Ticket reassigned successfully', '', 200);
         } catch (\Exception $ex) {
             DB::rollback();
             return ApiResponseClass::rollback($ex);
         }
+    }
+
+    public function retrieveTicketHistory($id){
+        $history = TicketHistory::where('ticket_id', $id)->latest();
+        $history->load('user:id,name,lastname');
     }
 }

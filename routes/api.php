@@ -42,4 +42,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/users/byrole/{role}', [UserController::class, 'getUsersByRole']);
     Route::apiResource('/roles', RolesController::class);
     Route::get('/permissions', [RolesController::class, 'listPermissions']);
+    Route::post('/tickets/history/{id}', [TicketController::class, 'retrieveTicketHistory']);
 });
