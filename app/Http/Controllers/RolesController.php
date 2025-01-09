@@ -186,7 +186,7 @@ class RolesController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/roles/permissions",
+     *     path="/permissions",
      *     summary="Get a list of all permissions",
      *     tags={"Roles"},
      *     @OA\Response(
