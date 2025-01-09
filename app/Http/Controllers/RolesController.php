@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PermissionResource;
 use App\Models\Role;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
@@ -201,6 +202,10 @@ class RolesController extends Controller
     public function listPermissions()
     {
         $permissions = Permission::all();
-        return ApiResponseClass::sendResponse($permissions, 'Permissions List Retrieved Successfully', 200);
+    
+        if ($permissions->isEmpty()) {
+            return ApiResponseClass::sendResponse('No permissions found', 404);
+        }
+        return ApiResponseClass::sendResponse(PermissionResource::collection($permissions), '', 200);
     }
 }

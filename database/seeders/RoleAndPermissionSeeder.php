@@ -22,7 +22,7 @@ class RoleAndPermissionSeeder extends Seeder
         Role::create(['name' => '3']);
 
 
-        //Permission::create(['name' => 'view-users']);
+        Permission::create(['name' => 'view-users']);
 
         
     }
