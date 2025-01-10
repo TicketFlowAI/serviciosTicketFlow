@@ -6,9 +6,10 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
 
-
 class StoreCompanyRequest extends FormRequest
 {
+    private const REQUIRED_STRING = 'required|string';
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -26,13 +27,13 @@ class StoreCompanyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'=> 'required|string',
+            'name'=> self::REQUIRED_STRING,
             'idNumber'=> 'required|numeric|unique:companies',
             'contactEmail'=> 'required|email',
             'phone'=> 'required',
-            'state'=> 'required|string',
-            'city'=> 'required|string',
-            'address'=> 'required|string'
+            'state'=> self::REQUIRED_STRING,
+            'city'=> self::REQUIRED_STRING,
+            'address'=> self::REQUIRED_STRING
         ];
     }
 

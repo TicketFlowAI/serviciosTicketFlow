@@ -8,6 +8,8 @@ use Illuminate\Contracts\Validation\Validator;
 
 class UpdateCompanyRequest extends FormRequest
 {
+    private const REQUIRED_STRING = 'required|string';
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -36,10 +38,10 @@ class UpdateCompanyRequest extends FormRequest
         if ($this->user()->hasRole('client')) {
             return [
                 'contactEmail' => 'required|email',
-                'phone' => 'required|string',
-                'state' => 'required|string',
-                'city' => 'required|string',
-                'address' => 'required|string',
+                'phone' => self::REQUIRED_STRING,
+                'state' => self::REQUIRED_STRING,
+                'city' => self::REQUIRED_STRING,
+                'address' => self::REQUIRED_STRING,
             ];
         }
 
@@ -48,10 +50,10 @@ class UpdateCompanyRequest extends FormRequest
             'name' => 'required|string|unique:companies,name,' . $id,
             'idNumber' => 'required|numeric|unique:companies,idNumber,' . $id,
             'contactEmail' => 'required|email',
-            'phone' => 'required|string',
-            'state' => 'required|string',
-            'city' => 'required|string',
-            'address' => 'required|string',
+            'phone' => self::REQUIRED_STRING,
+            'state' => self::REQUIRED_STRING,
+            'city' => self::REQUIRED_STRING,
+            'address' => self::REQUIRED_STRING,
         ];
     }
     

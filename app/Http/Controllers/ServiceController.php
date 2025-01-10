@@ -155,7 +155,7 @@ class ServiceController extends Controller
         ];
         DB::beginTransaction();
         try {
-            $service = $this->serviceRepositoryInterface->update($updateDetails, $id);
+            $this->serviceRepositoryInterface->update($updateDetails, $id);
 
             DB::commit();
             return ApiResponseClass::sendResponse('Service Update Successful', '', 201);

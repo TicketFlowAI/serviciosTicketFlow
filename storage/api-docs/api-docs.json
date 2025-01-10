@@ -860,6 +860,381 @@
                 }
             }
         },
+        "/reports/tickets-solved": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get the number of tickets solved",
+                "operationId": "5a0093c4f6c5e9341475335e1b5f9984",
+                "responses": {
+                    "200": {
+                        "description": "Number of tickets solved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer"
+                                },
+                                "example": 150
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/average-time-to-close": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get the average time to close tickets",
+                "operationId": "167000778558f272d56f3463b5c72582",
+                "responses": {
+                    "200": {
+                        "description": "Average time to close tickets in hours",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "number",
+                                    "format": "float"
+                                },
+                                "example": 24.5
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/tickets-escalations": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get the number of technicians who worked on a ticket to get it solved",
+                "operationId": "0ccdf714efa67867a5ea515cc41d2499",
+                "responses": {
+                    "200": {
+                        "description": "Number of technicians per ticket",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "ticket_id": {
+                                                "type": "integer"
+                                            },
+                                            "technicians_count": {
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/tickets-per-complexity": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get the number of tickets per complexity level",
+                "operationId": "a01ea56ac341e216f049135955fbdd49",
+                "responses": {
+                    "200": {
+                        "description": "Number of tickets per complexity level",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "complexity": {
+                                                "type": "integer"
+                                            },
+                                            "count": {
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/tickets-human-interaction": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get the number of tickets that needed human interaction",
+                "operationId": "ccab2d2677f80909765eff2028d4ad00",
+                "responses": {
+                    "200": {
+                        "description": "Number of tickets that needed human interaction",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer"
+                                },
+                                "example": 120
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/technician/{user_id}/tickets-solved": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get the number of tickets solved by a technician",
+                "operationId": "3c390da89e7e281c6ab8bfd23b47d4db",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "description": "ID of the technician",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "Start date for filtering",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "End date for filtering",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Number of tickets solved by the technician",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer"
+                                },
+                                "example": 50
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/technician/{user_id}/average-time-to-solve": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get the average time to solve a ticket by a technician",
+                "operationId": "5e57cba9051e87b2bed384f029af7c31",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "description": "ID of the technician",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "Start date for filtering",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "End date for filtering",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Average time to solve a ticket by the technician in hours",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "number",
+                                    "format": "float"
+                                },
+                                "example": 12.5
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/technician/{user_id}/tickets-assigned-reassigned": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get the number of tickets assigned and reassigned to a technician",
+                "operationId": "d02f12ba6356e2933d75b30e2cd55cbe",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "description": "ID of the technician",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "Start date for filtering",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "End date for filtering",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Number of tickets assigned and reassigned to the technician",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "assigned": {
+                                            "type": "integer",
+                                            "example": 30
+                                        },
+                                        "reassigned": {
+                                            "type": "integer",
+                                            "example": 5
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/technician/{user_id}/current-tickets": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get the number of tickets a technician is currently working on",
+                "operationId": "b0accc2aed8d2ef6932b1723ee75b127",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "description": "ID of the technician",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Number of tickets the technician is currently working on",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer"
+                                },
+                                "example": 10
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/technician/{user_id}/weekly-comparison": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get the number of tickets closed by a technician in the last 7 days vs the previous week",
+                "operationId": "ffedbeedc6903134f1d2345a9c134b88",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "description": "ID of the technician",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Number of tickets closed by the technician in the last 7 days vs the previous week",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_week": {
+                                            "type": "integer",
+                                            "example": 15
+                                        },
+                                        "previous_week": {
+                                            "type": "integer",
+                                            "example": 10
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/roles": {
             "get": {
                 "tags": [
@@ -2945,6 +3320,10 @@
         {
             "name": "Messages",
             "description": "API Endpoints for managing ticket messages"
+        },
+        {
+            "name": "Reports",
+            "description": "API Endpoints for generating reports"
         },
         {
             "name": "Roles",

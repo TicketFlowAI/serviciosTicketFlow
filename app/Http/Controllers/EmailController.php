@@ -147,7 +147,7 @@ class EmailController extends Controller
         ];
         DB::beginTransaction();
         try {
-            $email = $this->emailRepositoryInterface->update($updateDetails, $id);
+            $this->emailRepositoryInterface->update($updateDetails, $id);
             DB::commit();
             return ApiResponseClass::sendResponse('Email Update Successful', '', 201);
         } catch (\Exception $ex) {

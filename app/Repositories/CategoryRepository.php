@@ -50,7 +50,10 @@ class CategoryRepository implements CategoryRepositoryInterface
      * Deletes an Item by ID.
      */
     public function delete($id)
+
     {
-        Category::destroy($id);
+    
+        return Category::destroy($id) > 0;
+    
     }
 }

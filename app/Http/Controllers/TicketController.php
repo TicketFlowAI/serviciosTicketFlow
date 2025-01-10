@@ -25,6 +25,8 @@ use Spatie\Permission\Models\Role;
 class TicketController extends Controller
 {
     private TicketRepositoryInterface $ticketRepositoryInterface;
+    private const USER_FIELDS = 'user:id,name,lastname';
+    private const SERVICE_CONTRACT_FIELDS = 'service_contract:id,company_id,service_id';
 
     public function __construct(TicketRepositoryInterface $ticketRepositoryInterface)
     {
@@ -59,7 +61,7 @@ class TicketController extends Controller
             $data = $this->ticketRepositoryInterface->index();
         }
 
-        $data->load('user:id,name,lastname', 'service_contract:id,company_id,service_id');
+        $data->load(self::USER_FIELDS, self::SERVICE_CONTRACT_FIELDS);
         foreach ($data as $ticket) {
             $ticket->company = Company::find($ticket->service_contract->company_id);
             $ticket->service = Service::find($ticket->service_contract->service_id);
@@ -134,7 +136,7 @@ class TicketController extends Controller
     {
         $data = $this->ticketRepositoryInterface->getById($id);
 
-        $data->load('user:id,name,lastname', 'service_contract:id,company_id,service_id');
+        $data->load(self::USER_FIELDS, self::SERVICE_CONTRACT_FIELDS);
         $data->company = Company::find($data->service_contract->company_id);
         $data->service = Service::find($data->service_contract->service_id);
 
@@ -241,48 +243,32 @@ class TicketController extends Controller
     {
         DB::beginTransaction();
         try {
-            // Get the ticket by ID
             $ticket = $this->ticketRepositoryInterface->getById($id);
 
             if (!$ticket) {
                 return ApiResponseClass::sendResponse('Ticket not found', '', 404);
             }
 
-            // Get all users with the role 'technician' and roles 1, 2, or 3 that match the ticket's complexity
-            $technicians = Role::where('name', 'technician')->first()->users->filter(function ($technician) use ($ticket) {
-                return $technician->roles->pluck('name')->intersect(['1', '2', '3'])->isNotEmpty() && $technician->roles->pluck('name')->contains($ticket->complexity);
-            });
-            Log::info($technicians);
+            $technicians = $this->getAvailableTechnicians($ticket);
+
             if ($technicians->isEmpty()) {
                 return ApiResponseClass::sendResponse('No technicians available', '', 400);
             }
 
             if ($ticket->user_id) {
-                // If there is already a user_id, modify the ticket's complexity and reassign
                 $ticket->complexity += 1;
-                $technicians = Role::where('name', 'technician')->first()->users->filter(function ($technician) use ($ticket) {
-                    return $technician->roles->pluck('name')->contains($ticket->complexity) && $technician->id !== $ticket->user_id;
-                });
+                $technicians = $this->getAvailableTechnicians($ticket, $ticket->user_id);
 
                 if ($technicians->isEmpty()) {
                     return ApiResponseClass::sendResponse('No available technicians other than the current assignee', '', 400);
                 }
 
-                // Log ticket reassignment in history
                 $this->recordHistory($id, 'reassigned');
             }
 
-            // Find the technician with the fewest assigned tickets
-            $technicianWithLeastTickets = $technicians->sortBy(function ($technician) {
-                return $technician->ticket()->count();
-            })->first();
+            $technicianWithLeastTickets = $this->findTechnicianWithLeastTickets($technicians);
 
-            // Assign or reassign the ticket to the technician
-            $ticket->user_id = $technicianWithLeastTickets->id;
-            $ticket->save();
-
-            // Log new assignee in history
-            $this->recordHistory($id, 'assigned to user ' . $technicianWithLeastTickets->id);
+            $this->assignTicketToTechnician($ticket, $technicianWithLeastTickets);
 
             DB::commit();
             return ApiResponseClass::sendResponse('Ticket assigned/reassigned successfully', '', 200);
@@ -290,6 +276,29 @@ class TicketController extends Controller
             DB::rollback();
             return ApiResponseClass::rollback($ex);
         }
+    }
+
+    private function getAvailableTechnicians($ticket, $excludeUserId = null)
+    {
+        return Role::where('name', 'technician')->first()->users->filter(function ($technician) use ($ticket, $excludeUserId) {
+            return $technician->roles->pluck('name')->intersect(['1', '2', '3'])->isNotEmpty() &&
+                   $technician->roles->pluck('name')->contains($ticket->complexity) &&
+                   (!$excludeUserId || $technician->id !== $excludeUserId);
+        });
+    }
+
+    private function findTechnicianWithLeastTickets($technicians)
+    {
+        return $technicians->sortBy(function ($technician) {
+            return $technician->ticket()->count();
+        })->first();
+    }
+
+    private function assignTicketToTechnician($ticket, $technician)
+    {
+        $ticket->user_id = $technician->id;
+        $ticket->save();
+        $this->recordHistory($ticket->id, 'assigned to user ' . $technician->id);
     }
 
     /**
@@ -315,7 +324,7 @@ class TicketController extends Controller
     public function retrieveTicketHistory($id)
     {
         $history = TicketHistory::where('ticket_id', $id)->latest();
-        $history->load('user:id,name,lastname');
+        $history->load(self::USER_FIELDS);
         return ApiResponseClass::sendResponse(TicketHistoryResource::collection($history), '', 200);
     }
 

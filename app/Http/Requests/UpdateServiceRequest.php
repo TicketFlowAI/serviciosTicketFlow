@@ -8,6 +8,8 @@ use Illuminate\Contracts\Validation\Validator;
 
 class UpdateServiceRequest extends FormRequest
 {
+    private const REQUIRED_NUMERIC = 'required|numeric';
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -27,10 +29,10 @@ class UpdateServiceRequest extends FormRequest
         $id = $this->route('service'); // Ensure 'service' matches the route parameter
 
         return [
-            'category_id' => 'required|numeric',
+            'category_id' => self::REQUIRED_NUMERIC,
             'description' => "required|string|unique:services,description,{$id}",
-            'price' => 'required|numeric',
-            'tax_id' => 'required|numeric',
+            'price' => self::REQUIRED_NUMERIC,
+            'tax_id' => self::REQUIRED_NUMERIC,
         ];
     }
 

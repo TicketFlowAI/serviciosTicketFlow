@@ -141,20 +141,19 @@ class IntervalController extends Controller
     public function update(UpdateIntervalRequest $request, $id)
     {
         $updateDetails = [
-            'days' => $request->days, 
+            'days' => $request->days,
             'type' => $request->type,
             'email_id' => $request->email_id,
         ];
         DB::beginTransaction();
         try {
-            $interval = $this->intervalRepositoryInterface->update($updateDetails, $id);
+            $this->intervalRepositoryInterface->update($updateDetails, $id);
             DB::commit();
             return ApiResponseClass::sendResponse('Interval Update Successful', '', 201);
         } catch (\Exception $ex) {
             return ApiResponseClass::rollback($ex);
         }
     }
-
 
     /**
      * @OA\Delete(

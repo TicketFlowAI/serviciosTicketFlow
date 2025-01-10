@@ -9,5 +9,5 @@ interface TicketRepositoryInterface
     public function store(array $data);
     public function update(array $data,$id);
     public function getTicketsByCompany($id);
-    public function getTicketsByTechnician($Id);
+    public function getTicketsByTechnician($id);
 }

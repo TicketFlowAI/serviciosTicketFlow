@@ -51,7 +51,7 @@ class ContractEndingNotification extends Mailable
         return new Content(
             view: $this->viewTemplate,
             with: [
-                'serviceData' => $this->serviceData, 
+                'serviceData' => $this->serviceData,
                 'content' => $this->content // Pass content to view
             ],
         );

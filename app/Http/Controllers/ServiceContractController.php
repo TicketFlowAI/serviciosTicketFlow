@@ -168,7 +168,7 @@ class ServiceContractController extends Controller
 
         DB::beginTransaction();
         try {
-            $serviceContract = $this->serviceContractRepositoryInterface->update($updateDetails, $id);
+            $this->serviceContractRepositoryInterface->update($updateDetails, $id);
 
             DB::commit();
             return ApiResponseClass::sendResponse('ServiceContract Update Successful', '', 201);
