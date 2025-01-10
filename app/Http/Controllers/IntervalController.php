@@ -72,7 +72,7 @@ class IntervalController extends Controller
     public function store(StoreIntervalRequest $request)
     {
         $details = [
-            'days' => $request->days, 
+            'days' => $request->days,
             'type' => $request->type,
             'email_id' => $request->email_id,
         ];

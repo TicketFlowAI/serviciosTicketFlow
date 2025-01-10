@@ -9,7 +9,12 @@ use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    private const DEFAULT_PASSWORD = env('DEFAULT_USER_PASSWORD', );
+    private $defaultPassword;
+
+    public function __construct()
+    {
+        $this->defaultPassword = env('DEFAULT_USER_PASSWORD');
+    }
 
     /**
      * Run the database seeds.
@@ -20,35 +25,35 @@ class UserSeeder extends Seeder
             'name' => 'Mindsoft',
             'lastname' => 'Admin',
             'email' => 'info@mindsoft.biz',
-            'password' => Hash::make(self::DEFAULT_PASSWORD),
+            'password' => Hash::make($this->defaultPassword),
             'company_id' => 1
         ])->assignRole('super-admin');
         User::create([
             'name' => 'Technician',
             'lastname' => 'Level1',
             'email' => 'tecnico1@mindsoft.biz',
-            'password' => Hash::make(self::DEFAULT_PASSWORD),
+            'password' => Hash::make($this->defaultPassword),
             'company_id' => 1
         ])->assignRole('technician','1');
         User::create([
             'name' => 'Technician',
             'lastname' => 'Level2',
             'email' => 'tecnico2@mindsoft.biz',
-            'password' => Hash::make(self::DEFAULT_PASSWORD),
+            'password' => Hash::make($this->defaultPassword),
             'company_id' => 1
         ])->assignRole('technician','2');
         User::create([
             'name' => 'Technician',
             'lastname' => 'Level3',
             'email' => 'tecnico3@mindsoft.biz',
-            'password' => Hash::make(self::DEFAULT_PASSWORD),
+            'password' => Hash::make($this->defaultPassword),
             'company_id' => 1
         ])->assignRole('technician','3');
         User::create([
             'name' => 'Jessica',
             'lastname' => 'Montero',
             'email' => 'jmontero@siegfried.com.ec',
-            'password' => Hash::make(self::DEFAULT_PASSWORD),
+            'password' => Hash::make($this->defaultPassword),
             'company_id' => 2
         ])->assignRole('client');
     }

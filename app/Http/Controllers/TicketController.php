@@ -102,7 +102,7 @@ class TicketController extends Controller
             $ticket = $this->ticketRepositoryInterface->store($details);
 
             // Log ticket creation in history
-            $this->recordHistory($ticket->id, 'created');
+            $this->recordHistory($ticket->id, 'creado');
 
             DB::commit();
             return ApiResponseClass::sendResponse(new TicketResource($ticket), 'Ticket Create Successful', 201);
@@ -176,7 +176,7 @@ class TicketController extends Controller
             $this->ticketRepositoryInterface->update($updateDetails, $id);
 
             // Log ticket update in history
-            $this->recordHistory($id, 'updated');
+            $this->recordHistory($id, 'actualizado');
 
             DB::commit();
             return ApiResponseClass::sendResponse('Ticket Update Successful', '', 201);
@@ -213,7 +213,7 @@ class TicketController extends Controller
             $this->ticketRepositoryInterface->update($details, $id);
 
             // Log ticket closure in history
-            $this->recordHistory($id, 'closed');
+            $this->recordHistory($id, 'cerrado');
 
             DB::commit();
             return ApiResponseClass::sendResponse('Ticket Close Successful', '', 201);
@@ -246,32 +246,34 @@ class TicketController extends Controller
             $ticket = $this->ticketRepositoryInterface->getById($id);
 
             if (!$ticket) {
-                return ApiResponseClass::sendResponse('Ticket not found', '', 404);
-            }
-
-            $technicians = $this->getAvailableTechnicians($ticket);
-
-            if ($technicians->isEmpty()) {
-                return ApiResponseClass::sendResponse('No technicians available', '', 400);
-            }
-
-            if ($ticket->user_id) {
-                $ticket->complexity += 1;
-                $technicians = $this->getAvailableTechnicians($ticket, $ticket->user_id);
+                $response = ApiResponseClass::sendResponse('Ticket not found', '', 404);
+            } else {
+                $technicians = $this->getAvailableTechnicians($ticket);
 
                 if ($technicians->isEmpty()) {
-                    return ApiResponseClass::sendResponse('No available technicians other than the current assignee', '', 400);
-                }
+                    $response = ApiResponseClass::sendResponse('No technicians available', '', 400);
+                } else {
+                    if ($ticket->user_id) {
+                        $ticket->complexity += 1;
+                        $technicians = $this->getAvailableTechnicians($ticket, $ticket->user_id);
 
-                $this->recordHistory($id, 'reassigned');
+                        if ($technicians->isEmpty()) {
+                            $response = ApiResponseClass::sendResponse('No available technicians other than the current assignee', '', 400);
+                        } else {
+                            $this->recordHistory($id, 'Solicitado reasignación por ' . Auth::user()->name . ' ' . Auth::user()->lastname);
+                        }
+                    }
+
+                    if (!isset($response)) {
+                        $technicianWithLeastTickets = $this->findTechnicianWithLeastTickets($technicians);
+                        $this->assignTicketToTechnician($ticket, $technicianWithLeastTickets);
+                        $response = ApiResponseClass::sendResponse('Ticket assigned/reassigned successfully', '', 200);
+                    }
+                }
             }
 
-            $technicianWithLeastTickets = $this->findTechnicianWithLeastTickets($technicians);
-
-            $this->assignTicketToTechnician($ticket, $technicianWithLeastTickets);
-
             DB::commit();
-            return ApiResponseClass::sendResponse('Ticket assigned/reassigned successfully', '', 200);
+            return $response;
         } catch (\Exception $ex) {
             DB::rollback();
             return ApiResponseClass::rollback($ex);
@@ -298,7 +300,7 @@ class TicketController extends Controller
     {
         $ticket->user_id = $technician->id;
         $ticket->save();
-        $this->recordHistory($ticket->id, 'assigned to user ' . $technician->id);
+        $this->recordHistory($ticket->id, 'asignado a ' . $technician->name . ' ' . $technician->lastname);
     }
 
     /**
