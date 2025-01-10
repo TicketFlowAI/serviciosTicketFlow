@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    private const DEFAULT_PASSWORD = 'EstaEsUnaContraseña123*';
+    private const DEFAULT_PASSWORD = env('DEFAULT_USER_PASSWORD', );
 
     /**
      * Run the database seeds.
