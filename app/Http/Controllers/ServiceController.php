@@ -57,11 +57,12 @@ class ServiceController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"category_id", "description", "price", "tax_id"},
+     *             required={"category_id", "description", "price", "tax_id", "details"},
      *             @OA\Property(property="category_id", type="integer", example=1),
      *             @OA\Property(property="description", type="string", example="Premium Support Service"),
      *             @OA\Property(property="price", type="number", format="float", example=99.99),
-     *             @OA\Property(property="tax_id", type="integer", example=3)
+     *             @OA\Property(property="tax_id", type="integer", example=3),
+     *             @OA\Property(property="details", type="string", example="This service includes 24/7 support.")
      *         )
      *     ),
      *     @OA\Response(
@@ -79,6 +80,7 @@ class ServiceController extends Controller
             'description' => $request->description,
             'price' => $request->price,
             'tax_id' => $request->tax_id,
+            'details' => $request->details,
         ];
         DB::beginTransaction();
         try {
@@ -134,11 +136,12 @@ class ServiceController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"category_id", "description", "price", "tax_id"},
+     *             required={"category_id", "description", "price", "tax_id", "details"},
      *             @OA\Property(property="category_id", type="integer", example=1),
      *             @OA\Property(property="description", type="string", example="Updated Support Service"),
      *             @OA\Property(property="price", type="number", format="float", example=89.99),
-     *             @OA\Property(property="tax_id", type="integer", example=2)
+     *             @OA\Property(property="tax_id", type="integer", example=2),
+     *             @OA\Property(property="details", type="string", example="This service includes 24/7 support.")
      *         )
      *     ),
      *     @OA\Response(response=200, description="Service updated successfully"),
@@ -152,6 +155,7 @@ class ServiceController extends Controller
             'description' => $request->description,
             'price' => $request->price,
             'tax_id' => $request->tax_id,
+            'details' => $request->details,
         ];
         DB::beginTransaction();
         try {

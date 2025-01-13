@@ -51,6 +51,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *         type="string",
  *         description="Description of the tax",
  *         example="VAT 15%"
+ *     ),
+ *     @OA\Property(
+ *         property="details",
+ *         type="string",
+ *         description="Details of the service",
+ *         example="This service includes 24/7 support."
  *     )
  * )
  */
@@ -71,6 +77,7 @@ class ServiceResource extends JsonResource
             'price' => $this->price,
             'tax_id' => $this->tax_id,
             'tax_description' => $this->tax->description,
+            'details' => $this->details,
         ];
     }
 }

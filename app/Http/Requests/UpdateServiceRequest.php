@@ -33,6 +33,7 @@ class UpdateServiceRequest extends FormRequest
             'description' => "required|string|unique:services,description,{$id}",
             'price' => self::REQUIRED_NUMERIC,
             'tax_id' => self::REQUIRED_NUMERIC,
+            'details' => 'required|string',
         ];
     }
 

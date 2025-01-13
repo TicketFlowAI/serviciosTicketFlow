@@ -16,6 +16,7 @@ class Service extends Model
         'description',
         'price',
         'tax_id',
+        'details',
     ];
 
     public function category(): BelongsTo

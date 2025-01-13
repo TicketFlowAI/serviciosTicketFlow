@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('services', function (Blueprint $table) {
             $table->id();
             $table->foreignId('category_id')->constrained();
-            $table->string('description',length:150)->unique();
+            $table->string('description', length:150)->unique();
             $table->decimal('price');
             $table->foreignId('tax_id')->constrained();
+            $table->string('details');
             $table->softDeletes();
             $table->timestamps();
         });

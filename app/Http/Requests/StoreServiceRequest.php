@@ -30,6 +30,7 @@ class StoreServiceRequest extends FormRequest
             'description' => 'required|unique:services|string',
             'price' => self::REQUIRED_NUMERIC,
             'tax_id' => self::REQUIRED_NUMERIC,
+            'details' => 'required|string',
         ];
     }
 
