@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Message;
 use App\Models\Ticket;
 use Illuminate\Console\Command;
 use Aws\Comprehend\ComprehendClient;
@@ -9,52 +10,74 @@ use Illuminate\Support\Facades\Storage;
 
 class ExcecuteComprenhend extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'app:excecute-comprenhend';
+    protected $description = 'Run a classification job on Amazon Comprehend using messages content';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Run a classification job on Amazon Comprehend';
-
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
         $this->info('Starting Amazon Comprehend job process...');
-
-        // Step 1: Start jobs for pending tickets
+        $this->prepareMessagesForClassification();
         $this->startJobs();
-
-        // Step 2: Check the status of ongoing jobs
         $this->checkJobStatus();
-
         $this->info('Amazon Comprehend job process completed.');
     }
 
     /**
-     * Start jobs for tickets in "pending" status without job_id.
+     * Prepare messages for classification by creating CSV files and uploading them to S3.
+     */
+    protected function prepareMessagesForClassification()
+    {
+        $tickets = Ticket::where('status', 1) // 1 = Abierto
+                         ->whereNull('job_id')
+                         ->with('message') // Load related messages
+                         ->get();
+
+        if ($tickets->isEmpty()) {
+            $this->info('No open tickets to prepare messages for classification.');
+            return;
+        }
+
+        foreach ($tickets as $ticket) {
+            if ($ticket->message->isEmpty()) {
+                $this->info("No messages found for Ticket #{$ticket->id}. Skipping...");
+                continue; // Salta este ticket si no tiene mensajes
+            }
+
+            // Crear contenido CSV
+            $csvContent = $ticket->message->map(fn($message) => [
+                'MessageID' => $message->id,
+                'Content' => $message->content,
+            ])->toArray();
+
+            $csvFileName = "input/{$ticket->id}.csv";
+            $csvData = $this->convertArrayToCsv($csvContent);
+
+            // Subir a S3
+            if (!Storage::disk('s3')->put($csvFileName, $csvData)) {
+                $this->error("Failed to upload CSV for Ticket #{$ticket->id}");
+                continue; // Salta si no pudo subir el archivo
+            }
+
+            $this->info("Successfully uploaded CSV for Ticket #{$ticket->id} to S3.");
+        }
+    }
+
+    /**
+     * Start classification jobs for tickets with uploaded messages.
      */
     protected function startJobs()
     {
-        $tickets = Ticket::where('status', 'pending')
+        $tickets = Ticket::where('status', 1) // 1 = Abierto
                          ->whereNull('job_id')
                          ->get();
 
         if ($tickets->isEmpty()) {
-            $this->info('No pending tickets to process.');
+            $this->info('No open tickets to start jobs.');
             return;
         }
 
         $comprehendClient = new ComprehendClient([
-            'region' => config('services.aws.region'),
+            'region' => 'us-east-2',
             'version' => 'latest',
             'credentials' => [
                 'key' => config('services.aws.key'),
@@ -63,15 +86,22 @@ class ExcecuteComprenhend extends Command
         ]);
 
         foreach ($tickets as $ticket) {
-            try {
-                // Define S3 Input/Output URIs
-                $inputUri = 's3://comprenhend-dataset/' . $ticket->id . '.csv';
-                $outputUri = 's3://comprenhend-dataset/output/';
+            $csvFileName = "input/{$ticket->id}.csv";
+            if (!Storage::disk('s3')->exists($csvFileName)) {
+                $this->error("No CSV file found for Ticket #{$ticket->id}, skipping job creation.");
+                continue; // Salta si el archivo CSV no existe
+            }
 
-                // Start the Comprehend classification job
+            try {
+                $inputUri = "s3://comprenhend-dataset/{$csvFileName}";
+                $outputUri = 's3://comprenhend-dataset/output/classifier/';
+                $arn = $ticket->needsHumanInteraction
+                    ? 'arn:aws:comprehend:us-east-2:115894170195:document-classifier/PriorityClassifierHumanIntervention/version/v4'
+                    : 'arn:aws:comprehend:us-east-2:115894170195:document-classifier/PriorityClassifier/version/v1';
+
                 $response = $comprehendClient->startDocumentClassificationJob([
-                    'JobName' => 'TicketJob-' . $ticket->id,
-                    'DocumentClassifierArn' => 'arn:aws:comprehend:us-east-2:123456789012:document-classifier/PriorityClassifier/version/v1',
+                    'JobName' => 'Job-' . $ticket->id,
+                    'DocumentClassifierArn' => $arn,
                     'InputDataConfig' => [
                         'S3Uri' => $inputUri,
                         'InputFormat' => 'ONE_DOC_PER_LINE',
@@ -79,13 +109,11 @@ class ExcecuteComprenhend extends Command
                     'OutputDataConfig' => [
                         'S3Uri' => $outputUri,
                     ],
-                    'DataAccessRoleArn' => 'arn:aws:iam::123456789012:role/AmazonComprehendServiceRole-AmazonComprehendServiceRole',
+                    'DataAccessRoleArn' => 'arn:aws:iam::115894170195:role/service-role/AmazonComprehendServiceRole-AmazonComprehendServiceRole',
                 ]);
 
-                $jobId = $response['JobId'];
-                $ticket->update(['job_id' => $jobId]);
-
-                $this->info("Job started for Ticket #{$ticket->id} with Job ID: {$jobId}");
+                $ticket->update(['job_id' => $response['JobId']]);
+                $this->info("Job started for Ticket #{$ticket->id} with Job ID: {$response['JobId']}");
             } catch (\Exception $e) {
                 $this->error("Error processing Ticket #{$ticket->id}: " . $e->getMessage());
             }
@@ -93,11 +121,11 @@ class ExcecuteComprenhend extends Command
     }
 
     /**
-     * Check the status of jobs in progress.
+     * Check the status of classification jobs and process results.
      */
     protected function checkJobStatus()
     {
-        $tickets = Ticket::where('status', 'pending')
+        $tickets = Ticket::where('status', 1) // 1 = Abierto
                          ->whereNotNull('job_id')
                          ->get();
 
@@ -107,7 +135,7 @@ class ExcecuteComprenhend extends Command
         }
 
         $comprehendClient = new ComprehendClient([
-            'region' => config('services.aws.region'),
+            'region' => 'us-east-2',
             'version' => 'latest',
             'credentials' => [
                 'key' => config('services.aws.key'),
@@ -126,9 +154,6 @@ class ExcecuteComprenhend extends Command
 
                 if ($status === 'COMPLETED') {
                     $this->processResults($ticket, $response['DocumentClassificationJobProperties']);
-                } elseif ($status === 'FAILED') {
-                    $ticket->update(['status' => 'failed']);
-                    $this->error("Job failed for Ticket #{$ticket->id}");
                 }
             } catch (\Exception $e) {
                 $this->error("Error checking status for Ticket #{$ticket->id}: " . $e->getMessage());
@@ -137,15 +162,13 @@ class ExcecuteComprenhend extends Command
     }
 
     /**
-     * Process results from completed jobs.
+     * Process classification results from completed jobs.
      */
     protected function processResults(Ticket $ticket, array $jobProps)
     {
         $outputUri = $jobProps['OutputDataConfig']['S3Uri'];
-
         $outputDir = str_replace('s3://', '', $outputUri);
         $files = Storage::disk('s3')->files($outputDir);
-
         $resultFile = collect($files)->first(fn($file) => str_ends_with($file, '.json'));
 
         if (!$resultFile) {
@@ -156,12 +179,26 @@ class ExcecuteComprenhend extends Command
         $resultContent = Storage::disk('s3')->get($resultFile);
         $results = json_decode($resultContent, true);
 
-        $ticket->update([
-            'status' => 'processed',
-            'classification_results' => $results,
-        ]);
-
+        $ticket->update(['status' => 2]); // 2 = En proceso
         $this->info("Results processed for Ticket #{$ticket->id}");
     }
+
+    /**
+     * Convert array to CSV format.
+     */
+    protected function convertArrayToCsv(array $data): string
+    {
+        $csv = fopen('php://temp', 'r+');
+        fputcsv($csv, array_keys($data[0]));
+        foreach ($data as $row) {
+            fputcsv($csv, $row);
+        }
+        rewind($csv);
+        $csvData = stream_get_contents($csv);
+        fclose($csv);
+
+        return $csvData;
+    }
 }
+
 

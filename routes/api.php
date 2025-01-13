@@ -43,7 +43,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/users/byrole/{role}', [UserController::class, 'getUsersByRole']);
     Route::apiResource('/roles', RolesController::class);
     Route::get('/permissions', [RolesController::class, 'listPermissions']);
-    Route::post('/tickets/history/{id}', [TicketController::class, 'retrieveTicketHistory']);
+    Route::get('/tickets/history/{id}', [TicketController::class, 'retrieveTicketHistory']);
     Route::get('/reports/tickets-solved', [ReportController::class, 'getTicketsSolved']);
     Route::get('/reports/average-time-to-close', [ReportController::class, 'getAverageTimeToClose']);
     Route::get('/reports/tickets-escalations', [ReportController::class, 'getTicketsEscalations']);
