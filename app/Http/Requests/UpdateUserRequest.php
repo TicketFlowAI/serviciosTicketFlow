@@ -29,15 +29,15 @@ class UpdateUserRequest extends FormRequest
 
         return [
             'email' => "required|email|unique:users,email,{$id}",
-            'password' => [
-                'nullable',
-                Password::min(8)
-                    ->letters()
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols()
-                    ->uncompromised(),
-            ],
+            'name'=>'required',
+            'lastname'=>'required',
+            'company_id'=>'required',
+            'password' => ['required', Password::min(8)
+            ->letters()
+            ->mixedCase()
+            ->numbers()
+            ->symbols()
+            ->uncompromised()]
         ];
     }
 

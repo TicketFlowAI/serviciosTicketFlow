@@ -41,6 +41,7 @@ class EmailResource extends JsonResource
         return [
             'id' => $this->id,
             'template_name' => $this->template_name,
+            'subject' => $this->subject,
             'body' => $this->body,
         ];
     }
