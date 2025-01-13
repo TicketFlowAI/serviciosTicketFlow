@@ -295,11 +295,23 @@ class ServiceContractController extends Controller
      */
     public function getExpiringContracts()
     {
+        $user = Auth::user();
         $nextMonth = Carbon::now()->addMonth();
-        $data = ServiceContract::whereHas('serviceterm', function ($query) {
-            $query->where('months', '!=', 1);
-        })->where('expiration_date', '<=', $nextMonth)
-          ->get();
+
+        if ($user->hasRole('client')) {
+            $data = ServiceContract::where('company_id', $user->company_id)
+                ->whereHas('serviceterm', function ($query) {
+                    $query->where('months', '!=', 1);
+                })
+                ->where('expiration_date', '<=', $nextMonth)
+                ->get();
+        } else {
+            $data = ServiceContract::whereHas('serviceterm', function ($query) {
+                $query->where('months', '!=', 1);
+            })
+            ->where('expiration_date', '<=', $nextMonth)
+            ->get();
+        }
 
         $data->load('company:id,name', 'service:id,description,price', 'serviceterm:id,months,term');
 
