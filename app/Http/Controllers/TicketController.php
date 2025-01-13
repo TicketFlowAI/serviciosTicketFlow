@@ -241,6 +241,43 @@ class TicketController extends Controller
 
     /**
      * @OA\Post(
+     *     path="/tickets/open/{id}",
+     *     summary="Open a ticket",
+     *     tags={"Tickets"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the ticket",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Ticket opened successfully"),
+     *     @OA\Response(response=404, description="Ticket not found")
+     * )
+     */
+    public function openTicket($id)
+    {
+        $details = [
+            'status' => 1
+        ];
+
+        DB::beginTransaction();
+        try {
+            $this->ticketRepositoryInterface->update($details, $id);
+
+            // Log ticket opening in history
+            $this->recordHistory($id, 'abierto');
+
+            DB::commit();
+            return ApiResponseClass::sendResponse('Ticket Open Successful', '', 201);
+        } catch (\Exception $ex) {
+            DB::rollback();
+            return ApiResponseClass::rollback($ex);
+        }
+    }
+
+    /**
+     * @OA\Post(
      *     path="/tickets/reassign/{id}",
      *     summary="Assign or reassign a ticket",
      *     tags={"Tickets"},

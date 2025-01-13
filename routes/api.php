@@ -41,6 +41,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('/intervals', IntervalController::class);
     Route::post('/tickets/close/{id}', [TicketController::class, 'closeTicket']);
     Route::post('/tickets/reassign/{id}', [TicketController::class, 'assignTicket']);
+    Route::post('/tickets/open/{id}', [TicketController::class, 'openTicket']);
     Route::get('/users/byrole/{role}', [UserController::class, 'getUsersByRole']);
     Route::apiResource('/roles', RolesController::class);
     Route::get('/permissions', [RolesController::class, 'listPermissions']);
