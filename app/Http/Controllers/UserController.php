@@ -43,8 +43,16 @@ class UserController extends Controller
      */
     public function index()
     {
+        $currentUser = auth()->user();
         $data = $this->userRepositoryInterface->index();
         $data->load('company:id,name');
+
+        if ($currentUser->hasRole('technician')) {
+            $data = $data->filter(function ($user) {
+                return !$user->hasRole('super-admin');
+            });
+        }
+
         foreach ($data as $user) {
             $user->role = $user->getRoleNames()->first();
         }
@@ -79,6 +87,11 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
+        $currentUser = auth()->user();
+        if ($currentUser->hasRole('technician') && $request->role === 'super-admin') {
+            return ApiResponseClass::sendResponse(null, 'Technicians cannot assign the super-admin role.', 403);
+        }
+
         $details = [
             'name' => $request->name,
             'lastname' => $request->lastname,
@@ -162,6 +175,11 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, $id)
     {
+        $currentUser = auth()->user();
+        if ($currentUser->hasRole('technician') && $request->role === 'super-admin') {
+            return ApiResponseClass::sendResponse(null, 'Technicians cannot assign the super-admin role.', 403);
+        }
+
         $updateDetails = [
             'name' => $request->name,
             'lastname' => $request->lastname,

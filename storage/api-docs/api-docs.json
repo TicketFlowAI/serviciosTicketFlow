@@ -1475,7 +1475,40 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/components/schemas/ServiceContractResource"
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "company_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "service_id": {
+                                                "type": "integer",
+                                                "example": 10
+                                            },
+                                            "service_term_id": {
+                                                "type": "integer",
+                                                "example": 2
+                                            },
+                                            "price": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 100
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2023-01-01T00:00:00Z"
+                                            },
+                                            "expiration_date": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2023-07-01T00:00:00Z"
+                                            }
+                                        },
+                                        "type": "object"
                                     }
                                 }
                             }
@@ -1562,7 +1595,40 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ServiceContractResource"
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "company_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "service_id": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "service_term_id": {
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "price": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 100
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-01-01T00:00:00Z"
+                                        },
+                                        "expiration_date": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-07-01T00:00:00Z"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -1688,6 +1754,33 @@
                     },
                     "404": {
                         "description": "Company not found"
+                    }
+                }
+            }
+        },
+        "/service-contracts/expiring": {
+            "get": {
+                "tags": [
+                    "Service Contracts"
+                ],
+                "summary": "Get a list of service contracts expiring in the next month",
+                "operationId": "88341a10b0fe385aa6eb4675f0e081dc",
+                "responses": {
+                    "200": {
+                        "description": "List of expiring service contracts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ServiceContractResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
                     }
                 }
             }
@@ -3054,6 +3147,12 @@
                         "type": "number",
                         "format": "float",
                         "example": 100.5
+                    },
+                    "expiration_date": {
+                        "description": "Expiration date of the service contract in DD/MM/YYYY format",
+                        "type": "string",
+                        "format": "date",
+                        "example": "01/07/2023"
                     }
                 },
                 "type": "object"

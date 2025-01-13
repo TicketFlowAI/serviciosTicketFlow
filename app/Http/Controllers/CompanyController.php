@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
 use App\Http\Resources\CompanyResource;
+use App\Http\Resources\UserResource;
 use App\Interfaces\CompanyRepositoryInterface;
 use App\Classes\ApiResponseClass;
 use Illuminate\Support\Facades\DB;
@@ -178,5 +179,38 @@ class CompanyController extends Controller
     {
         $this->companyRepositoryInterface->delete($id);
         return ApiResponseClass::sendResponse('Company Delete Successful', '', 204);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/companies/{id}/users",
+     *     summary="Get all users from a specific company",
+     *     tags={"Companies"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the company",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of users",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/UserResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Company not found")
+     * )
+     */
+    public function getUsersByCompanyId($id)
+    {
+        $company = $this->companyRepositoryInterface->getById($id);
+        if (!$company) {
+            return ApiResponseClass::sendResponse(null, 'Company not found', 404);
+        }
+        $users = $company->users; // Assuming the Company model has a 'users' relationship
+        return ApiResponseClass::sendResponse(UserResource::collection($users), '', 200);
     }
 }

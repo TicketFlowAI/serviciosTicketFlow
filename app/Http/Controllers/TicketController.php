@@ -61,10 +61,18 @@ class TicketController extends Controller
             $data = $this->ticketRepositoryInterface->index();
         }
 
-        $data->load(self::USER_FIELDS, self::SERVICE_CONTRACT_FIELDS);
+        $data->load(self::SERVICE_CONTRACT_FIELDS, self::USER_FIELDS);
         foreach ($data as $ticket) {
             $ticket->company = Company::find($ticket->service_contract->company_id);
             $ticket->service = Service::find($ticket->service_contract->service_id);
+            if (is_null($ticket->user)) {
+                $ticket->user = (object) ['name' => 'Asignando', 'lastname' => ''];
+            }
+            if (is_null($ticket->priority) || is_null($ticket->complexity) || is_null($ticket->needsHumanInteraction)) {
+                $ticket->priority = 'Asignando';
+                $ticket->complexity = 'Asignando';
+                $ticket->needsHumanInteraction = 'Asignando';
+            }
         }
 
         return ApiResponseClass::sendResponse(TicketResource::collection($data), '', 200);
@@ -136,9 +144,17 @@ class TicketController extends Controller
     {
         $data = $this->ticketRepositoryInterface->getById($id);
 
-        $data->load(self::USER_FIELDS, self::SERVICE_CONTRACT_FIELDS);
+        $data->load(self::SERVICE_CONTRACT_FIELDS, self::USER_FIELDS);
         $data->company = Company::find($data->service_contract->company_id);
         $data->service = Service::find($data->service_contract->service_id);
+        if (is_null($data->user)) {
+            $data->user = (object) ['name' => 'Asignando', 'lastname' => ''];
+        }
+        if (is_null($data->priority) || is_null($data->complexity) || is_null($data->needsHumanInteraction)) {
+            $data->priority = 'Asignando';
+            $data->complexity = 'Asignando';
+            $data->needsHumanInteraction = 'Asignando';
+        }
 
         return ApiResponseClass::sendResponse(new TicketResource($data), '', 200);
     }

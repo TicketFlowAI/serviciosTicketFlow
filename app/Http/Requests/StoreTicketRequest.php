@@ -26,10 +26,6 @@ class StoreTicketRequest extends FormRequest
         return [
             'service_contract_id' => 'required|numeric',
             'title' => 'required|string',
-            'priority' => 'required|numeric|between:1,5',
-            'needsHumanInteraction' => 'required|boolean',
-            'complexity' => 'required|numeric|between:1,3',
-            'user_id' => 'required|numeric',
         ];
     }
 

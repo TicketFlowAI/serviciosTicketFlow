@@ -32,6 +32,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('/serviceTerms', ServiceTermController::class);
     Route::apiResource('/servicecontracts', ServiceContractController::class);
     Route::get('/servicecontracts/bycompany/{id}', [ServiceContractController::class, 'getContractsByCompany']);
+    Route::get('/servicecontracts/expiring', [ServiceContractController::class, 'getExpiringContracts']);
     Route::apiResource('/tickets', TicketController::class);
     Route::apiResource('/messages', MessageController::class);
     Route::apiResource('/users', UserController::class);
@@ -54,4 +55,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/reports/technician/{user_id}/tickets-assigned-reassigned', [ReportController::class, 'getTechnicianTicketsAssignedAndReassigned']);
     Route::get('/reports/technician/{user_id}/current-tickets', [ReportController::class, 'getTechnicianCurrentTickets']);
     Route::get('/reports/technician/{user_id}/weekly-comparison', [ReportController::class, 'getTechnicianWeeklyComparison']);
+    Route::get('/companies/{id}/users', [CompanyController::class, 'getUsersByCompanyId']);
 });

@@ -46,6 +46,14 @@ class RolesController extends Controller
     public function index()
     {
         $data = $this->roleRepositoryInterface->index();
+
+        // Check if the current user is a technician
+        if (auth()->user()->hasRole('technician')) {
+            $data = $data->filter(function ($role) {
+                return $role->name !== 'super-admin';
+            });
+        }
+
         return ApiResponseClass::sendResponse(RoleResource::collection($data), '', 200);
     }
 

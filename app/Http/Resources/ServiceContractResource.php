@@ -57,6 +57,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *         format="float",
  *         description="Calculated monthly price for the service",
  *         example=100.50
+ *     ),
+ *     @OA\Property(
+ *         property="expiration_date",
+ *         type="string",
+ *         format="date",
+ *         description="Expiration date of the service contract in DD/MM/YYYY format",
+ *         example="01/07/2023"
  *     )
  * )
  */
@@ -78,6 +85,7 @@ class ServiceContractResource extends JsonResource
             'service_term_id' => $this->service_term_id,
             'service_term' => $this->serviceterm->term,
             'price' => $this->price,
+            'expiration_date' => $this->expiration_date,
         ];
     }
 }

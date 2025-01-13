@@ -10,6 +10,9 @@ use App\Classes\ApiResponseClass;
 use App\Http\Resources\ServiceContractResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Service; // Add this import
+use App\Models\ServiceTerm; // Add this import
+use Carbon\Carbon; // Add this import
 
 /**
  * @OA\Tag(
@@ -36,7 +39,15 @@ class ServiceContractController extends Controller
      *         description="List of service contracts",
      *         @OA\JsonContent(
      *             type="array",
-     *             @OA\Items(ref="#/components/schemas/ServiceContractResource")
+     *             @OA\Items(
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="company_id", type="integer", example=1),
+     *                 @OA\Property(property="service_id", type="integer", example=10),
+     *                 @OA\Property(property="service_term_id", type="integer", example=2),
+     *                 @OA\Property(property="price", type="number", format="float", example=100.0),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00Z"),
+     *                 @OA\Property(property="expiration_date", type="string", format="date-time", example="2023-07-01T00:00:00Z")
+     *             )
      *         )
      *     ),
      *     @OA\Response(response=400, description="Invalid request")
@@ -55,7 +66,8 @@ class ServiceContractController extends Controller
         $data->load('company:id,name', 'service:id,description,price', 'serviceterm:id,months,term');
 
         foreach ($data as $serviceContract) {
-            $serviceContract->price = $serviceContract->service->price / $serviceContract->serviceterm->months;
+            $serviceContract->price = ($serviceContract->service->price / 12) * $serviceContract->serviceterm->months;
+            $serviceContract->expiration_date = $serviceContract->created_at->addMonths($serviceContract->serviceTerm->months);
         }
 
         return ApiResponseClass::sendResponse(ServiceContractResource::collection($data), '', 200);
@@ -87,6 +99,12 @@ class ServiceContractController extends Controller
     {
         $user = Auth::user();
 
+        $service = Service::find($request->service_id);
+        $serviceTerm = ServiceTerm::find($request->service_term_id);
+        if ($service->category_id == 1 && $serviceTerm->months != 12) {
+            return ApiResponseClass::sendResponse([], 'Domains must be billed annually', 400);
+        }
+
         $details = [
             'company_id' => $user->hasRole('client') ? $user->company_id : $request->company_id,
             'service_id' => $request->service_id,
@@ -98,6 +116,7 @@ class ServiceContractController extends Controller
             $serviceContract = $this->serviceContractRepositoryInterface->store($details);
 
             DB::commit();
+            $serviceContract->expiration_date = "En proceso";
             return ApiResponseClass::sendResponse(new ServiceContractResource($serviceContract), 'ServiceContract Create Successful', 201);
         } catch (\Exception $ex) {
             return ApiResponseClass::rollback($ex);
@@ -119,7 +138,15 @@ class ServiceContractController extends Controller
      *     @OA\Response(
      *         response=200,
      *         description="Service contract details retrieved successfully",
-     *         @OA\JsonContent(ref="#/components/schemas/ServiceContractResource")
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="company_id", type="integer", example=1),
+     *             @OA\Property(property="service_id", type="integer", example=10),
+     *             @OA\Property(property="service_term_id", type="integer", example=2),
+     *             @OA\Property(property="price", type="number", format="float", example=100.0),
+     *             @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00Z"),
+     *             @OA\Property(property="expiration_date", type="string", format="date-time", example="2023-07-01T00:00:00Z")
+     *         )
      *     ),
      *     @OA\Response(response=404, description="Service contract not found")
      * )
@@ -127,8 +154,9 @@ class ServiceContractController extends Controller
     public function show($id)
     {
         $serviceContract = $this->serviceContractRepositoryInterface->getById($id);
-
         $serviceContract->load('company:id,name', 'service:id,description', 'serviceterm:id,months,term');
+        $serviceContract->price = ($serviceContract->service->price / 12) * $serviceContract->serviceterm->months;
+        $serviceContract->expiration_date = $serviceContract->created_at->addMonths($serviceContract->serviceterm->months);
 
         return ApiResponseClass::sendResponse(new ServiceContractResource($serviceContract), '', 200);
     }
@@ -160,6 +188,12 @@ class ServiceContractController extends Controller
      */
     public function update(UpdateServiceContractRequest $request, $id)
     {
+        $service = Service::find($request->service_id);
+        $serviceTerm = ServiceTerm::find($request->service_term_id);
+        if ($service->category_id == 1 && $serviceTerm->months != 12) {
+            return ApiResponseClass::sendResponse([], 'Domains must be billed annually', 400);
+        }
+
         $updateDetails = [
             'company_id' => $request->company_id,
             'service_id' => $request->service_id,
@@ -232,6 +266,47 @@ class ServiceContractController extends Controller
         }
 
         $data = $this->serviceContractRepositoryInterface->getContractsByCompany($id);
+
+        $data->load('company:id,name', 'service:id,description,price', 'serviceterm:id,months,term');
+
+        foreach ($data as $serviceContract) {
+            $serviceContract->price = ($serviceContract->service->price / 12) * $serviceContract->serviceterm->months;
+            $serviceContract->expiration_date = $serviceContract->created_at->addMonths($serviceContract->serviceterm->months);
+        }
+
+        return ApiResponseClass::sendResponse(ServiceContractResource::collection($data), '', 200);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/service-contracts/expiring",
+     *     summary="Get a list of service contracts expiring in the next month",
+     *     tags={"Service Contracts"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of expiring service contracts",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/ServiceContractResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
+     */
+    public function getExpiringContracts()
+    {
+        $nextMonth = Carbon::now()->addMonth();
+        $data = ServiceContract::whereHas('serviceterm', function ($query) {
+            $query->where('months', '!=', 1);
+        })->where('expiration_date', '<=', $nextMonth)
+          ->get();
+
+        $data->load('company:id,name', 'service:id,description,price', 'serviceterm:id,months,term');
+
+        foreach ($data as $serviceContract) {
+            $serviceContract->price = ($serviceContract->service->price / 12) * $serviceContract->serviceterm->months;
+            $serviceContract->expiration_date = $serviceContract->created_at->addMonths($serviceContract->serviceterm->months);
+        }
 
         return ApiResponseClass::sendResponse(ServiceContractResource::collection($data), '', 200);
     }

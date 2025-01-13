@@ -18,8 +18,8 @@ return new class extends Migration
             $table->tinyInteger('priority')->nullable();
             $table->boolean('needsHumanInteraction')->nullable();
             $table->tinyInteger('complexity')->nullable();
-            $table->foreignId('user_id')->constrained();
-            $table->tinyInteger('status')->default(1);
+            $table->foreignId('user_id')->nullable()->constrained();
+            $table->tinyInteger('status')->default(2);
             $table->boolean('newClientMessage')->default(0);
             $table->boolean('newTechnicianMessage')->default(0);
             $table->string('job_id')->nullable();
