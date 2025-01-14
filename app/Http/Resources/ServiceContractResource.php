@@ -64,6 +64,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *         format="date",
  *         description="Expiration date of the service contract in DD/MM/YYYY format",
  *         example="01/07/2023"
+ *     ),
+ *     @OA\Property(
+ *         property="created_at",
+ *         type="string",
+ *         format="date",
+ *         description="Creation date of the service contract in DD/MM/YYYY format",
+ *         example="01/01/2023"
  *     )
  * )
  */
@@ -86,6 +93,7 @@ class ServiceContractResource extends JsonResource
             'service_term' => $this->serviceterm->term,
             'price' => $this->price,
             'expiration_date' => $this->expiration_date,
+            'created_at' => $this->created_at->format('d/m/Y'),
         ];
     }
 }

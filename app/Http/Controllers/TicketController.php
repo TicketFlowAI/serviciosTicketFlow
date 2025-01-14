@@ -378,7 +378,7 @@ class TicketController extends Controller
      */
     public function retrieveTicketHistory($id)
     {
-        $history = TicketHistory::where('ticket_id', $id)->latest();
+        $history = TicketHistory::where('ticket_id', $id)->latest()->get();
         $history->load('user:id,name,lastname');
         return ApiResponseClass::sendResponse(TicketHistoryResource::collection($history), '', 200);
     }
