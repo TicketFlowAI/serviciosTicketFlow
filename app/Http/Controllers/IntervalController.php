@@ -44,7 +44,7 @@ class IntervalController extends Controller
     public function index()
     {
         $data = $this->intervalRepositoryInterface->index();
-        return ApiResponseClass::sendResponse(IntervalResource::collection($data), '', 200);
+        return ApiResponseClass::sendResponse(IntervalResource::collection($data->load('email')), '', 200);
     }
 
         /**
@@ -109,7 +109,7 @@ class IntervalController extends Controller
     public function show($id)
     {
         $interval = $this->intervalRepositoryInterface->getById($id);
-        return ApiResponseClass::sendResponse(new IntervalResource($interval), '', 200);
+        return ApiResponseClass::sendResponse(new IntervalResource($interval->load('email')), '', 200);
     }
 
         /**

@@ -54,7 +54,8 @@ class IntervalResource extends JsonResource
             'id' => $this->id,
             'days' => $this->days,
             'type' => $this->type,
-            'template_name' => $this->template_name,
+            'email_id' => $this->email_id,
+            'template_name' => $this->email->template_name,
         ];
     }
 }
