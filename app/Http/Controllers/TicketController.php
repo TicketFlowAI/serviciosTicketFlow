@@ -353,7 +353,7 @@ class TicketController extends Controller
     {
         $ticket->user_id = $technician->id;
         $ticket->save();
-        $this->recordHistory($ticket->id, 'asignado a ' . $technician->name . ' ' . $technician->lastname);
+        $this->recordHistory($ticket->id, 'Asignado a ' . $technician->name . ' ' . $technician->lastname);
     }
 
     /**

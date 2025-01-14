@@ -114,7 +114,13 @@ class ReportController extends Controller
             $query->whereBetween('updated_at', [$request->start_date, $request->end_date]);
         }
 
-        $complexityLevels = $query->get();
+        $complexityLevels = $query->get()->map(function ($item) {
+            if (is_null($item->complexity)) {
+                $item->complexity = 'Asignando parámetro';
+            }
+            return $item;
+        });
+
         return ApiResponseClass::sendResponse($complexityLevels, '', 200);
     }
 
@@ -141,6 +147,10 @@ class ReportController extends Controller
         }
 
         $count = $query->count();
+        if (is_null($count)) {
+            $count = 'Asignando parámetro';
+        }
+
         return ApiResponseClass::sendResponse($count, '', 200);
     }
 

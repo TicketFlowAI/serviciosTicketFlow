@@ -1864,7 +1864,8 @@
                                     "category_id",
                                     "description",
                                     "price",
-                                    "tax_id"
+                                    "tax_id",
+                                    "details"
                                 ],
                                 "properties": {
                                     "category_id": {
@@ -1883,6 +1884,10 @@
                                     "tax_id": {
                                         "type": "integer",
                                         "example": 3
+                                    },
+                                    "details": {
+                                        "type": "string",
+                                        "example": "This service includes 24/7 support."
                                     }
                                 },
                                 "type": "object"
@@ -1967,7 +1972,8 @@
                                     "category_id",
                                     "description",
                                     "price",
-                                    "tax_id"
+                                    "tax_id",
+                                    "details"
                                 ],
                                 "properties": {
                                     "category_id": {
@@ -1986,6 +1992,10 @@
                                     "tax_id": {
                                         "type": "integer",
                                         "example": 2
+                                    },
+                                    "details": {
+                                        "type": "string",
+                                        "example": "This service includes 24/7 support."
                                     }
                                 },
                                 "type": "object"
@@ -3219,6 +3229,12 @@
                         "type": "string",
                         "format": "date",
                         "example": "01/07/2023"
+                    },
+                    "created_at": {
+                        "description": "Creation date of the service contract in DD/MM/YYYY format",
+                        "type": "string",
+                        "format": "date",
+                        "example": "01/01/2023"
                     }
                 },
                 "type": "object"
@@ -3260,6 +3276,11 @@
                         "description": "Description of the tax",
                         "type": "string",
                         "example": "VAT 15%"
+                    },
+                    "details": {
+                        "description": "Details of the service",
+                        "type": "string",
+                        "example": "This service includes 24/7 support."
                     }
                 },
                 "type": "object"
