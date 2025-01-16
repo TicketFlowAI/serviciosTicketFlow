@@ -190,4 +190,51 @@ class ServiceController extends Controller
 
         return ApiResponseClass::sendResponse('Service Delete Successful', '', 204);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/services/deleted",
+     *     summary="Get a list of deleted services",
+     *     tags={"Services"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of deleted services",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/ServiceResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
+     */
+    public function getDeleted()
+    {
+        $data = $this->serviceRepositoryInterface->getDeleted();
+        $data->load('tax:id,description', 'category:id,category');
+
+        return ApiResponseClass::sendResponse(ServiceResource::collection($data), '', 200);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/services/{id}/restore",
+     *     summary="Restore a deleted service",
+     *     tags={"Services"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the service",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Service restored successfully"),
+     *     @OA\Response(response=404, description="Service not found")
+     * )
+     */
+    public function restore($id)
+    {
+        $this->serviceRepositoryInterface->restore($id);
+
+        return ApiResponseClass::sendResponse('Service Restore Successful', '', 200);
+    }
 }

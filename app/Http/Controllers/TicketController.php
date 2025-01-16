@@ -391,4 +391,48 @@ class TicketController extends Controller
             'action' => $action,
         ]);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/tickets/deleted",
+     *     summary="Get a list of deleted tickets",
+     *     tags={"Tickets"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of deleted tickets",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/TicketResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
+     */
+    public function getDeleted()
+    {
+        $data = $this->ticketRepositoryInterface->getDeleted();
+        return ApiResponseClass::sendResponse(TicketResource::collection($data), '', 200);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/tickets/{id}/restore",
+     *     summary="Restore a deleted ticket",
+     *     tags={"Tickets"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the ticket",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Ticket restored successfully"),
+     *     @OA\Response(response=404, description="Ticket not found")
+     * )
+     */
+    public function restore($id)
+    {
+        $this->ticketRepositoryInterface->restore($id);
+        return ApiResponseClass::sendResponse('Ticket Restore Successful', '', 200);
+    }
 }

@@ -168,4 +168,56 @@ class CategoryController extends Controller
         $this->categoryRepositoryInterface->delete($id);
         return ApiResponseClass::sendResponse('Category Delete Successful', '', 204);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/categories/deleted",
+     *     summary="Get all soft deleted categories",
+     *     tags={"Category"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of soft deleted categories",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/CategoryResource")
+     *         )
+     *     )
+     * )
+     */
+    public function getDeleted()
+    {
+        $data = $this->categoryRepositoryInterface->getDeleted();
+        return ApiResponseClass::sendResponse(CategoryResource::collection($data), '', 200);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/api/categories/{id}/restore",
+     *     summary="Restore a soft deleted category",
+     *     tags={"Category"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Category ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Category restored successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/CategoryResource")
+     *     )
+     * )
+     */
+    public function restore($id)
+    {
+        DB::beginTransaction();
+        try {
+            $category = $this->categoryRepositoryInterface->restore($id);
+            DB::commit();
+            return ApiResponseClass::sendResponse(new CategoryResource($category), 'Category Restore Successful', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::rollback($ex);
+        }
+    }
 }

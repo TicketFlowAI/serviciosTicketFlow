@@ -176,4 +176,53 @@ class EmailController extends Controller
         $this->emailRepositoryInterface->delete($id);
         return ApiResponseClass::sendResponse('Email Delete Successful', '', 204);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/emails/deleted",
+     *     summary="Get a list of deleted email templates",
+     *     tags={"Emails"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of deleted email templates",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/EmailResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
+     */
+    public function getDeleted()
+    {
+        $data = $this->emailRepositoryInterface->getDeleted();
+        return ApiResponseClass::sendResponse(EmailResource::collection($data), '', 200);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/emails/{id}/restore",
+     *     summary="Restore a deleted email template",
+     *     tags={"Emails"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the email template"
+     *     ),
+     *     @OA\Response(response=200, description="Email template restored successfully"),
+     *     @OA\Response(response=404, description="Email template not found")
+     * )
+     */
+    public function restore($id)
+    {
+        DB::beginTransaction();
+        try {
+            $this->emailRepositoryInterface->restore($id);
+            DB::commit();
+            return ApiResponseClass::sendResponse('Email Restore Successful', '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::rollback($ex);
+        }
+    }
 }

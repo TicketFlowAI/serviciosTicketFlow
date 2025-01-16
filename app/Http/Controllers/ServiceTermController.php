@@ -173,4 +173,55 @@ class ServiceTermController extends Controller
         $this->serviceTermRepositoryInterface->delete($id);
         return ApiResponseClass::sendResponse('ServiceTerm Delete Successful', '', 204);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/service-terms/deleted",
+     *     summary="Get a list of deleted service terms",
+     *     tags={"Service Terms"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of deleted service terms",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/ServiceTermResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
+     */
+    public function getDeleted()
+    {
+        $data = $this->serviceTermRepositoryInterface->getDeleted();
+        return ApiResponseClass::sendResponse(ServiceTermResource::collection($data), '', 200);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/service-terms/{id}/restore",
+     *     summary="Restore a deleted service term",
+     *     tags={"Service Terms"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the service term",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Service term restored successfully"),
+     *     @OA\Response(response=404, description="Service term not found")
+     * )
+     */
+    public function restore($id)
+    {
+        DB::beginTransaction();
+        try {
+            $this->serviceTermRepositoryInterface->restore($id);
+
+            DB::commit();
+            return ApiResponseClass::sendResponse('ServiceTerm Restore Successful', '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::rollback($ex);
+        }
+    }
 }

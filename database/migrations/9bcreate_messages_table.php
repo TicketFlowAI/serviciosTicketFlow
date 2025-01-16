@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('ticket_id')->constrained();
             $table->string('content',length:500);
             $table->foreignId('user_id')->constrained();
-            $table->softDeletes();
             $table->timestamps();
         });
     }

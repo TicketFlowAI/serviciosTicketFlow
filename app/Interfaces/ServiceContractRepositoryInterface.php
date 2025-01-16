@@ -10,4 +10,6 @@ interface ServiceContractRepositoryInterface
     public function update(array $data,$id);
     public function delete($id);
     public function getContractsByCompany($id);
+    public function getDeleted();
+    public function restore($id);
 }

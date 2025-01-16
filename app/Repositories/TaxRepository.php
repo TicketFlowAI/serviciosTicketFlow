@@ -53,4 +53,20 @@ class TaxRepository implements TaxRepositoryInterface
     {
         Tax::destroy($id);
     }
+
+    /**
+     * Retrieves all deleted items.
+     */
+    public function getDeleted()
+    {
+        return Tax::onlyTrashed()->get();
+    }
+
+    /**
+     * Restores a deleted item by ID.
+     */
+    public function restore($id)
+    {
+        return Tax::withTrashed()->where('id', $id)->restore();
+    }
 }

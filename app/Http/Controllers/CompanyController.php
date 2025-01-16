@@ -213,4 +213,47 @@ class CompanyController extends Controller
         $users = $company->users; // Assuming the Company model has a 'users' relationship
         return ApiResponseClass::sendResponse(UserResource::collection($users), '', 200);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/companies/deleted",
+     *     summary="Get a list of soft-deleted companies",
+     *     tags={"Companies"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of soft-deleted companies",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/CompanyResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
+     */
+    public function getDeleted()
+    {
+        $data = $this->companyRepositoryInterface->getDeleted();
+        return ApiResponseClass::sendResponse(CompanyResource::collection($data), '', 200);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/companies/{id}/restore",
+     *     summary="Restore a soft-deleted company",
+     *     tags={"Companies"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the company"
+     *     ),
+     *     @OA\Response(response=200, description="Company restored successfully"),
+     *     @OA\Response(response=404, description="Company not found")
+     * )
+     */
+    public function restore($id)
+    {
+        $this->companyRepositoryInterface->restore($id);
+        return ApiResponseClass::sendResponse('Company Restore Successful', '', 200);
+    }
 }

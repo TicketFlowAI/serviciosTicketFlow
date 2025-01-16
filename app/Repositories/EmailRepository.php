@@ -54,4 +54,20 @@ class EmailRepository implements EmailRepositoryInterface
     {
         Email::destroy($id);
     }
+
+    /**
+     * Retrieves all deleted items.
+     */
+    public function getDeleted()
+    {
+        return Email::onlyTrashed()->get();
+    }
+
+    /**
+     * Restores a deleted item by ID.
+     */
+    public function restore($id)
+    {
+        return Email::withTrashed()->where('id', $id)->restore();
+    }
 }

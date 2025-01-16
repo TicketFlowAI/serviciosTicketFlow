@@ -48,4 +48,18 @@ class CompanyRepository implements CompanyRepositoryInterface
    public function delete($id){
       Company::destroy($id);
    }
+
+   /**
+    * Retrieves all soft-deleted items.
+    */
+   public function getDeleted(){
+      return Company::onlyTrashed()->get();
+   }
+
+   /**
+    * Restores a soft-deleted item by ID.
+    */
+   public function restore($id){
+      return Company::withTrashed()->where('id', $id)->restore();
+   }
 }

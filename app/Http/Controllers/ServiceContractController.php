@@ -322,4 +322,48 @@ class ServiceContractController extends Controller
 
         return ApiResponseClass::sendResponse(ServiceContractResource::collection($data), '', 200);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/service-contracts/deleted",
+     *     summary="Get a list of deleted service contracts",
+     *     tags={"Service Contracts"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of deleted service contracts",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/ServiceContractResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
+     */
+    public function getDeleted()
+    {
+        $data = $this->serviceContractRepositoryInterface->getDeleted();
+        return ApiResponseClass::sendResponse(ServiceContractResource::collection($data), '', 200);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/service-contracts/{id}/restore",
+     *     summary="Restore a deleted service contract",
+     *     tags={"Service Contracts"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the service contract",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Service contract restored successfully"),
+     *     @OA\Response(response=404, description="Service contract not found")
+     * )
+     */
+    public function restore($id)
+    {
+        $this->serviceContractRepositoryInterface->restore($id);
+        return ApiResponseClass::sendResponse('ServiceContract Restore Successful', '', 200);
+    }
 }

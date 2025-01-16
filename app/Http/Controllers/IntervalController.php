@@ -175,4 +175,51 @@ class IntervalController extends Controller
         $this->intervalRepositoryInterface->delete($id);
         return ApiResponseClass::sendResponse('Interval Delete Successful', '', 204);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/intervals/deleted",
+     *     summary="Get a list of deleted intervals",
+     *     tags={"Intervals"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of deleted intervals",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/IntervalResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
+     */
+    public function getDeleted()
+    {
+        $data = $this->intervalRepositoryInterface->getDeleted();
+        return ApiResponseClass::sendResponse(IntervalResource::collection($data->load('email')), '', 200);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/intervals/{id}/restore",
+     *     summary="Restore a deleted interval",
+     *     tags={"Intervals"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the interval"
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Interval restored successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/IntervalResource")
+     *     ),
+     *     @OA\Response(response=404, description="Interval not found")
+     * )
+     */
+    public function restore($id)
+    {
+        $this->intervalRepositoryInterface->restore($id);
+        return ApiResponseClass::sendResponse('Interval Restore Successful', '', 200);
+    }
 }

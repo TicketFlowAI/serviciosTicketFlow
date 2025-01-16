@@ -50,10 +50,25 @@ class CategoryRepository implements CategoryRepositoryInterface
      * Deletes an Item by ID.
      */
     public function delete($id)
-
     {
-    
         return Category::destroy($id) > 0;
-    
+    }
+
+    /**
+     * Retrieves all soft deleted items.
+     */
+    public function getDeleted()
+    {
+        return Category::onlyTrashed()->get();
+    }
+
+    /**
+     * Restores a soft deleted item by ID.
+     */
+    public function restore($id)
+    {
+        $category = Category::onlyTrashed()->findOrFail($id);
+        $category->restore();
+        return $category;
     }
 }

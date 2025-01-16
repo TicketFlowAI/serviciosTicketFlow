@@ -53,4 +53,20 @@ class ServiceRepository implements ServiceRepositoryInterface
    {
       Service::destroy($id);
    }
+
+   /**
+    * Retrieves all deleted items.
+    */
+   public function getDeleted()
+   {
+      return Service::onlyTrashed()->get();
+   }
+
+   /**
+    * Restores a deleted item by ID.
+    */
+   public function restore($id)
+   {
+      return Service::withTrashed()->where('id', $id)->restore();
+   }
 }

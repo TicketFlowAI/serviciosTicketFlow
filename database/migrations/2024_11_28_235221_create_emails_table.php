@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('template_name')->unique();
             $table->string('subject');
             $table->longText('body'); // Store HTML content of the email
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -10,4 +10,6 @@ interface TicketRepositoryInterface
     public function update(array $data,$id);
     public function getTicketsByCompany($id);
     public function getTicketsByTechnician($id);
+    public function getDeleted();
+    public function restore($id);
 }

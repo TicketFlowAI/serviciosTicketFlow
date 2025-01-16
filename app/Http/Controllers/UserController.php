@@ -298,4 +298,51 @@ class UserController extends Controller
             return ApiResponseClass::rollback($ex);
         }
     }
+
+    /**
+     * @OA\Get(
+     *     path="/users/deleted",
+     *     summary="Get a list of deleted users",
+     *     tags={"Users"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of deleted users",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/UserResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
+     */
+    public function getDeleted()
+    {
+        $deletedUsers = $this->userRepositoryInterface->getDeleted();
+        return ApiResponseClass::sendResponse(UserResource::collection($deletedUsers), 'Deleted Users Retrieved Successfully', 200);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/users/{id}/restore",
+     *     summary="Restore a deleted user",
+     *     tags={"Users"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the user to restore",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User restored successfully"
+     *     ),
+     *     @OA\Response(response=404, description="User not found")
+     * )
+     */
+    public function restore($id)
+    {
+        $this->userRepositoryInterface->restore($id);
+        return ApiResponseClass::sendResponse('User Restored Successfully', '', 200);
+    }
 }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->smallInteger('days');
             $table->string('type');
             $table->foreignId('email_id')->constrained();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

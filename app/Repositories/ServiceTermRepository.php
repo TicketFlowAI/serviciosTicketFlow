@@ -54,4 +54,20 @@ class ServiceTermRepository implements ServiceTermRepositoryInterface
    {
       ServiceTerm::destroy($id);
    }
+
+   /**
+    * Retrieves all deleted items.
+    */
+   public function getDeleted()
+   {
+      return ServiceTerm::onlyTrashed()->get();
+   }
+
+   /**
+    * Restores a deleted item by ID.
+    */
+   public function restore($id)
+   {
+      return ServiceTerm::withTrashed()->where('id', $id)->restore();
+   }
 }

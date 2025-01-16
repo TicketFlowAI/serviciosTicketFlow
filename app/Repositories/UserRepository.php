@@ -62,4 +62,20 @@ class UserRepository implements UserRepositoryInterface
     {
         return $request->user();
     }
+
+    /**
+     * Retrieves all deleted items.
+     */
+    public function getDeleted()
+    {
+        return User::onlyTrashed()->get();
+    }
+
+    /**
+     * Restores a deleted item by ID.
+     */
+    public function restore($id)
+    {
+        return User::withTrashed()->where('id', $id)->restore();
+    }
 }

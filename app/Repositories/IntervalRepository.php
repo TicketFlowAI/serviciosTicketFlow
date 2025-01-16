@@ -54,4 +54,20 @@ class IntervalRepository implements IntervalRepositoryInterface
     {
         Interval::destroy($id);
     }
+
+    /**
+     * Retrieves all deleted items.
+     */
+    public function getDeleted()
+    {
+        return Interval::onlyTrashed()->get();
+    }
+
+    /**
+     * Restores a deleted item by ID.
+     */
+    public function restore($id)
+    {
+        return Interval::withTrashed()->where('id', $id)->restore();
+    }
 }

@@ -178,4 +178,57 @@ class TaxController extends Controller
 
         return ApiResponseClass::sendResponse('Tax Delete Successful', '', 204);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/taxes/deleted",
+     *     summary="Get a list of deleted taxes",
+     *     tags={"Taxes"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of deleted taxes",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/TaxResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
+     */
+    public function getDeleted()
+    {
+        $data = $this->taxRepositoryInterface->getDeleted();
+
+        return ApiResponseClass::sendResponse(TaxResource::collection($data), '', 200);
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/taxes/{id}/restore",
+     *     summary="Restore a deleted tax",
+     *     tags={"Taxes"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the tax",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Tax restored successfully"),
+     *     @OA\Response(response=404, description="Tax not found")
+     * )
+     */
+    public function restore($id)
+    {
+        DB::beginTransaction();
+        try {
+            $this->taxRepositoryInterface->restore($id);
+
+            DB::commit();
+            return ApiResponseClass::sendResponse('Tax Restore Successful', '', 200);
+
+        } catch (\Exception $ex) {
+            return ApiResponseClass::rollback($ex);
+        }
+    }
 }

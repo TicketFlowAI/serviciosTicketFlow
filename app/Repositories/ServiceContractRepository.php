@@ -54,6 +54,22 @@ class ServiceContractRepository implements ServiceContractRepositoryInterface
       ServiceContract::destroy($id);
    }
 
+   /**
+    * Retrieves all deleted items.
+    */
+   public function getDeleted()
+   {
+      return ServiceContract::onlyTrashed()->get();
+   }
+
+   /**
+    * Restores a deleted item by ID.
+    */
+   public function restore($id)
+   {
+      return ServiceContract::withTrashed()->where('id', $id)->restore();
+   }
+
    public function getContractsByCompany($id)
    {
       return ServiceContract::where('company_id',$id)->get();

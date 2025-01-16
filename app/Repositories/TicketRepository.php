@@ -63,4 +63,20 @@ class TicketRepository implements TicketRepositoryInterface
         return Ticket::where('user_id', $technicianId)->get();
     }
 
+    /**
+     * Retrieves deleted tickets.
+     */
+    public function getDeleted()
+    {
+        return Ticket::onlyTrashed()->get();
+    }
+
+    /**
+     * Restores a deleted ticket by ID.
+     */
+    public function restore($id)
+    {
+        return Ticket::withTrashed()->where('id', $id)->restore();
+    }
+
 }
