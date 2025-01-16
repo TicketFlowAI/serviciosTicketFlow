@@ -3193,6 +3193,34 @@
                 }
             }
         },
+        "/tickets/{id}/needs-human-interaction": {
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Mark ticket as needing human interaction and assign it",
+                "operationId": "715ea5d60ee66229dae338015b6024e1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the ticket",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ticket marked and assigned successfully"
+                    },
+                    "404": {
+                        "description": "Ticket not found"
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "tags": [
