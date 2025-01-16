@@ -183,13 +183,18 @@ class RolesController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(response=204, description="Role deleted successfully"),
-     *     @OA\Response(response=404, description="Role not found")
+     *     @OA\Response(response=404, description="Role not found"),
+     *     @OA\Response(response=400, description="Cannot delete this role, there are users assigned to it")
      * )
      */
     public function destroy($id)
     {
-        $this->roleRepositoryInterface->delete($id);
-        return ApiResponseClass::sendResponse('Role Delete Successful', '', 204);
+        try {
+            $this->roleRepositoryInterface->delete($id);
+            return ApiResponseClass::sendResponse('Role Delete Successful', '', 204);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse($ex->getMessage(), '', 400);
+        }
     }
 
     /**
