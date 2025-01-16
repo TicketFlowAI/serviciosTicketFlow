@@ -435,4 +435,44 @@ class TicketController extends Controller
         $this->ticketRepositoryInterface->restore($id);
         return ApiResponseClass::sendResponse('Ticket Restore Successful', '', 200);
     }
+
+    /**
+     * @OA\Post(
+     *     path="/tickets/{id}/needs-human-interaction",
+     *     summary="Mark ticket as needing human interaction and assign it",
+     *     tags={"Tickets"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the ticket",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Ticket marked and assigned successfully"),
+     *     @OA\Response(response=404, description="Ticket not found")
+     * )
+     */
+    public function markNeedsHumanInteractionAndAssign($id)
+    {
+        DB::beginTransaction();
+        try {
+            $ticket = $this->ticketRepositoryInterface->getById($id);
+
+            if (!$ticket) {
+                DB::rollback();
+                return ApiResponseClass::sendResponse('Ticket not found', '', 404);
+            }
+
+            $ticket->needsHumanInteraction = 1;
+            $ticket->save();
+
+            $response = $this->assignTicket($id);
+
+            DB::commit();
+            return $response;
+        } catch (\Exception $ex) {
+            DB::rollback();
+            return ApiResponseClass::rollback($ex);
+        }
+    }
 }
