@@ -29,10 +29,47 @@ class RoleAndPermissionSeeder extends Seeder
         }
 
         // Create permissions
-        $viewUsersPermission = Permission::create(['name' => 'view-users']);
-        Permission::create(['name' => 'modify-roles']);
-        // Assign permission to the super-admin role
+        $permissions = [
+            'view-companies', 'create-companies', 'edit-companies', 'delete-companies', 'view-deleted-companies', 'restore-companies', 'view-company-users',
+            'view-services', 'create-services', 'edit-services', 'delete-services', 'view-deleted-services', 'restore-services',
+            'view-taxes', 'create-taxes', 'edit-taxes', 'delete-taxes', 'view-deleted-taxes', 'restore-taxes',
+            'view-categories', 'create-categories', 'edit-categories', 'delete-categories', 'view-deleted-categories', 'restore-categories',
+            'view-service-terms', 'create-service-terms', 'edit-service-terms', 'delete-service-terms', 'view-deleted-service-terms', 'restore-service-terms',
+            'view-service-contracts', 'create-service-contracts', 'edit-service-contracts', 'delete-service-contracts', 'view-deleted-service-contracts', 'restore-service-contracts',
+            'view-tickets', 'create-tickets', 'edit-tickets', 'delete-tickets', 'view-deleted-tickets', 'restore-tickets', 'close-tickets', 'reassign-tickets', 'open-tickets', 'mark-needs-human-interaction', 'view-ticket-history',
+            'view-messages', 'create-messages', 'edit-messages', 'delete-messages',
+            'view-users', 'create-users', 'edit-users', 'delete-users', 'view-authenticated-user', 'view-deleted-users', 'restore-users', 'view-users-by-role',
+            'view-emails', 'create-emails', 'edit-emails', 'delete-emails', 'view-deleted-emails', 'restore-emails',
+            'view-intervals', 'create-intervals', 'edit-intervals', 'delete-intervals', 'view-deleted-intervals', 'restore-intervals',
+            'view-roles', 'create-roles', 'edit-roles', 'delete-roles', 'view-permissions',
+            'view-reports', 'view-technician-reports'
+        ];
+
+        foreach ($permissions as $permissionName) {
+            Permission::create(['name' => $permissionName]);
+        }
+
+        // Assign permissions to roles
         $superAdminRole = Role::where('name', 'super-admin')->first();
-        $superAdminRole->givePermissionTo($viewUsersPermission);
+        $technicianRole = Role::where('name', 'technician')->first();
+        $clientRole = Role::where('name', 'client')->first();
+
+        $superAdminRole->givePermissionTo($permissions);
+
+        $technicianPermissions = array_filter($permissions, function($permission) {
+            return !str_contains($permission, 'delete') && !str_contains($permission, 'view-reports');
+        });
+
+        $technicianRole->givePermissionTo($technicianPermissions);
+
+        $clientPermissions = [
+            'view-companies', 'edit-companies',
+            'view-service-contracts',
+            'view-tickets', 'create-tickets', 'edit-tickets', 'close-tickets', 'open-tickets', 'mark-needs-human-interaction', 'view-ticket-history',
+            'view-messages', 'create-messages',
+            'view-users', 'create-users', 'edit-users', 'view-authenticated-user'
+        ];
+
+        $clientRole->givePermissionTo($clientPermissions);
     }
 }
