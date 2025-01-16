@@ -17,10 +17,10 @@ class TicketSeeder extends Seeder
             'service_contract_id' => 1,
             'title' => 'Errores con los correos',
         ]);
-        Ticket::create([
-            'service_contract_id' => 2,
-            'title' => 'Como conectar una cuenta de correo',
-        ]);
+        // Ticket::create([
+        //     'service_contract_id' => 2,
+        //     'title' => 'Como conectar una cuenta de correo',
+        // ]);
         Ticket::create([
             'service_contract_id' => 3,
             'title' => 'Necesito espacio en mi hosting',
