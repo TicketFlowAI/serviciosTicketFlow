@@ -8,8 +8,6 @@ use Illuminate\Database\Seeder;
 
 class MessageSeeder extends Seeder
 {
-    private const MESSAGE_CONTENT = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nec sodales lacus, quis feugiat metus. Donec auctor odio lacus, sit amet eleifend magna semper ut. Cras non ultrices metus. Aliquam tincidunt dui sem, vitae pretium libero consectetur quis. Donec commodo dapibus ex, gravida iaculis risus bibendum a. Curabitur in lacinia tellus. Cras fermentum vehicula ex vitae venenatis. Mauris sit amet odio aliquet, interdum justo ac, sollicitudin risus. Fusce diam odio, malesuada tempor molestie vel';
-
     /**
      * Run the database seeds.
      */
@@ -17,23 +15,18 @@ class MessageSeeder extends Seeder
     {
         Message::create([
             'ticket_id' => 1,
-            'Content' => self::MESSAGE_CONTENT,
-            'user_id' => 2
+            'Content' => 'Estoy teniendo problemas con mis correos electrónicos. No se están enviando. ¿Pueden ayudarme a resolver esto?',
+            'user_id' => 5
         ]);
         Message::create([
-            'ticket_id' => 1,
-            'Content' => self::MESSAGE_CONTENT,
-            'user_id' => 3
+            'ticket_id' => 2,
+            'Content' => 'Necesito ayuda para conectar mi correo electrónico a Outlook. ¿Pueden proporcionar los pasos y los datos necesarios para la conexión?',
+            'user_id' => 5
         ]);
         Message::create([
-            'ticket_id' => 1,
-            'Content' => self::MESSAGE_CONTENT,
-            'user_id' => 2
-        ]);
-        Message::create([
-            'ticket_id' => 1,
-            'Content' => self::MESSAGE_CONTENT,
-            'user_id' => 3
+            'ticket_id' => 3,
+            'Content' => 'Estoy quedándome sin espacio en mi hosting. ¿Podrían aumentar mi espacio de alojamiento?',
+            'user_id' => 5
         ]);
     }
 }

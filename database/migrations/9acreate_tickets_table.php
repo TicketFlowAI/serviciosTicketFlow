@@ -22,7 +22,8 @@ return new class extends Migration
             $table->tinyInteger('status')->default(2);
             $table->boolean('newClientMessage')->default(0);
             $table->boolean('newTechnicianMessage')->default(0);
-            $table->string('job_id')->nullable();
+            $table->string('job_id_classifier')->nullable();
+            $table->string('job_id_human_intervention')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
