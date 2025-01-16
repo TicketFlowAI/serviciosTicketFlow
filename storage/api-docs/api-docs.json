@@ -164,6 +164,62 @@
                 }
             }
         },
+        "/api/categories/deleted": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Get all soft deleted categories",
+                "operationId": "3ffa26fec6c5a419ee015ac77fad1446",
+                "responses": {
+                    "200": {
+                        "description": "List of soft deleted categories",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CategoryResource"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/categories/{id}/restore": {
+            "put": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Restore a soft deleted category",
+                "operationId": "3b72ddb55fbd5786efa49437b1381261",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Category ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category restored successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CategoryResource"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/companies": {
             "get": {
                 "tags": [
@@ -418,6 +474,58 @@
                 }
             }
         },
+        "/companies/deleted": {
+            "get": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Get a list of soft-deleted companies",
+                "operationId": "5216ae6262921e38838f59d29eeda332",
+                "responses": {
+                    "200": {
+                        "description": "List of soft-deleted companies",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CompanyResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/companies/{id}/restore": {
+            "put": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Restore a soft-deleted company",
+                "operationId": "4ff4a938f8d31ef63fcec4b026b8cd25",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the company",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Company restored successfully"
+                    },
+                    "404": {
+                        "description": "Company not found"
+                    }
+                }
+            }
+        },
         "/emails": {
             "get": {
                 "tags": [
@@ -616,6 +724,58 @@
                 }
             }
         },
+        "/emails/deleted": {
+            "get": {
+                "tags": [
+                    "Emails"
+                ],
+                "summary": "Get a list of deleted email templates",
+                "operationId": "a2631aded61a72fc9ea0fc9caf2e0926",
+                "responses": {
+                    "200": {
+                        "description": "List of deleted email templates",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/EmailResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/emails/{id}/restore": {
+            "put": {
+                "tags": [
+                    "Emails"
+                ],
+                "summary": "Restore a deleted email template",
+                "operationId": "289d1eed10df974123b7ce7b4285d189",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the email template",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email template restored successfully"
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    }
+                }
+            }
+        },
         "/intervals": {
             "get": {
                 "tags": [
@@ -807,6 +967,65 @@
                 "responses": {
                     "204": {
                         "description": "Interval deleted successfully"
+                    },
+                    "404": {
+                        "description": "Interval not found"
+                    }
+                }
+            }
+        },
+        "/intervals/deleted": {
+            "get": {
+                "tags": [
+                    "Intervals"
+                ],
+                "summary": "Get a list of deleted intervals",
+                "operationId": "17372f691deda128d59488e5ded6d5dc",
+                "responses": {
+                    "200": {
+                        "description": "List of deleted intervals",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/IntervalResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/intervals/{id}/restore": {
+            "put": {
+                "tags": [
+                    "Intervals"
+                ],
+                "summary": "Restore a deleted interval",
+                "operationId": "0493b3aea50eb0f3f355b543d88f2a8d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the interval",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Interval restored successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IntervalResource"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Interval not found"
@@ -1823,6 +2042,61 @@
                 }
             }
         },
+        "/service-contracts/deleted": {
+            "get": {
+                "tags": [
+                    "Service Contracts"
+                ],
+                "summary": "Get a list of deleted service contracts",
+                "operationId": "5bcae923c2c6f28ebf55c7dfafb1178e",
+                "responses": {
+                    "200": {
+                        "description": "List of deleted service contracts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ServiceContractResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/service-contracts/{id}/restore": {
+            "put": {
+                "tags": [
+                    "Service Contracts"
+                ],
+                "summary": "Restore a deleted service contract",
+                "operationId": "2145a7892fc96aea9a07228a67355e38",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the service contract",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Service contract restored successfully"
+                    },
+                    "404": {
+                        "description": "Service contract not found"
+                    }
+                }
+            }
+        },
         "/services": {
             "get": {
                 "tags": [
@@ -2039,6 +2313,61 @@
                 }
             }
         },
+        "/services/deleted": {
+            "get": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Get a list of deleted services",
+                "operationId": "75ad9cff5783baa99413dbddea3b68fc",
+                "responses": {
+                    "200": {
+                        "description": "List of deleted services",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ServiceResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/services/{id}/restore": {
+            "put": {
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Restore a deleted service",
+                "operationId": "45a9246d122168a5c77f9615485fcb20",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the service",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Service restored successfully"
+                    },
+                    "404": {
+                        "description": "Service not found"
+                    }
+                }
+            }
+        },
         "/service-terms": {
             "get": {
                 "tags": [
@@ -2216,6 +2545,61 @@
                 "responses": {
                     "204": {
                         "description": "Service term deleted successfully"
+                    },
+                    "404": {
+                        "description": "Service term not found"
+                    }
+                }
+            }
+        },
+        "/service-terms/deleted": {
+            "get": {
+                "tags": [
+                    "Service Terms"
+                ],
+                "summary": "Get a list of deleted service terms",
+                "operationId": "4979b8dcf96da5f6a6d7579f7c0009cc",
+                "responses": {
+                    "200": {
+                        "description": "List of deleted service terms",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ServiceTermResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/service-terms/{id}/restore": {
+            "put": {
+                "tags": [
+                    "Service Terms"
+                ],
+                "summary": "Restore a deleted service term",
+                "operationId": "2420ba60ee38e8de609d6fd9924fafed",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the service term",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Service term restored successfully"
                     },
                     "404": {
                         "description": "Service term not found"
@@ -2402,6 +2786,61 @@
                 "responses": {
                     "204": {
                         "description": "Tax deleted successfully"
+                    },
+                    "404": {
+                        "description": "Tax not found"
+                    }
+                }
+            }
+        },
+        "/taxes/deleted": {
+            "get": {
+                "tags": [
+                    "Taxes"
+                ],
+                "summary": "Get a list of deleted taxes",
+                "operationId": "610088e08f37f12242535af678abcde2",
+                "responses": {
+                    "200": {
+                        "description": "List of deleted taxes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/TaxResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/taxes/{id}/restore": {
+            "put": {
+                "tags": [
+                    "Taxes"
+                ],
+                "summary": "Restore a deleted tax",
+                "operationId": "9c816ac6feea7ffd8d9e09b365f1a46a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the tax",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tax restored successfully"
                     },
                     "404": {
                         "description": "Tax not found"
@@ -2699,6 +3138,61 @@
                 }
             }
         },
+        "/tickets/deleted": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Get a list of deleted tickets",
+                "operationId": "213ee1d0829aef02b892463c614a4de9",
+                "responses": {
+                    "200": {
+                        "description": "List of deleted tickets",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/TicketResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/tickets/{id}/restore": {
+            "put": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Restore a deleted ticket",
+                "operationId": "a5b7e3154a4e1d79993dd77bc2440045",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the ticket",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ticket restored successfully"
+                    },
+                    "404": {
+                        "description": "Ticket not found"
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "tags": [
@@ -2979,6 +3473,61 @@
                     },
                     "400": {
                         "description": "Role parameter is required"
+                    }
+                }
+            }
+        },
+        "/users/deleted": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get a list of deleted users",
+                "operationId": "3bff85916d4b9a372f148c7da817e863",
+                "responses": {
+                    "200": {
+                        "description": "List of deleted users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UserResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/users/{id}/restore": {
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Restore a deleted user",
+                "operationId": "4a61f73bdc45cf05ffded930a328ddaa",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user to restore",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User restored successfully"
+                    },
+                    "404": {
+                        "description": "User not found"
                     }
                 }
             }
