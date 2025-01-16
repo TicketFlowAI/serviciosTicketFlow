@@ -71,5 +71,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(TicketHistory::class);
     }
-
+    
+    protected $guard_name = 'sanctum';
 }

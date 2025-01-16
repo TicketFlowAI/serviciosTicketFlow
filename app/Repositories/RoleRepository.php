@@ -35,6 +35,11 @@ class RoleRepository implements RoleRepositoryInterface
     public function delete($id)
     {
         $role = Role::findOrFail($id);
+
+        if ($role->users()->exists()) {
+            throw new \Exception('Cannot delete this role, there are users assigned to it');
+        }
+
         $role->delete();
     }
 }
