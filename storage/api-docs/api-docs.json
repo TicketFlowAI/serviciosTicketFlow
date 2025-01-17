@@ -1678,6 +1678,9 @@
                     },
                     "404": {
                         "description": "Role not found"
+                    },
+                    "400": {
+                        "description": "Cannot delete this role, there are users assigned to it"
                     }
                 }
             }
@@ -2603,6 +2606,414 @@
                     },
                     "404": {
                         "description": "Service term not found"
+                    }
+                }
+            }
+        },
+        "/surveys": {
+            "post": {
+                "tags": [
+                    "Surveys"
+                ],
+                "summary": "Create a new survey",
+                "operationId": "aa1c11ac664ab9313aefdfa5850a5abf",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "ticket_id",
+                                    "question_id",
+                                    "user_id",
+                                    "score"
+                                ],
+                                "properties": {
+                                    "ticket_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "question_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "score": {
+                                        "type": "integer",
+                                        "example": 5
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Survey created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Survey"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/surveys/{id}": {
+            "get": {
+                "tags": [
+                    "Surveys"
+                ],
+                "summary": "Get details of a specific survey",
+                "operationId": "434e8bcb03ca5237b1907362bcd93a1a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the survey",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Survey details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Survey"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Survey not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Surveys"
+                ],
+                "summary": "Update a survey",
+                "operationId": "dd344725d88b5445b16ed96c9a42e526",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the survey",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "ticket_id",
+                                    "question_id",
+                                    "user_id",
+                                    "score"
+                                ],
+                                "properties": {
+                                    "ticket_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "question_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "score": {
+                                        "type": "integer",
+                                        "example": 5
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Survey updated successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Surveys"
+                ],
+                "summary": "Delete a survey",
+                "operationId": "589cb3cf17f47bbda84b2887656db9d5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the survey",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Survey deleted successfully"
+                    },
+                    "404": {
+                        "description": "Survey not found"
+                    }
+                }
+            }
+        },
+        "/survey-questions": {
+            "get": {
+                "tags": [
+                    "SurveyQuestions"
+                ],
+                "summary": "Get a list of survey questions",
+                "operationId": "de6c6f3d3840a8eb89fdb727756978e7",
+                "responses": {
+                    "200": {
+                        "description": "List of survey questions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/SurveyQuestionResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "SurveyQuestions"
+                ],
+                "summary": "Create a new survey question",
+                "operationId": "35c854a20010dec26b9c75b519aa833b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "question"
+                                ],
+                                "properties": {
+                                    "question": {
+                                        "type": "string",
+                                        "example": "¿Cómo calificaría la satisfacción con el servicio de soporte recibido?"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Survey question created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SurveyQuestionResource"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/survey-questions/{id}": {
+            "get": {
+                "tags": [
+                    "SurveyQuestions"
+                ],
+                "summary": "Get details of a specific survey question",
+                "operationId": "4c36d1f2dca9c92d7c67b261d4a69df6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the survey question",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Survey question details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SurveyQuestionResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Survey question not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "SurveyQuestions"
+                ],
+                "summary": "Update a survey question",
+                "operationId": "4ed36abfda0a79c314fe8799efb524d2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the survey question",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "question"
+                                ],
+                                "properties": {
+                                    "question": {
+                                        "type": "string",
+                                        "example": "Updated survey question"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Survey question updated successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "SurveyQuestions"
+                ],
+                "summary": "Delete a survey question",
+                "operationId": "8170bfef5f0d58c797fa2632c2d60b6d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the survey question",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Survey question deleted successfully"
+                    },
+                    "404": {
+                        "description": "Survey question not found"
+                    }
+                }
+            }
+        },
+        "/survey-questions/deleted": {
+            "get": {
+                "tags": [
+                    "SurveyQuestions"
+                ],
+                "summary": "Get a list of deleted survey questions",
+                "operationId": "ffeaae4fc89fcdf077562d3f37fe5780",
+                "responses": {
+                    "200": {
+                        "description": "List of deleted survey questions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/SurveyQuestionResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/survey-questions/{id}/restore": {
+            "put": {
+                "tags": [
+                    "SurveyQuestions"
+                ],
+                "summary": "Restore a deleted survey question",
+                "operationId": "fd3edada2c0bd90c2a766980490215c4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the survey question",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Survey question restored successfully"
+                    },
+                    "404": {
+                        "description": "Survey question not found"
                     }
                 }
             }
@@ -3882,6 +4293,54 @@
                 },
                 "type": "object"
             },
+            "SurveyQuestionResource": {
+                "title": "SurveyQuestionResource",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "question": {
+                        "type": "string",
+                        "example": "¿Cómo calificaría la satisfacción con el servicio de soporte recibido?"
+                    }
+                },
+                "type": "object"
+            },
+            "Survey": {
+                "title": "Survey",
+                "properties": {
+                    "ticket_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user": {
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "example": "John"
+                            },
+                            "lastname": {
+                                "type": "string",
+                                "example": "Doe"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "questions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "What is your favorite color?"
+                        }
+                    },
+                    "score": {
+                        "type": "integer",
+                        "example": 5
+                    }
+                },
+                "type": "object"
+            },
             "TaxResource": {
                 "properties": {
                     "id": {
@@ -4103,6 +4562,14 @@
         {
             "name": "Service Terms",
             "description": "API Endpoints for managing service terms"
+        },
+        {
+            "name": "Surveys",
+            "description": "API Endpoints for managing surveys"
+        },
+        {
+            "name": "SurveyQuestions",
+            "description": "API Endpoints for managing survey questions"
         },
         {
             "name": "Taxes",

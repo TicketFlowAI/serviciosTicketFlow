@@ -25,29 +25,6 @@ class SurveyController extends Controller
     }
 
     /**
-     * @OA\Get(
-     *     path="/surveys",
-     *     summary="Get a list of surveys",
-     *     tags={"Surveys"},
-     *     @OA\Response(
-     *         response=200,
-     *         description="List of surveys",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/SurveyResource")
-     *         )
-     *     ),
-     *     @OA\Response(response=400, description="Invalid request")
-     * )
-     */
-    public function index()
-    {
-        $data = $this->surveyRepositoryInterface->index();
-
-        return ApiResponseClass::sendResponse(SurveyResource::collection($data), '', 200);
-    }
-
-    /**
      * @OA\Post(
      *     path="/surveys",
      *     summary="Create a new survey",
@@ -65,7 +42,7 @@ class SurveyController extends Controller
      *     @OA\Response(
      *         response=201,
      *         description="Survey created successfully",
-     *         @OA\JsonContent(ref="#/components/schemas/SurveyResource")
+     *         @OA\JsonContent(ref="#/components/schemas/Survey")
      *     ),
      *     @OA\Response(response=400, description="Invalid request")
      * )
@@ -100,7 +77,7 @@ class SurveyController extends Controller
      *     @OA\Response(
      *         response=200,
      *         description="Survey details retrieved successfully",
-     *         @OA\JsonContent(ref="#/components/schemas/SurveyResource")
+     *         @OA\JsonContent(ref="#/components/schemas/Survey")
      *     ),
      *     @OA\Response(response=404, description="Survey not found")
      * )

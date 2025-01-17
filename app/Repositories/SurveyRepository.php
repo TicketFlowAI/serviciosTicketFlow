@@ -7,16 +7,13 @@ use App\Interfaces\SurveyRepositoryInterface;
 
 class SurveyRepository implements SurveyRepositoryInterface
 {
-    // Retrieve all surveys
-    public function index()
-    {
-        return Survey::all();
-    }
-
-    // Retrieve surveys by ticket_id
+    // Retrieve surveys by ticket_id and load specific fields in relationships
     public function getById($id)
     {
-        return Survey::where('ticket_id', $id)->get();
+        return Survey::with([
+            'user:id,name,lastname',
+            'questions:id,question'
+        ])->where('ticket_id', $id)->get();
     }
 
     // Store a new survey

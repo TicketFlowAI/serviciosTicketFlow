@@ -11,8 +11,17 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     type="object",
  *     title="Survey",
  *     @OA\Property(property="ticket_id", type="integer", example=1),
- *     @OA\Property(property="question_id", type="integer", example=1),
- *     @OA\Property(property="user_id", type="integer", example=1),
+ *     @OA\Property(
+ *         property="user",
+ *         type="object",
+ *         @OA\Property(property="name", type="string", example="John"),
+ *         @OA\Property(property="lastname", type="string", example="Doe")
+ *     ),
+ *     @OA\Property(
+ *         property="questions",
+ *         type="array",
+ *         @OA\Items(type="string", example="What is your favorite color?")
+ *     ),
  *     @OA\Property(property="score", type="integer", example=5),
  * )
  */
@@ -27,8 +36,13 @@ class SurveyResource extends JsonResource
     {
         return [
             'ticket_id' => $this->ticket_id,
-            'question_id' => $this->question_id,
-            'user_id' => $this->user_id,
+            'user' => [
+                'name' => $this->user->name,
+                'lastname' => $this->user->lastname,
+            ],
+            'questions' => $this->questions->map(function ($question) {
+                return $question->question;
+            }),
             'score' => $this->score,
         ];
     }

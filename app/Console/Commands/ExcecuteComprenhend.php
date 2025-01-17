@@ -33,7 +33,6 @@ class ExcecuteComprenhend extends Command
             ],
         ]);
 
-        // Procesamos los tickets en progreso
         $inProgressJobs = Ticket::whereNotNull('job_id_classifier')
             ->orWhereNotNull('job_id_human_intervention')
             ->where('status', 2) // 2 = En proceso
@@ -96,35 +95,35 @@ class ExcecuteComprenhend extends Command
             // Descargar archivo de S3
             $fileContents = Storage::disk('s3')->get($relativePath);
 
-            // Crear directorio local para el Job ID
-            $localDir = "temp/{$jobId}";
-            $absoluteLocalDir = storage_path("app/{$localDir}");
+            // Ruta base para archivos temporales
+            $baseTempPath = '/home/servicios/htdocs/servicios.mindsoftdev.com/storage/app/private/temp';
+            $localDir = "{$baseTempPath}/{$jobId}";
 
-            if (!Storage::disk('local')->exists($localDir)) {
-                Storage::disk('local')->makeDirectory($localDir);
-                $this->info("Directory created: {$absoluteLocalDir}");
+            // Crear directorio local para el Job ID
+            if (!file_exists($localDir)) {
+                mkdir($localDir, 0775, true);
+                $this->info("Directory created: {$localDir}");
             } else {
-                $this->info("Directory already exists: {$absoluteLocalDir}");
+                $this->info("Directory already exists: {$localDir}");
             }
 
-            // Guardar el archivo en local
-            $localTarGzPath = "{$localDir}/output.tar.gz";
-            Storage::disk('local')->put($localTarGzPath, $fileContents);
-
-            $this->info("File downloaded and stored locally at: storage/app/{$localTarGzPath}");
-
-            // Verificar si el archivo existe antes de extraer
-            $absoluteTarGzPath = storage_path("app/{$localTarGzPath}");
-            if (!file_exists($absoluteTarGzPath)) {
-                $this->error("Downloaded file not found: {$absoluteTarGzPath}");
+            // Verificar existencia del directorio
+            if (!file_exists($localDir)) {
+                $this->error("Directory does not exist after creation: {$localDir}");
                 return;
             }
 
-            $absoluteExtractDir = $absoluteLocalDir;
-            $this->extractTarGz($absoluteTarGzPath, $absoluteExtractDir);
+            // Guardar el archivo descargado localmente
+            $localTarGzPath = "{$localDir}/output.tar.gz";
+            file_put_contents($localTarGzPath, $fileContents);
 
-            // Procesar el archivo JSON extraído
-            $jsonFilePath = "{$absoluteExtractDir}/output.json";
+            $this->info("File downloaded and stored locally at: {$localTarGzPath}");
+
+            // Extraer los archivos
+            $this->extractTarGz($localTarGzPath, $localDir);
+
+            // Procesar el archivo JSON
+            $jsonFilePath = "{$localDir}/output.json";
             if (!file_exists($jsonFilePath)) {
                 $this->error("Extracted JSON file not found for Ticket #{$ticket->id}, Job Type: {$jobType}.");
                 return;
@@ -133,7 +132,6 @@ class ExcecuteComprenhend extends Command
             $resultContent = file_get_contents($jsonFilePath);
             $results = json_decode($resultContent, true);
 
-            // Procesar resultados
             if ($jobType === 'classifier') {
                 $this->updatePriority($ticket, $results);
             } elseif ($jobType === 'human intervention') {
@@ -155,11 +153,9 @@ class ExcecuteComprenhend extends Command
         }
 
         try {
-            // Extraer archivo .tar.gz usando `PharData`
             $phar = new \PharData($tarFilePath);
             $phar->decompress(); // Crea un archivo .tar
 
-            // Cambiar extensión a .tar
             $tarPath = str_replace('.gz', '', $tarFilePath);
 
             if (!file_exists($tarPath)) {
@@ -216,6 +212,8 @@ class ExcecuteComprenhend extends Command
         }
     }
 }
+
+
 
 
 

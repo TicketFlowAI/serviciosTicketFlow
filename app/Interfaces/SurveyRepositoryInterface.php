@@ -4,7 +4,6 @@ namespace App\Interfaces;
 
 interface SurveyRepositoryInterface
 {
-    public function index();
     public function getById($id);
     public function store(array $data);
     public function update(array $data,$id);
