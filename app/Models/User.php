@@ -71,6 +71,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(TicketHistory::class);
     }
+
+    public function surveys()
+    {
+        return $this->hasMany(Survey::class);
+    }
     
     protected $guard_name = 'sanctum';
 }

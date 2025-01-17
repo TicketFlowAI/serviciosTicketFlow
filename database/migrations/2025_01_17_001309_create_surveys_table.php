@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('surveys', function (Blueprint $table) {
             $table->id();
-            $table->integer('ticket_id');
-            $table->integer('question_id');
-            $table->integer('user_id');
+            $table->foreignId('ticket_id')->constrained('tickets');
+            $table->foreignId('question_id')->constrained('survey_questions');
+            $table->foreignId('user_id')->constrained('users');
             $table->tinyInteger('score')->unsigned()->constrained()->check('score >= 0 and score <= 5');
             $table->timestamps();
         });

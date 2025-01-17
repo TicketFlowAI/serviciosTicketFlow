@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Survey extends Model
 {
-    /** @use HasFactory<\Database\Factories\SurveyFactory> */
+
     use HasFactory;
 
     protected $fillable = [
@@ -16,4 +16,19 @@ class Survey extends Model
         'user_id',
         'score',
     ];
+
+    public function questions()
+    {
+        return $this->hasMany(SurveyQuestion::class);
+    }
+
+    public function ticket()
+    {
+        return $this->belongsTo(Ticket::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

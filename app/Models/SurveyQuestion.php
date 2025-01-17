@@ -11,4 +11,9 @@ class SurveyQuestion extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = ['question'];
+
+    public function surveys()
+    {
+        return $this->belongsToMany(Survey::class);
+    }
 }

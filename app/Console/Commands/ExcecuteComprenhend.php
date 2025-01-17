@@ -98,33 +98,33 @@ class ExcecuteComprenhend extends Command
 
             // Crear directorio local para el Job ID
             $localDir = "temp/{$jobId}";
-            Storage::disk('local')->makeDirectory($localDir);
+            $absoluteLocalDir = storage_path("app/{$localDir}");
+
+            if (!Storage::disk('local')->exists($localDir)) {
+                Storage::disk('local')->makeDirectory($localDir);
+                $this->info("Directory created: {$absoluteLocalDir}");
+            } else {
+                $this->info("Directory already exists: {$absoluteLocalDir}");
+            }
 
             // Guardar el archivo en local
             $localTarGzPath = "{$localDir}/output.tar.gz";
             Storage::disk('local')->put($localTarGzPath, $fileContents);
 
-            $this->info("File downloaded and stored locally at: {$localTarGzPath}");
-
-            // Pausa breve para asegurar sincronización
-            sleep(1);
+            $this->info("File downloaded and stored locally at: storage/app/{$localTarGzPath}");
 
             // Verificar si el archivo existe antes de extraer
-            $localTarFile = storage_path("app/{$localTarGzPath}");
-
-            if (!file_exists($localTarFile)) {
-                $this->error("Downloaded file not found: {$localTarFile}");
-                $this->info("Re-checking storage folder contents...");
-                $localFiles = Storage::disk('local')->files($localDir);
-                $this->info("Files in directory: " . print_r($localFiles, true));
+            $absoluteTarGzPath = storage_path("app/{$localTarGzPath}");
+            if (!file_exists($absoluteTarGzPath)) {
+                $this->error("Downloaded file not found: {$absoluteTarGzPath}");
                 return;
             }
 
-            $extractDir = storage_path("app/{$localDir}");
-            $this->extractTarGz($localTarFile, $extractDir);
+            $absoluteExtractDir = $absoluteLocalDir;
+            $this->extractTarGz($absoluteTarGzPath, $absoluteExtractDir);
 
             // Procesar el archivo JSON extraído
-            $jsonFilePath = "{$extractDir}/output.json";
+            $jsonFilePath = "{$absoluteExtractDir}/output.json";
             if (!file_exists($jsonFilePath)) {
                 $this->error("Extracted JSON file not found for Ticket #{$ticket->id}, Job Type: {$jobType}.");
                 return;
@@ -155,11 +155,6 @@ class ExcecuteComprenhend extends Command
         }
 
         try {
-            // Crear directorio de extracción si no existe
-            if (!is_dir($extractToDir)) {
-                mkdir($extractToDir, 0755, true);
-            }
-
             // Extraer archivo .tar.gz usando `PharData`
             $phar = new \PharData($tarFilePath);
             $phar->decompress(); // Crea un archivo .tar
@@ -221,6 +216,7 @@ class ExcecuteComprenhend extends Command
         }
     }
 }
+
 
 
 

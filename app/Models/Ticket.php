@@ -45,4 +45,9 @@ class Ticket extends Model
         return $this->hasMany(TicketHistory::class);
     }
 
+    public function survey()
+    {
+        return $this->hasOne(Survey::class);
+    }
+
 }
