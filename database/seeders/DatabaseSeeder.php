@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
             MessageSeeder::class,
             EmailSeeder::class,
             IntervalSeeder::class,
-            SurveySeeder::class,
             SurveyQuestionSeeder::class,
+            SurveySeeder::class,
         ]);
     }
 }
