@@ -33,6 +33,7 @@ class ExcecuteComprenhend extends Command
             ],
         ]);
 
+        // Procesar trabajos en progreso
         $inProgressJobs = Ticket::whereNotNull('job_id_classifier')
             ->orWhereNotNull('job_id_human_intervention')
             ->where('status', 2) // 2 = En proceso
@@ -47,6 +48,33 @@ class ExcecuteComprenhend extends Command
             }
 
             $this->info('Finished processing in-progress jobs.');
+        }
+
+        // Procesar nuevos tickets
+        $tickets = Ticket::where('status', 2)
+            ->with('message')
+            ->get();
+
+        if ($tickets->isEmpty()) {
+            $this->info('No tickets to process.');
+            return;
+        }
+
+        foreach ($tickets as $ticket) {
+            $this->info("Processing Ticket #{$ticket->id}...");
+
+            if ($ticket->message->isEmpty()) {
+                $this->info("No messages found for Ticket #{$ticket->id}. Skipping...");
+                continue;
+            }
+
+            $csvUploaded = $this->prepareMessagesForClassification($ticket);
+            if (!$csvUploaded) {
+                $this->error("Failed to prepare messages for Ticket #{$ticket->id}. Skipping...");
+                continue;
+            }
+
+            $this->createJobsSequentially($ticket, $comprehendClient);
         }
     }
 
@@ -92,50 +120,49 @@ class ExcecuteComprenhend extends Command
         }
 
         try {
-            // Descargar archivo de S3
             $fileContents = Storage::disk('s3')->get($relativePath);
 
-            // Ruta base para archivos temporales
             $baseTempPath = '/home/servicios/htdocs/servicios.mindsoftdev.com/storage/app/private/temp';
             $localDir = "{$baseTempPath}/{$jobId}";
 
-            // Crear directorio local para el Job ID
             if (!file_exists($localDir)) {
                 mkdir($localDir, 0775, true);
                 $this->info("Directory created: {$localDir}");
-            } else {
-                $this->info("Directory already exists: {$localDir}");
             }
 
-            // Verificar existencia del directorio
-            if (!file_exists($localDir)) {
-                $this->error("Directory does not exist after creation: {$localDir}");
-                return;
-            }
-
-            // Guardar el archivo descargado localmente
             $localTarGzPath = "{$localDir}/output.tar.gz";
             file_put_contents($localTarGzPath, $fileContents);
 
             $this->info("File downloaded and stored locally at: {$localTarGzPath}");
 
-            // Extraer los archivos
             $this->extractTarGz($localTarGzPath, $localDir);
 
-            // Procesar el archivo JSON
-            $jsonFilePath = "{$localDir}/output.json";
+            $jsonFilePath = "{$localDir}/predictions.jsonl";
+
             if (!file_exists($jsonFilePath)) {
-                $this->error("Extracted JSON file not found for Ticket #{$ticket->id}, Job Type: {$jobType}.");
+                $this->error("Extracted JSONL file not found for Ticket #{$ticket->id}, Job Type: {$jobType}.");
                 return;
             }
 
-            $resultContent = file_get_contents($jsonFilePath);
-            $results = json_decode($resultContent, true);
+            $this->info("Found extracted JSONL file for Ticket #{$ticket->id} at: {$jsonFilePath}");
+
+            $lines = file($jsonFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            if (count($lines) < 2) {
+                $this->error("Not enough lines in JSONL file for Ticket #{$ticket->id}.");
+                return;
+            }
+
+            $secondLine = json_decode($lines[1], true);
+
+            if (!$secondLine) {
+                $this->error("Failed to decode the second line of JSONL for Ticket #{$ticket->id}.");
+                return;
+            }
 
             if ($jobType === 'classifier') {
-                $this->updatePriority($ticket, $results);
+                $this->updatePriority($ticket, $secondLine);
             } elseif ($jobType === 'human intervention') {
-                $this->updateNeedsHumanInteraction($ticket, $results);
+                $this->updateNeedsHumanInteraction($ticket, $secondLine);
             }
 
             $this->info("Results processed successfully for Ticket #{$ticket->id}, Job Type: {$jobType}.");
@@ -153,10 +180,15 @@ class ExcecuteComprenhend extends Command
         }
 
         try {
-            $phar = new \PharData($tarFilePath);
-            $phar->decompress(); // Crea un archivo .tar
-
             $tarPath = str_replace('.gz', '', $tarFilePath);
+
+            if (file_exists($tarPath)) {
+                unlink($tarPath);
+                $this->info("Existing tar file deleted: {$tarPath}");
+            }
+
+            $phar = new \PharData($tarFilePath);
+            $phar->decompress();
 
             if (!file_exists($tarPath)) {
                 throw new \Exception("Decompressed .tar file not found: {$tarPath}");
@@ -168,6 +200,29 @@ class ExcecuteComprenhend extends Command
             $this->info("Extraction completed successfully to: {$extractToDir}");
         } catch (\Exception $e) {
             throw new \Exception("Error extracting {$tarFilePath}: " . $e->getMessage());
+        }
+    }
+
+    protected function prepareMessagesForClassification(Ticket $ticket): bool
+    {
+        $csvContent = $ticket->message->map(fn($message) => [
+            'MessageID' => $message->id,
+            'Content'   => $message->content,
+        ])->toArray();
+
+        $csvFileName = "input/{$ticket->id}.csv";
+        $csvData = $this->convertArrayToCsv($csvContent);
+
+        try {
+            if (!Storage::disk('s3')->put($csvFileName, $csvData)) {
+                return false;
+            }
+
+            $this->info("Successfully uploaded CSV for Ticket #{$ticket->id} to S3.");
+            return true;
+        } catch (\Exception $e) {
+            $this->error("Error uploading CSV for Ticket #{$ticket->id}: " . $e->getMessage());
+            return false;
         }
     }
 
@@ -211,25 +266,91 @@ class ExcecuteComprenhend extends Command
             $this->warn("No valid class found in results for Ticket #{$ticket->id}");
         }
     }
+
+    protected function convertArrayToCsv(array $data): string
+    {
+        $csv = fopen('php://temp', 'r+');
+        fputcsv($csv, array_keys($data[0]));
+        foreach ($data as $row) {
+            fputcsv($csv, $row);
+        }
+        rewind($csv);
+        $csvData = stream_get_contents($csv);
+        fclose($csv);
+
+        return $csvData;
+    }
+
+    protected function createJobsSequentially(Ticket $ticket, ComprehendClient $comprehendClient)
+    {
+        if (!$ticket->job_id_classifier) {
+            $jobId = $this->startJob(
+                $ticket,
+                'arn:aws:comprehend:us-east-2:115894170195:document-classifier/PriorityClassifier/version/v1',
+                's3://comprenhend-dataset/output/classifier/',
+                $comprehendClient
+            );
+            if ($jobId) {
+                $ticket->update(['job_id_classifier' => $jobId]);
+            }
+        }
+
+        if (!$ticket->job_id_human_intervention) {
+            $jobId = $this->startJob(
+                $ticket,
+                'arn:aws:comprehend:us-east-2:115894170195:document-classifier/PriorityClassifierHumanIntervention/version/v4',
+                's3://comprenhend-dataset/output/human_intervention/',
+                $comprehendClient
+            );
+            if ($jobId) {
+                $ticket->update(['job_id_human_intervention' => $jobId]);
+            }
+        }
+
+        $ticket->update(['status' => 1]);
+    }
+
+    protected function startJob(Ticket $ticket, string $classifierArn, string $outputUri, ComprehendClient $comprehendClient): ?string
+    {
+        $csvFileName = "input/{$ticket->id}.csv";
+        $inputUri = "s3://comprenhend-dataset/{$csvFileName}";
+
+        $maxAttempts = 5;
+        $attempt = 0;
+        $backoff = 1;
+
+        while ($attempt < $maxAttempts) {
+            try {
+                $response = $comprehendClient->startDocumentClassificationJob([
+                    'JobName'               => 'Job-' . $ticket->id,
+                    'DocumentClassifierArn' => $classifierArn,
+                    'InputDataConfig'       => [
+                        'S3Uri'       => $inputUri,
+                        'InputFormat' => 'ONE_DOC_PER_LINE',
+                    ],
+                    'OutputDataConfig' => [
+                        'S3Uri' => $outputUri,
+                    ],
+                    'DataAccessRoleArn' => 'arn:aws:iam::115894170195:role/service-role/AmazonComprehendServiceRole-AmazonComprehendServiceRole',
+                ]);
+
+                $this->info("Job started for Ticket #{$ticket->id}, Job Type: {$classifierArn}, Job ID: {$response['JobId']}");
+                return $response['JobId'];
+
+            } catch (\Aws\Exception\AwsException $e) {
+                if ($e->getAwsErrorCode() === 'ThrottlingException') {
+                    $attempt++;
+                    $this->warn("ThrottlingException (Rate exceeded) for Ticket #{$ticket->id}, Job Type: {$classifierArn}. Attempt {$attempt} of {$maxAttempts}. Retrying in {$backoff}s...");
+                    sleep($backoff);
+                    $backoff *= 2;
+                } else {
+                    $this->error("Error starting job for Ticket #{$ticket->id}, Job Type: {$classifierArn}: " . $e->getMessage());
+                    return null;
+                }
+            }
+        }
+
+        $this->error("Max attempts reached for Ticket #{$ticket->id}, Job Type: {$classifierArn}. Job could not be started.");
+        return null;
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
