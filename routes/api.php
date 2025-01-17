@@ -13,7 +13,8 @@ use App\Http\Controllers\{
     EmailController,
     IntervalController,
     RolesController,
-    ReportController
+    ReportController,
+    SurveyController
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -145,4 +146,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/reports/technician/{user_id}/tickets-assigned-reassigned', [ReportController::class, 'getTechnicianTicketsAssignedAndReassigned'])->middleware('permission:view-technician-reports');
     Route::get('/reports/technician/{user_id}/current-tickets', [ReportController::class, 'getTechnicianCurrentTickets'])->middleware('permission:view-technician-reports');
     Route::get('/reports/technician/{user_id}/weekly-comparison', [ReportController::class, 'getTechnicianWeeklyComparison'])->middleware('permission:view-technician-reports');
+
+    // Survey routes
+    Route::get('/surveys', [SurveyController::class, 'index'])->middleware('permission:view-surveys');
+    Route::post('/surveys', [SurveyController::class, 'store'])->middleware('permission:create-surveys');
+    Route::get('/surveys/{id}', [SurveyController::class, 'show'])->middleware('permission:view-surveys');
+    Route::put('/surveys/{id}', [SurveyController::class, 'update'])->middleware('permission:edit-surveys');
+    Route::delete('/surveys/{id}', [SurveyController::class, 'destroy'])->middleware('permission:delete-surveys');
 });

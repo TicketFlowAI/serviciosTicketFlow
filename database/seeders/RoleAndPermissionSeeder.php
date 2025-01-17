@@ -42,7 +42,8 @@ class RoleAndPermissionSeeder extends Seeder
             'view-emails', 'create-emails', 'edit-emails', 'delete-emails', 'view-deleted-emails', 'restore-emails',
             'view-intervals', 'create-intervals', 'edit-intervals', 'delete-intervals', 'view-deleted-intervals', 'restore-intervals',
             'view-roles', 'create-roles', 'edit-roles', 'delete-roles', 'view-permissions',
-            'view-reports', 'view-technician-reports'
+            'view-reports', 'view-technician-reports',
+            'view-surveys', 'create-surveys', 'edit-surveys', 'delete-surveys'
         ];
 
         foreach ($permissions as $permissionName) {
@@ -57,7 +58,7 @@ class RoleAndPermissionSeeder extends Seeder
         $superAdminRole->givePermissionTo($permissions);
 
         $technicianPermissions = array_filter($permissions, function($permission) {
-            return !str_contains($permission, 'delete') && !str_contains($permission, 'view-reports');
+            return !str_contains($permission, 'delete') && !str_contains($permission, 'view-reports') && !str_contains($permission, 'delete-surveys') && !str_contains($permission, 'edit-surveys');
         });
 
         $technicianRole->givePermissionTo($technicianPermissions);
@@ -67,7 +68,8 @@ class RoleAndPermissionSeeder extends Seeder
             'view-service-contracts',
             'view-tickets', 'create-tickets', 'edit-tickets', 'close-tickets', 'open-tickets', 'mark-needs-human-interaction', 'view-ticket-history',
             'view-messages', 'create-messages',
-            'view-users', 'create-users', 'edit-users', 'view-authenticated-user'
+            'view-users', 'create-users', 'edit-users', 'view-authenticated-user',
+            'create-surveys'
         ];
 
         $clientRole->givePermissionTo($clientPermissions);

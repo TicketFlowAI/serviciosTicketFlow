@@ -14,7 +14,8 @@ use App\Interfaces\{
     ServiceTermRepositoryInterface,
     TaxRepositoryInterface,
     TicketRepositoryInterface,
-    UserRepositoryInterface
+    UserRepositoryInterface,
+    SurveyRepositoryInterface
 };
 
 use App\Repositories\{
@@ -29,7 +30,8 @@ use App\Repositories\{
     ServiceTermRepository,
     TaxRepository,
     TicketRepository,
-    UserRepository
+    UserRepository,
+    SurveyRepository
 };
 use Illuminate\Support\ServiceProvider;
 
@@ -54,6 +56,7 @@ class RepositoryServiceProvider extends ServiceProvider
             EmailRepositoryInterface::class => EmailRepository::class,
             IntervalRepositoryInterface::class => IntervalRepository::class,
             RoleRepositoryInterface::class => RoleRepository::class,
+            SurveyRepositoryInterface::class => SurveyRepository::class,
         ];
     
         foreach ($repositories as $interface => $implementation) {

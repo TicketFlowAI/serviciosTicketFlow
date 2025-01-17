@@ -233,23 +233,33 @@ class ExcecuteComprenhend extends Command
         }
 
         try {
-            // ======================
-            // CAMBIO IMPORTANTE
-            // ======================
-            
             // Descargamos el archivo .tar.gz de S3 a una ruta local relativa (disco "local").
             $fileContents = Storage::disk('s3')->get($relativePath);
 
-            // Guardamos en: "temp/<jobId>.tar.gz" dentro de storage/app
+            // ====== BLOQUE DE VERIFICACIÓN (1) ======
+            $this->info('Downloaded size: '.strlen($fileContents).' bytes');
+
             $localRelativePath = "temp/{$jobId}.tar.gz";
             Storage::disk('local')->put($localRelativePath, $fileContents);
 
+            // Verificamos que efectivamente se guardó
+            if (!Storage::disk('local')->exists($localRelativePath)) {
+                dd("El archivo no se guardó en disk('local') -> {$localRelativePath}");
+            } else {
+                $storedFileSize = Storage::disk('local')->size($localRelativePath);
+                $this->info("Local file stored: {$localRelativePath}, size: {$storedFileSize} bytes");
+            }
+
+            // Listamos la carpeta temp para ver qué hay
+            $tempContents = Storage::disk('local')->files('temp');
+            $this->info("Archivos en /temp: " . print_r($tempContents, true));
+            // ====== FIN BLOQUE DE VERIFICACIÓN (1) ======
+
             // Ahora sí generamos la ruta absoluta:
             $localTarFile = storage_path("app/{$localRelativePath}");
-            
+
             // Extraer el archivo TAR.GZ
             $extractDir = storage_path("app/temp/{$jobId}");
-
             $this->extractTarGz($localTarFile, $extractDir);
 
             // Verificar el archivo JSON extraído
@@ -278,18 +288,42 @@ class ExcecuteComprenhend extends Command
 
     protected function extractTarGz(string $tarFilePath, string $extractToDir)
     {
+        $this->info("Starting extractTarGz for: {$tarFilePath}");
+        
+        if (!file_exists($tarFilePath)) {
+            throw new \Exception("File not found: {$tarFilePath}");
+        }
+
+        $size = filesize($tarFilePath);
+        $this->info("File size (bytes): {$size}");
+
+        if (!extension_loaded('zlib')) {
+            throw new \Exception("La extensión zlib no está habilitada en PHP. Es necesaria para descomprimir .gz");
+        }
+
         if (!is_dir($extractToDir)) {
             mkdir($extractToDir, 0755, true);
         }
 
-        // Primero extraemos el .gz a .tar
-        $phar = new \PharData($tarFilePath);
-        $phar->decompress(); // genera .tar
-        $tarPath = str_replace('.gz', '', $tarFilePath);
+        try {
+            $phar = new \PharData($tarFilePath);
+            $this->info("Decompressing .tar.gz to .tar...");
+            $phar->decompress();  // => genera un .tar (mismo nombre sin .gz)
 
-        // Luego extraemos el .tar
-        $pharTar = new \PharData($tarPath);
-        $pharTar->extractTo($extractToDir);
+            $tarPath = str_replace('.gz', '', $tarFilePath);
+
+            if (!file_exists($tarPath)) {
+                throw new \Exception("El archivo .tar no fue creado en: {$tarPath}");
+            }
+
+            $this->info("Extracting .tar to folder: {$extractToDir}");
+            $pharTar = new \PharData($tarPath);
+            $pharTar->extractTo($extractToDir);
+
+            $this->info("Extraction complete.");
+        } catch (\Exception $e) {
+            throw new \Exception("Error al descomprimir {$tarFilePath}: " . $e->getMessage());
+        }
     }
 
     protected function convertArrayToCsv(array $data): string
@@ -311,6 +345,7 @@ class ExcecuteComprenhend extends Command
         $labels = $results['Labels'] ?? [];
         foreach ($labels as $label) {
             if (str_contains($label['Name'], 'Prioridad')) {
+                // Extrae el número de prioridad
                 $priorityValue    = (int) filter_var($label['Name'], FILTER_SANITIZE_NUMBER_INT);
                 $ticket->priority = $priorityValue;
                 $ticket->save();
@@ -337,7 +372,6 @@ class ExcecuteComprenhend extends Command
         }
 
         if ($selectedClass !== null) {
-            // Aquí interpretamos el valor
             $needsHumanInteraction = ($selectedClass === 'sí' || $selectedClass === 'Etiqueta') ? 1 : 0;
             $ticket->needsHumanInteraction = $needsHumanInteraction;
             $ticket->save();
@@ -348,6 +382,8 @@ class ExcecuteComprenhend extends Command
         }
     }
 }
+
+
 
 
 
