@@ -33,7 +33,7 @@ class ExcecuteComprenhend extends Command
             ],
         ]);
 
-        // 1. Revisamos si hay jobs en progreso
+        // Procesamos los tickets en progreso
         $inProgressJobs = Ticket::whereNotNull('job_id_classifier')
             ->orWhereNotNull('job_id_human_intervention')
             ->where('status', 2) // 2 = En proceso
@@ -49,141 +49,12 @@ class ExcecuteComprenhend extends Command
 
             $this->info('Finished processing in-progress jobs.');
         }
-
-        // 2. Procesamos los nuevos tickets
-        $tickets = Ticket::where('status', 2) // 2 = En proceso
-            ->with('message')
-            ->get();
-
-        if ($tickets->isEmpty()) {
-            $this->info('No tickets to process.');
-            return;
-        }
-
-        foreach ($tickets as $ticket) {
-            $this->info("Processing Ticket #{$ticket->id}...");
-
-            if ($ticket->message->isEmpty()) {
-                $this->info("No messages found for Ticket #{$ticket->id}. Skipping...");
-                continue;
-            }
-
-            $csvUploaded = $this->prepareMessagesForClassification($ticket);
-            if (!$csvUploaded) {
-                $this->error("Failed to prepare messages for Ticket #{$ticket->id}. Skipping...");
-                continue;
-            }
-
-            $this->createJobsSequentially($ticket, $comprehendClient);
-        }
-    }
-
-    protected function prepareMessagesForClassification(Ticket $ticket): bool
-    {
-        $csvContent = $ticket->message->map(fn($message) => [
-            'MessageID' => $message->id,
-            'Content'   => $message->content,
-        ])->toArray();
-
-        $csvFileName = "input/{$ticket->id}.csv";
-        $csvData     = $this->convertArrayToCsv($csvContent);
-
-        try {
-            if (!Storage::disk('s3')->put($csvFileName, $csvData)) {
-                return false;
-            }
-
-            $this->info("Successfully uploaded CSV for Ticket #{$ticket->id} to S3.");
-            return true;
-        } catch (\Exception $e) {
-            $this->error("Error uploading CSV for Ticket #{$ticket->id}: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    protected function createJobsSequentially(Ticket $ticket, ComprehendClient $comprehendClient): void
-    {
-        // Primero creamos el job "classifier" si no existe
-        if (!$ticket->job_id_classifier) {
-            $jobId = $this->startJob(
-                $ticket,
-                'arn:aws:comprehend:us-east-2:115894170195:document-classifier/PriorityClassifier/version/v1',
-                's3://comprenhend-dataset/output/classifier/',
-                $comprehendClient
-            );
-            if ($jobId) {
-                $ticket->update(['job_id_classifier' => $jobId]);
-            }
-        }
-
-        // Luego creamos el job "human intervention" si no existe
-        if (!$ticket->job_id_human_intervention) {
-            $jobId = $this->startJob(
-                $ticket,
-                'arn:aws:comprehend:us-east-2:115894170195:document-classifier/PriorityClassifierHumanIntervention/version/v4',
-                's3://comprenhend-dataset/output/human intervention/',
-                $comprehendClient
-            );
-            if ($jobId) {
-                $ticket->update(['job_id_human_intervention' => $jobId]);
-            }
-        }
-
-        // Finalmente, marcamos el ticket como "Abierto" (status = 1)
-        $ticket->update(['status' => 1]);
-    }
-
-    protected function startJob(Ticket $ticket, string $classifierArn, string $outputUri, ComprehendClient $comprehendClient): ?string
-    {
-        $csvFileName = "input/{$ticket->id}.csv";
-        $inputUri    = "s3://comprenhend-dataset/{$csvFileName}";
-
-        // Parámetros de reintento
-        $attempts     = 0;
-        $maxAttempts  = 5;   // máximo de reintentos
-        $backoff      = 1;   // segundos de espera inicial
-
-        while ($attempts < $maxAttempts) {
-            try {
-                $response = $comprehendClient->startDocumentClassificationJob([
-                    'JobName'               => 'Job-' . $ticket->id,
-                    'DocumentClassifierArn' => $classifierArn,
-                    'InputDataConfig'       => [
-                        'S3Uri'       => $inputUri,
-                        'InputFormat' => 'ONE_DOC_PER_LINE',
-                    ],
-                    'OutputDataConfig' => [
-                        'S3Uri' => $outputUri,
-                    ],
-                    'DataAccessRoleArn' => 'arn:aws:iam::115894170195:role/service-role/AmazonComprehendServiceRole-AmazonComprehendServiceRole',
-                ]);
-
-                $this->info("Job started for Ticket #{$ticket->id}, Job Type: {$classifierArn}, Job ID: {$response['JobId']}");
-                return $response['JobId'];
-
-            } catch (\Aws\Exception\AwsException $e) {
-                // Detecta si es ThrottlingException
-                if ($e->getAwsErrorCode() === 'ThrottlingException') {
-                    $attempts++;
-                    $this->warn("ThrottlingException (Rate exceeded) al iniciar job: intento #{$attempts} de {$maxAttempts}. Esperando {$backoff}s...");
-                    sleep($backoff);
-                    $backoff *= 2;
-                } else {
-                    // Otro tipo de error, no reintentamos
-                    $this->error("Error starting job for Ticket #{$ticket->id}, Job Type: {$classifierArn}: " . $e->getMessage());
-                    return null;
-                }
-            }
-        }
-
-        $this->error("Max reintentos agotados para iniciar job en Ticket #{$ticket->id}, Job Type: {$classifierArn}");
-        return null;
     }
 
     protected function checkJobStatus(Ticket $ticket, string $jobType, ComprehendClient $comprehendClient)
     {
         $jobIdField = $jobType === 'classifier' ? 'job_id_classifier' : 'job_id_human_intervention';
-        $jobId      = $ticket->{$jobIdField};
+        $jobId = $ticket->{$jobIdField};
 
         if (!$jobId) {
             return;
@@ -208,84 +79,68 @@ class ExcecuteComprenhend extends Command
     protected function processResults(Ticket $ticket, array $jobProps, string $jobType)
     {
         $jobIdField = $jobType === 'classifier' ? 'job_id_classifier' : 'job_id_human_intervention';
-        $jobId      = $ticket->{$jobIdField};
+        $jobId = $ticket->{$jobIdField};
 
-        // Comprehend, en "OutputDataConfig", puede devolver la ruta COMPLETA con output.tar.gz
         $fullS3Uri = $jobProps['OutputDataConfig']['S3Uri'];
-        $this->info("Comprehend gave me: {$fullS3Uri}");
-
-        // 1) Quitar la parte "s3://comprenhend-dataset/" para usarlo como path relativo en disk('s3')
-        $bucketPrefix = 's3://'.env('AWS_BUCKET').'/';
+        $bucketPrefix = 's3://' . env('AWS_BUCKET') . '/';
         $relativePath = Str::after($fullS3Uri, $bucketPrefix);
 
-        $this->info("Relative path to check: {$relativePath}");
+        $this->info("Processing file for Ticket #{$ticket->id}, Job Type: {$jobType}.");
 
-        // 2) Listar archivos en el directorio padre de $relativePath
-        $dir = dirname($relativePath);
-        $this->info("Listing files under directory: {$dir}");
-        $filesInDir = Storage::disk('s3')->files($dir);
-        $this->info("Files found: " . print_r($filesInDir, true));
-
-        // 3) Ahora sí, verificamos si existe $relativePath en S3
         if (!Storage::disk('s3')->exists($relativePath)) {
-            $this->error("Result file not found for Ticket #{$ticket->id}, Job Type: {$jobType} at {$relativePath}");
+            $this->error("Result file not found in S3: {$relativePath}");
             return;
         }
 
         try {
-            // Descargamos el archivo .tar.gz de S3 a memoria
+            // Descargar archivo de S3
             $fileContents = Storage::disk('s3')->get($relativePath);
 
-            // ===== CREAR CARPETA EN local PARA ESTE JOBID =====
-            // Queremos "storage/app/temp/<jobId>/"
+            // Crear directorio local para el Job ID
             $localDir = "temp/{$jobId}";
             Storage::disk('local')->makeDirectory($localDir);
 
-            // Guardar el .tar.gz dentro de esa carpeta con nombre "output.tar.gz"
+            // Guardar el archivo en local
             $localTarGzPath = "{$localDir}/output.tar.gz";
             Storage::disk('local')->put($localTarGzPath, $fileContents);
 
-            // Verificamos que efectivamente se guardó
-            if (!Storage::disk('local')->exists($localTarGzPath)) {
-                dd("El archivo no se guardó en disk('local'): {$localTarGzPath}");
-            } else {
-                $storedFileSize = Storage::disk('local')->size($localTarGzPath);
-                $this->info("Local file stored: {$localTarGzPath}, size: {$storedFileSize} bytes");
-            }
+            $this->info("File downloaded and stored locally at: {$localTarGzPath}");
 
-            // Listamos la carpeta del job
-            $jobDirContents = Storage::disk('local')->files($localDir);
-            $this->info("Archivos en /{$localDir}: " . print_r($jobDirContents, true));
+            // Pausa breve para asegurar sincronización
+            sleep(1);
 
-            // Generamos la ruta absoluta del .tar.gz
-            // (p.ej. /var/www/.../storage/app/temp/<jobId>/output.tar.gz)
+            // Verificar si el archivo existe antes de extraer
             $localTarFile = storage_path("app/{$localTarGzPath}");
 
-            // El directorio de extracción va a ser el mismo subfolder "temp/<jobId>"
-            $extractDir = storage_path("app/{$localDir}");
-
-            // Extraemos en la misma carpeta "temp/<jobId>"
-            $this->extractTarGz($localTarFile, $extractDir);
-
-            // Verificar el archivo JSON extraído, p.ej. "output.json"
-            $jsonFilePath = "{$extractDir}/output.json";
-            if (!file_exists($jsonFilePath)) {
-                $this->error("Extracted JSON file not found for Ticket #{$ticket->id}, Job Type: {$jobType} in {$jsonFilePath}");
+            if (!file_exists($localTarFile)) {
+                $this->error("Downloaded file not found: {$localTarFile}");
+                $this->info("Re-checking storage folder contents...");
+                $localFiles = Storage::disk('local')->files($localDir);
+                $this->info("Files in directory: " . print_r($localFiles, true));
                 return;
             }
 
-            // Leer el contenido del archivo JSON
-            $resultContent = file_get_contents($jsonFilePath);
-            $results       = json_decode($resultContent, true);
+            $extractDir = storage_path("app/{$localDir}");
+            $this->extractTarGz($localTarFile, $extractDir);
 
-            // Procesar los resultados según el tipo de job
+            // Procesar el archivo JSON extraído
+            $jsonFilePath = "{$extractDir}/output.json";
+            if (!file_exists($jsonFilePath)) {
+                $this->error("Extracted JSON file not found for Ticket #{$ticket->id}, Job Type: {$jobType}.");
+                return;
+            }
+
+            $resultContent = file_get_contents($jsonFilePath);
+            $results = json_decode($resultContent, true);
+
+            // Procesar resultados
             if ($jobType === 'classifier') {
                 $this->updatePriority($ticket, $results);
             } elseif ($jobType === 'human intervention') {
                 $this->updateNeedsHumanInteraction($ticket, $results);
             }
 
-            $this->info("Results processed successfully for Ticket #{$ticket->id}, Job Type: {$jobType}");
+            $this->info("Results processed successfully for Ticket #{$ticket->id}, Job Type: {$jobType}.");
         } catch (\Exception $e) {
             $this->error("Error processing results for Ticket #{$ticket->id}, Job Type: {$jobType}: " . $e->getMessage());
         }
@@ -293,59 +148,36 @@ class ExcecuteComprenhend extends Command
 
     protected function extractTarGz(string $tarFilePath, string $extractToDir)
     {
-        $this->info("Starting extractTarGz for: {$tarFilePath}");
-        
+        $this->info("Extracting: {$tarFilePath}");
+
         if (!file_exists($tarFilePath)) {
             throw new \Exception("File not found: {$tarFilePath}");
         }
 
-        $size = filesize($tarFilePath);
-        $this->info("File size (bytes): {$size}");
-
-        if (!extension_loaded('zlib')) {
-            throw new \Exception("La extensión zlib no está habilitada en PHP. Es necesaria para descomprimir .gz");
-        }
-
-        // Nos aseguramos de crear la carpeta de destino si no existe
-        if (!is_dir($extractToDir)) {
-            mkdir($extractToDir, 0755, true);
-        }
-
         try {
-            // Descomprimir con PharData
-            $phar = new \PharData($tarFilePath);
-            $this->info("Decompressing .tar.gz to .tar...");
-            $phar->decompress();  // => genera un .tar (mismo nombre sin .gz)
+            // Crear directorio de extracción si no existe
+            if (!is_dir($extractToDir)) {
+                mkdir($extractToDir, 0755, true);
+            }
 
-            // Generamos la ruta .tar
+            // Extraer archivo .tar.gz usando `PharData`
+            $phar = new \PharData($tarFilePath);
+            $phar->decompress(); // Crea un archivo .tar
+
+            // Cambiar extensión a .tar
             $tarPath = str_replace('.gz', '', $tarFilePath);
 
             if (!file_exists($tarPath)) {
-                throw new \Exception("El archivo .tar no fue creado en: {$tarPath}");
+                throw new \Exception("Decompressed .tar file not found: {$tarPath}");
             }
 
-            $this->info("Extracting .tar to folder: {$extractToDir}");
             $pharTar = new \PharData($tarPath);
             $pharTar->extractTo($extractToDir);
 
-            $this->info("Extraction complete.");
+            $this->info("Extraction completed successfully to: {$extractToDir}");
         } catch (\Exception $e) {
-            throw new \Exception("Error al descomprimir {$tarFilePath}: " . $e->getMessage());
+            throw new \Exception("Error extracting {$tarFilePath}: " . $e->getMessage());
         }
-    }
-
-    protected function convertArrayToCsv(array $data): string
-    {
-        $csv = fopen('php://temp', 'r+');
-        fputcsv($csv, array_keys($data[0]));
-        foreach ($data as $row) {
-            fputcsv($csv, $row);
-        }
-        rewind($csv);
-        $csvData = stream_get_contents($csv);
-        fclose($csv);
-
-        return $csvData;
     }
 
     protected function updatePriority(Ticket $ticket, array $results)
@@ -353,8 +185,7 @@ class ExcecuteComprenhend extends Command
         $labels = $results['Labels'] ?? [];
         foreach ($labels as $label) {
             if (str_contains($label['Name'], 'Prioridad')) {
-                // Extrae el número de prioridad
-                $priorityValue    = (int) filter_var($label['Name'], FILTER_SANITIZE_NUMBER_INT);
+                $priorityValue = (int) filter_var($label['Name'], FILTER_SANITIZE_NUMBER_INT);
                 $ticket->priority = $priorityValue;
                 $ticket->save();
 
@@ -368,13 +199,13 @@ class ExcecuteComprenhend extends Command
 
     protected function updateNeedsHumanInteraction(Ticket $ticket, array $results)
     {
-        $classes      = $results['Classes'] ?? [];
+        $classes = $results['Classes'] ?? [];
         $highestScore = 0;
         $selectedClass = null;
 
         foreach ($classes as $class) {
             if ($class['Score'] > $highestScore) {
-                $highestScore  = $class['Score'];
+                $highestScore = $class['Score'];
                 $selectedClass = $class['Name'];
             }
         }
@@ -390,6 +221,7 @@ class ExcecuteComprenhend extends Command
         }
     }
 }
+
 
 
 

@@ -7,41 +7,67 @@ use App\Models\SurveyQuestion;
 
 class SurveyQuestionRepository implements SurveyQuestionRepositoryInterface
 {
+    /**
+     * Create a new class instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Retrieves all items.
+     */
     public function index()
     {
         return SurveyQuestion::all();
     }
 
-    public function store(array $details): SurveyQuestion
-    {
-        return SurveyQuestion::create($details);
-    }
-
-    public function getById($id): SurveyQuestion
+    /**
+     * Retrieves an item by ID.
+     */
+    public function getById($id)
     {
         return SurveyQuestion::findOrFail($id);
     }
 
-    public function update(array $details, $id): bool
+    /**
+     * Creates a new item in the repository.
+     */
+    public function store(array $data)
     {
-        $surveyQuestion = SurveyQuestion::findOrFail($id);
-        return $surveyQuestion->update($details);
+        return SurveyQuestion::create($data);
     }
 
-    public function delete($id): bool
+    /**
+     * Updates an Item by ID.
+     */
+    public function update(array $data, $id)
     {
-        $surveyQuestion = SurveyQuestion::findOrFail($id);
-        return $surveyQuestion->delete();
+        return SurveyQuestion::whereId($id)->update($data);
     }
 
-    public function restore($id): bool
+    /**
+     * Deletes an Item by ID.
+     */
+    public function delete($id)
     {
-        $surveyQuestion = SurveyQuestion::withTrashed()->findOrFail($id);
-        return $surveyQuestion->restore();
+        SurveyQuestion::destroy($id);
     }
 
+    /**
+     * Retrieves all deleted items.
+     */
     public function getDeleted()
     {
         return SurveyQuestion::onlyTrashed()->get();
+    }
+
+    /**
+     * Restores a deleted item by ID.
+     */
+    public function restore($id)
+    {
+        return SurveyQuestion::withTrashed()->where('id', $id)->restore();
     }
 }

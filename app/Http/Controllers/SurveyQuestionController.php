@@ -107,6 +107,7 @@ class SurveyQuestionController extends Controller
      *     ),
      *     @OA\Response(response=404, description="Survey question not found")
      * )
+     */
     public function show($id)
     {
         $surveyQuestion = $this->surveyQuestionRepositoryInterface->getById($id);
