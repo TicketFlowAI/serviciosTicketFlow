@@ -226,46 +226,51 @@ class ExcecuteComprenhend extends Command
         $filesInDir = Storage::disk('s3')->files($dir);
         $this->info("Files found: " . print_r($filesInDir, true));
 
-        // 3) Ahora sí, verificamos si existe $relativePath
+        // 3) Ahora sí, verificamos si existe $relativePath en S3
         if (!Storage::disk('s3')->exists($relativePath)) {
             $this->error("Result file not found for Ticket #{$ticket->id}, Job Type: {$jobType} at {$relativePath}");
             return;
         }
 
         try {
-            // Descargamos el archivo .tar.gz de S3 a una ruta local relativa (disco "local").
+            // Descargamos el archivo .tar.gz de S3 a memoria
             $fileContents = Storage::disk('s3')->get($relativePath);
 
-            // ====== BLOQUE DE VERIFICACIÓN (1) ======
-            $this->info('Downloaded size: '.strlen($fileContents).' bytes');
+            // ===== CREAR CARPETA EN local PARA ESTE JOBID =====
+            // Queremos "storage/app/temp/<jobId>/"
+            $localDir = "temp/{$jobId}";
+            Storage::disk('local')->makeDirectory($localDir);
 
-            $localRelativePath = "temp/{$jobId}.tar.gz";
-            Storage::disk('local')->put($localRelativePath, $fileContents);
+            // Guardar el .tar.gz dentro de esa carpeta con nombre "output.tar.gz"
+            $localTarGzPath = "{$localDir}/output.tar.gz";
+            Storage::disk('local')->put($localTarGzPath, $fileContents);
 
             // Verificamos que efectivamente se guardó
-            if (!Storage::disk('local')->exists($localRelativePath)) {
-                dd("El archivo no se guardó en disk('local') -> {$localRelativePath}");
+            if (!Storage::disk('local')->exists($localTarGzPath)) {
+                dd("El archivo no se guardó en disk('local'): {$localTarGzPath}");
             } else {
-                $storedFileSize = Storage::disk('local')->size($localRelativePath);
-                $this->info("Local file stored: {$localRelativePath}, size: {$storedFileSize} bytes");
+                $storedFileSize = Storage::disk('local')->size($localTarGzPath);
+                $this->info("Local file stored: {$localTarGzPath}, size: {$storedFileSize} bytes");
             }
 
-            // Listamos la carpeta temp para ver qué hay
-            $tempContents = Storage::disk('local')->files('temp');
-            $this->info("Archivos en /temp: " . print_r($tempContents, true));
-            // ====== FIN BLOQUE DE VERIFICACIÓN (1) ======
+            // Listamos la carpeta del job
+            $jobDirContents = Storage::disk('local')->files($localDir);
+            $this->info("Archivos en /{$localDir}: " . print_r($jobDirContents, true));
 
-            // Ahora sí generamos la ruta absoluta:
-            $localTarFile = storage_path("app/{$localRelativePath}");
+            // Generamos la ruta absoluta del .tar.gz
+            // (p.ej. /var/www/.../storage/app/temp/<jobId>/output.tar.gz)
+            $localTarFile = storage_path("app/{$localTarGzPath}");
 
-            // Extraer el archivo TAR.GZ
-            $extractDir = storage_path("app/temp/{$jobId}");
+            // El directorio de extracción va a ser el mismo subfolder "temp/<jobId>"
+            $extractDir = storage_path("app/{$localDir}");
+
+            // Extraemos en la misma carpeta "temp/<jobId>"
             $this->extractTarGz($localTarFile, $extractDir);
 
-            // Verificar el archivo JSON extraído
+            // Verificar el archivo JSON extraído, p.ej. "output.json"
             $jsonFilePath = "{$extractDir}/output.json";
             if (!file_exists($jsonFilePath)) {
-                $this->error("Extracted JSON file not found for Ticket #{$ticket->id}, Job Type: {$jobType}");
+                $this->error("Extracted JSON file not found for Ticket #{$ticket->id}, Job Type: {$jobType} in {$jsonFilePath}");
                 return;
             }
 
@@ -301,15 +306,18 @@ class ExcecuteComprenhend extends Command
             throw new \Exception("La extensión zlib no está habilitada en PHP. Es necesaria para descomprimir .gz");
         }
 
+        // Nos aseguramos de crear la carpeta de destino si no existe
         if (!is_dir($extractToDir)) {
             mkdir($extractToDir, 0755, true);
         }
 
         try {
+            // Descomprimir con PharData
             $phar = new \PharData($tarFilePath);
             $this->info("Decompressing .tar.gz to .tar...");
             $phar->decompress();  // => genera un .tar (mismo nombre sin .gz)
 
+            // Generamos la ruta .tar
             $tarPath = str_replace('.gz', '', $tarFilePath);
 
             if (!file_exists($tarPath)) {
@@ -382,6 +390,8 @@ class ExcecuteComprenhend extends Command
         }
     }
 }
+
+
 
 
 
