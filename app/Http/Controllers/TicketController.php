@@ -220,16 +220,22 @@ class TicketController extends Controller
      */
     public function closeTicket($id)
     {
-        $details = [
-            'status' => 0
-        ];
-
         DB::beginTransaction();
         try {
+            $ticket = $this->ticketRepositoryInterface->getById($id);
+
+            if ($ticket->survey) {
+                $details = ['status' => 0];
+                $historyMessage = 'Encuesta completada';
+            } else {
+                $details = ['status' => 3];
+                $historyMessage = 'Ticket cerrado';
+            }
+
             $this->ticketRepositoryInterface->update($details, $id);
 
             // Log ticket closure in history
-            $this->recordHistory($id, 'cerrado');
+            $this->recordHistory($id, $historyMessage);
 
             DB::commit();
             return ApiResponseClass::sendResponse('Ticket Close Successful', '', 201);
