@@ -21,26 +21,4 @@ class SurveyRepository implements SurveyRepositoryInterface
     {
         return Survey::create($data);
     }
-
-    // Update an existing survey
-    public function update(array $data, $id)
-    {
-        $survey = Survey::find($id);
-        if ($survey) {
-            $survey->update($data);
-            return $survey;
-        }
-        return null;
-    }
-
-    // Delete a survey by its ID
-    public function delete($id)
-    {
-        $survey = Survey::find($id);
-        if ($survey) {
-            $survey->delete();
-            return true;
-        }
-        return false;
-    }
 }

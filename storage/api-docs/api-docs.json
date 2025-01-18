@@ -1695,55 +1695,6 @@
                         "description": "Invalid request"
                     }
                 }
-            },
-            "post": {
-                "tags": [
-                    "Roles"
-                ],
-                "summary": "Create a new role",
-                "operationId": "a39d43e405902d707bd48570d2d39c68",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name",
-                                    "permissions"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "example": "Admin"
-                                    },
-                                    "permissions": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "example": "view_users"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Role created successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/RoleResource"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request"
-                    }
-                }
             }
         },
         "/roles/{id}": {
@@ -1830,35 +1781,6 @@
                     },
                     "400": {
                         "description": "Invalid request"
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Roles"
-                ],
-                "summary": "Delete a role",
-                "operationId": "df13d2b88c93242dcce58a2e1805b294",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID of the role",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Role deleted successfully"
-                    },
-                    "404": {
-                        "description": "Role not found"
-                    },
-                    "400": {
-                        "description": "Cannot delete this role, there are users assigned to it"
                     }
                 }
             }
@@ -2880,92 +2802,6 @@
                                 }
                             }
                         }
-                    },
-                    "404": {
-                        "description": "Survey not found"
-                    }
-                }
-            },
-            "put": {
-                "tags": [
-                    "Surveys"
-                ],
-                "summary": "Update a survey",
-                "operationId": "dd344725d88b5445b16ed96c9a42e526",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID of the survey",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "ticket_id",
-                                    "question_id",
-                                    "user_id",
-                                    "score"
-                                ],
-                                "properties": {
-                                    "ticket_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "question_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "user_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "score": {
-                                        "type": "integer",
-                                        "example": 5
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Survey updated successfully"
-                    },
-                    "400": {
-                        "description": "Invalid request"
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Surveys"
-                ],
-                "summary": "Delete a survey",
-                "operationId": "589cb3cf17f47bbda84b2887656db9d5",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID of the survey",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Survey deleted successfully"
                     },
                     "404": {
                         "description": "Survey not found"

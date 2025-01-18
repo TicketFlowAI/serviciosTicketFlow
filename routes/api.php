@@ -139,10 +139,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Role routes
     Route::get('/roles', [RolesController::class, 'index'])->middleware('permission:view-roles');
-    Route::post('/roles', [RolesController::class, 'store'])->middleware('permission:create-roles');
     Route::get('/roles/{role}', [RolesController::class, 'show'])->middleware('permission:view-roles');
     Route::put('/roles/{role}', [RolesController::class, 'update'])->middleware('permission:edit-roles');
-    Route::delete('/roles/{role}', [RolesController::class, 'destroy'])->middleware('permission:delete-roles');
     Route::get('/permissions', [RolesController::class, 'listPermissions'])->middleware('permission:view-permissions');
 
     // Report routes

@@ -41,7 +41,7 @@ class RoleAndPermissionSeeder extends Seeder
             'view-users', 'create-users', 'edit-users', 'delete-users', 'view-authenticated-user', 'view-deleted-users', 'restore-users', 'view-users-by-role',
             'view-emails', 'create-emails', 'edit-emails', 'delete-emails', 'view-deleted-emails', 'restore-emails',
             'view-intervals', 'create-intervals', 'edit-intervals', 'delete-intervals', 'view-deleted-intervals', 'restore-intervals',
-            'view-roles', 'create-roles', 'edit-roles', 'delete-roles', 'view-permissions',
+            'view-roles', 'edit-roles', 'view-permissions',
             'view-reports', 'view-technician-reports',
             'create-surveys', 'edit-surveys', 'delete-surveys',
             'view-survey-questions', 'create-survey-questions', 'edit-survey-questions', 'delete-survey-questions', 'view-deleted-survey-questions', 'restore-survey-questions', 'view-all-survey-questions'
@@ -70,7 +70,7 @@ class RoleAndPermissionSeeder extends Seeder
             'view-tickets', 'create-tickets', 'edit-tickets', 'close-tickets', 'open-tickets', 'mark-needs-human-interaction', 'view-ticket-history',
             'view-messages', 'create-messages',
             'view-users', 'create-users', 'edit-users', 'view-authenticated-user',
-            'create-surveys'
+            'create-surveys','view-services'
         ];
 
         $clientRole->givePermissionTo($clientPermissions);
