@@ -16,11 +16,11 @@ class SurveyQuestionRepository implements SurveyQuestionRepositoryInterface
     }
 
     /**
-     * Retrieves all items.
+     * Retrieves all active items.
      */
     public function index()
     {
-        return SurveyQuestion::all();
+        return SurveyQuestion::where('active', true)->get();
     }
 
     /**
@@ -69,5 +69,13 @@ class SurveyQuestionRepository implements SurveyQuestionRepositoryInterface
     public function restore($id)
     {
         return SurveyQuestion::withTrashed()->where('id', $id)->restore();
+    }
+
+    /**
+     * Retrieves all items, both active and inactive.
+     */
+    public function getAll()
+    {
+        return SurveyQuestion::all();
     }
 }

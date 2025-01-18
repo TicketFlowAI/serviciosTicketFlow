@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('survey_questions', function (Blueprint $table) {
             $table->id();
             $table->string('question');
+            $table->boolean('active')->default(true);
             $table->timestamps();
             $table->softDeletes();
         });

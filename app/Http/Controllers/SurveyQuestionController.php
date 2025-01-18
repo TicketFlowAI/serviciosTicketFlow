@@ -229,4 +229,26 @@ class SurveyQuestionController extends Controller
             return ApiResponseClass::rollback($ex);
         }
     }
+
+    /**
+     * @OA\Get(
+     *     path="/survey-questions/all",
+     *     summary="Get a list of all survey questions",
+     *     tags={"SurveyQuestions"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of all survey questions",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/SurveyQuestionResource")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
+     */
+    public function getAll()
+    {
+        $data = $this->surveyQuestionRepositoryInterface->getAll();
+        return ApiResponseClass::sendResponse(SurveyQuestionResource::collection($data), '', 200);
+    }
 }

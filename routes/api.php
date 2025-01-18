@@ -15,7 +15,8 @@ use App\Http\Controllers\{
     RolesController,
     ReportController,
     SurveyController,
-    ClassifierController
+    ClassifierController,
+    SurveyQuestionController
 };
 
 // Endpoint para listar clasificadores y versiones
@@ -163,4 +164,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/surveys/{id}', [SurveyController::class, 'show'])->middleware('permission:view-surveys');
     Route::put('/surveys/{id}', [SurveyController::class, 'update'])->middleware('permission:edit-surveys');
     Route::delete('/surveys/{id}', [SurveyController::class, 'destroy'])->middleware('permission:delete-surveys');
+
+    // Survey Question routes
+    Route::get('/survey-questions', [SurveyQuestionController::class, 'index'])->middleware('permission:view-survey-questions');
+    Route::get('/survey-questions/all', [SurveyQuestionController::class, 'getAll'])->middleware('permission:view-all-survey-questions');
+    Route::get('/survey-questions/deleted', [SurveyQuestionController::class, 'getDeleted'])->middleware('permission:view-deleted-survey-questions');
+    Route::post('/survey-questions', [SurveyQuestionController::class, 'store'])->middleware('permission:create-survey-questions');
+    Route::get('/survey-questions/{id}', [SurveyQuestionController::class, 'show'])->middleware('permission:view-survey-questions');
+    Route::put('/survey-questions/{id}', [SurveyQuestionController::class, 'update'])->middleware('permission:edit-survey-questions');
+    Route::delete('/survey-questions/{id}', [SurveyQuestionController::class, 'destroy'])->middleware('permission:delete-survey-questions');
+    Route::put('/survey-questions/{id}/restore', [SurveyQuestionController::class, 'restore'])->middleware('permission:restore-survey-questions');
 });

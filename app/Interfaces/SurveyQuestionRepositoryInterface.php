@@ -2,8 +2,6 @@
 
 namespace App\Interfaces;
 
-use App\Models\SurveyQuestion;
-
 interface SurveyQuestionRepositoryInterface
 {
     public function index();
@@ -13,4 +11,5 @@ interface SurveyQuestionRepositoryInterface
     public function delete($id);
     public function restore($id);
     public function getDeleted();
+    public function getAll();
 }

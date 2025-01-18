@@ -10,7 +10,7 @@ class SurveyQuestion extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['question'];
+    protected $fillable = ['question', 'active'];
 
     public function surveys()
     {

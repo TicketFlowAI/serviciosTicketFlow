@@ -43,7 +43,8 @@ class RoleAndPermissionSeeder extends Seeder
             'view-intervals', 'create-intervals', 'edit-intervals', 'delete-intervals', 'view-deleted-intervals', 'restore-intervals',
             'view-roles', 'create-roles', 'edit-roles', 'delete-roles', 'view-permissions',
             'view-reports', 'view-technician-reports',
-            'create-surveys', 'edit-surveys', 'delete-surveys'
+            'create-surveys', 'edit-surveys', 'delete-surveys',
+            'view-survey-questions', 'create-survey-questions', 'edit-survey-questions', 'delete-survey-questions', 'view-deleted-survey-questions', 'restore-survey-questions', 'view-all-survey-questions'
         ];
 
         foreach ($permissions as $permissionName) {
@@ -58,7 +59,7 @@ class RoleAndPermissionSeeder extends Seeder
         $superAdminRole->givePermissionTo($permissions);
 
         $technicianPermissions = array_filter($permissions, function($permission) {
-            return !str_contains($permission, 'delete') && !str_contains($permission, 'view-reports') && !str_contains($permission, 'delete-surveys') && !str_contains($permission, 'edit-surveys');
+            return !str_contains($permission, 'delete') && !str_contains($permission, 'view-reports') && !str_contains($permission, 'delete-surveys') && !str_contains($permission, 'edit-surveys') && !str_contains($permission, 'create-survey-questions') && !str_contains($permission, 'edit-survey-questions') && !str_contains($permission, 'delete-survey-questions') && !str_contains($permission, 'view-deleted-survey-questions') && !str_contains($permission, 'restore-survey-questions') && !str_contains($permission, 'view-all-survey-questions');
         });
 
         $technicianRole->givePermissionTo($technicianPermissions);

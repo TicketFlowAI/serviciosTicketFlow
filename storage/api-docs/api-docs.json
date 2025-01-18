@@ -3202,6 +3202,33 @@
                 }
             }
         },
+        "/survey-questions/all": {
+            "get": {
+                "tags": [
+                    "SurveyQuestions"
+                ],
+                "summary": "Get a list of all survey questions",
+                "operationId": "26ac4251ef3e2b5ac05f9b1d594c460a",
+                "responses": {
+                    "200": {
+                        "description": "List of all survey questions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/SurveyQuestionResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
         "/taxes": {
             "get": {
                 "tags": [
@@ -4519,6 +4546,10 @@
                     "question": {
                         "type": "string",
                         "example": "¿Cómo calificaría la satisfacción con el servicio de soporte recibido?"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
                     }
                 },
                 "type": "object"
