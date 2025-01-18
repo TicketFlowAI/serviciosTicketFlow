@@ -220,6 +220,103 @@
                 }
             }
         },
+        "/classifiers": {
+            "get": {
+                "summary": "List all classifiers and their versions",
+                "operationId": "040a965a0fb59bd53e36b3b9534cd2c9",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "VersionArn": {
+                                                    "type": "string"
+                                                },
+                                                "VersionName": {
+                                                    "type": "string"
+                                                },
+                                                "Status": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No classifiers found"
+                    },
+                    "500": {
+                        "description": "Error listing classifiers"
+                    }
+                }
+            }
+        },
+        "/classifiers/performance": {
+            "post": {
+                "summary": "Get performance of a specific classifier version",
+                "operationId": "3df0652b1c91615b82a751e80e14f554",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "versionArn": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "VersionArn": {
+                                            "type": "string"
+                                        },
+                                        "Accuracy": {
+                                            "type": "string"
+                                        },
+                                        "F1Score": {
+                                            "type": "string"
+                                        },
+                                        "Precision": {
+                                            "type": "string"
+                                        },
+                                        "Recall": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No performance metrics found"
+                    },
+                    "500": {
+                        "description": "Error getting performance"
+                    }
+                }
+            }
+        },
         "/companies": {
             "get": {
                 "tags": [
