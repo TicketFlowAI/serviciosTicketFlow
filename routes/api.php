@@ -22,7 +22,7 @@ use App\Http\Controllers\{
 Route::get('/classifiers', [ClassifierController::class, 'listAllClassifiers']);
 
 // Endpoint para obtener el rendimiento de una versión específica
-Route::post('/classifier/performance', [ClassifierController::class, 'getClassifierPerformance']);
+Route::post('/classifier/{id}/performance', [ClassifierController::class, 'getClassifierPerformance']);
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
