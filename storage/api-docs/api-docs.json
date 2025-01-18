@@ -160,6 +160,9 @@
                 "responses": {
                     "204": {
                         "description": "Category deleted successfully"
+                    },
+                    "400": {
+                        "description": "Cannot delete, services associated"
                     }
                 }
             }
@@ -529,6 +532,9 @@
                     },
                     "404": {
                         "description": "Company not found"
+                    },
+                    "400": {
+                        "description": "Cannot delete, users or service contracts associated"
                     }
                 }
             }
@@ -817,6 +823,9 @@
                     },
                     "404": {
                         "description": "Email template not found"
+                    },
+                    "400": {
+                        "description": "Cannot delete, intervals associated"
                     }
                 }
             }
@@ -2145,6 +2154,9 @@
                     },
                     "404": {
                         "description": "Service contract not found"
+                    },
+                    "400": {
+                        "description": "Cannot delete, tickets associated"
                     }
                 }
             }
@@ -2481,6 +2493,9 @@
                     },
                     "404": {
                         "description": "Service not found"
+                    },
+                    "400": {
+                        "description": "Cannot delete, service contracts associated"
                     }
                 }
             }
@@ -3369,6 +3384,9 @@
                     },
                     "404": {
                         "description": "Tax not found"
+                    },
+                    "400": {
+                        "description": "Cannot delete, services associated"
                     }
                 }
             }
@@ -3592,6 +3610,35 @@
                     },
                     "400": {
                         "description": "Invalid request"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Delete a ticket",
+                "operationId": "cec7be57c0153e6b94020ab492e0ab2b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the ticket",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Ticket deleted successfully"
+                    },
+                    "404": {
+                        "description": "Ticket not found"
+                    },
+                    "400": {
+                        "description": "Cannot delete, histories associated"
                     }
                 }
             }
@@ -4483,25 +4530,17 @@
                         "type": "integer",
                         "example": 1
                     },
-                    "user": {
-                        "properties": {
-                            "name": {
-                                "type": "string",
-                                "example": "John"
-                            },
-                            "lastname": {
-                                "type": "string",
-                                "example": "Doe"
-                            }
-                        },
-                        "type": "object"
+                    "user_name": {
+                        "type": "string",
+                        "example": "John"
                     },
-                    "questions": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "example": "What is your favorite color?"
-                        }
+                    "user_lastname": {
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "question": {
+                        "type": "string",
+                        "example": "What is your favorite color?"
                     },
                     "score": {
                         "type": "integer",
