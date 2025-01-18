@@ -14,68 +14,75 @@ use App\Http\Controllers\{
     IntervalController,
     RolesController,
     ReportController,
-    SurveyController
+    SurveyController,
+    ClassifierController
 };
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+
+// Endpoint para listar clasificadores y versiones
+Route::get('/classifiers', [ClassifierController::class, 'listAllClassifiers']);
+
+// Endpoint para obtener el rendimiento de una versión específica
+Route::post('/classifier/performance', [ClassifierController::class, 'getClassifierPerformance']);
+
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    
     // Company routes
     Route::get('/companies', [CompanyController::class, 'index'])->middleware('permission:view-companies');
+    Route::get('/companies/deleted', [CompanyController::class, 'getDeleted'])->middleware('permission:view-deleted-companies');
+    Route::put('/companies/{id}/restore', [CompanyController::class, 'restore'])->middleware('permission:restore-companies');
     Route::post('/companies', [CompanyController::class, 'store'])->middleware('permission:create-companies');
     Route::get('/companies/{company}', [CompanyController::class, 'show'])->middleware('permission:view-companies');
     Route::put('/companies/{company}', [CompanyController::class, 'update'])->middleware('permission:edit-companies');
     Route::delete('/companies/{company}', [CompanyController::class, 'destroy'])->middleware('permission:delete-companies');
-    Route::get('/companies/deleted', [CompanyController::class, 'getDeleted'])->middleware('permission:view-deleted-companies');
-    Route::put('/companies/{id}/restore', [CompanyController::class, 'restore'])->middleware('permission:restore-companies');
     Route::get('/companies/{id}/users', [CompanyController::class, 'getUsersByCompanyId'])->middleware('permission:view-company-users');
 
     // Service routes
     Route::get('/services', [ServiceController::class, 'index'])->middleware('permission:view-services');
+    Route::get('/services/deleted', [ServiceController::class, 'getDeleted'])->middleware('permission:view-deleted-services');
+    Route::put('/services/{id}/restore', [ServiceController::class, 'restore'])->middleware('permission:restore-services');
     Route::post('/services', [ServiceController::class, 'store'])->middleware('permission:create-services');
     Route::get('/services/{service}', [ServiceController::class, 'show'])->middleware('permission:view-services');
     Route::put('/services/{service}', [ServiceController::class, 'update'])->middleware('permission:edit-services');
     Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->middleware('permission:delete-services');
-    Route::get('/services/deleted', [ServiceController::class, 'getDeleted'])->middleware('permission:view-deleted-services');
-    Route::put('/services/{id}/restore', [ServiceController::class, 'restore'])->middleware('permission:restore-services');
 
     // Tax routes
     Route::get('/taxes', [TaxController::class, 'index'])->middleware('permission:view-taxes');
+    Route::get('/taxes/deleted', [TaxController::class, 'getDeleted'])->middleware('permission:view-deleted-taxes');
+    Route::put('/taxes/{id}/restore', [TaxController::class, 'restore'])->middleware('permission:restore-taxes');
     Route::post('/taxes', [TaxController::class, 'store'])->middleware('permission:create-taxes');
     Route::get('/taxes/{tax}', [TaxController::class, 'show'])->middleware('permission:view-taxes');
     Route::put('/taxes/{tax}', [TaxController::class, 'update'])->middleware('permission:edit-taxes');
     Route::delete('/taxes/{tax}', [TaxController::class, 'destroy'])->middleware('permission:delete-taxes');
-    Route::get('/taxes/deleted', [TaxController::class, 'getDeleted'])->middleware('permission:view-deleted-taxes');
-    Route::put('/taxes/{id}/restore', [TaxController::class, 'restore'])->middleware('permission:restore-taxes');
 
     // Category routes
     Route::get('/categories', [CategoryController::class, 'index'])->middleware('permission:view-categories');
+    Route::get('/categories/deleted', [CategoryController::class, 'getDeleted'])->middleware('permission:view-deleted-categories');
+    Route::put('/categories/{id}/restore', [CategoryController::class, 'restore'])->middleware('permission:restore-categories');
     Route::post('/categories', [CategoryController::class, 'store'])->middleware('permission:create-categories');
     Route::get('/categories/{category}', [CategoryController::class, 'show'])->middleware('permission:view-categories');
     Route::put('/categories/{category}', [CategoryController::class, 'update'])->middleware('permission:edit-categories');
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->middleware('permission:delete-categories');
-    Route::get('/categories/deleted', [CategoryController::class, 'getDeleted'])->middleware('permission:view-deleted-categories');
-    Route::put('/categories/{id}/restore', [CategoryController::class, 'restore'])->middleware('permission:restore-categories');
 
     // Service Term routes
     Route::get('/serviceTerms', [ServiceTermController::class, 'index'])->middleware('permission:view-service-terms');
+    Route::get('/serviceTerms/deleted', [ServiceTermController::class, 'getDeleted'])->middleware('permission:view-deleted-service-terms');
+    Route::put('/serviceTerms/{id}/restore', [ServiceTermController::class, 'restore'])->middleware('permission:restore-service-terms');
     Route::post('/serviceTerms', [ServiceTermController::class, 'store'])->middleware('permission:create-service-terms');
     Route::get('/serviceTerms/{serviceTerm}', [ServiceTermController::class, 'show'])->middleware('permission:view-service-terms');
     Route::put('/serviceTerms/{serviceTerm}', [ServiceTermController::class, 'update'])->middleware('permission:edit-service-terms');
     Route::delete('/serviceTerms/{serviceTerm}', [ServiceTermController::class, 'destroy'])->middleware('permission:delete-service-terms');
-    Route::get('/serviceTerms/deleted', [ServiceTermController::class, 'getDeleted'])->middleware('permission:view-deleted-service-terms');
-    Route::put('/serviceTerms/{id}/restore', [ServiceTermController::class, 'restore'])->middleware('permission:restore-service-terms');
 
     // Service Contract routes
     Route::get('/servicecontracts', [ServiceContractController::class, 'index'])->middleware('permission:view-service-contracts');
+    Route::get('/servicecontracts/deleted', [ServiceContractController::class, 'getDeleted'])->middleware('permission:view-deleted-service-contracts');
+    Route::put('/servicecontracts/{id}/restore', [ServiceContractController::class, 'restore'])->middleware('permission:restore-service-contracts');
     Route::post('/servicecontracts', [ServiceContractController::class, 'store'])->middleware('permission:create-service-contracts');
     Route::get('/servicecontracts/{servicecontract}', [ServiceContractController::class, 'show'])->middleware('permission:view-service-contracts');
     Route::put('/servicecontracts/{servicecontract}', [ServiceContractController::class, 'update'])->middleware('permission:edit-service-contracts');
     Route::delete('/servicecontracts/{servicecontract}', [ServiceContractController::class, 'destroy'])->middleware('permission:delete-service-contracts');
     Route::get('/servicecontracts/bycompany/{id}', [ServiceContractController::class, 'getContractsByCompany'])->middleware('permission:view-service-contracts');
     Route::get('/servicecontracts/expiring', [ServiceContractController::class, 'getExpiringContracts'])->middleware('permission:view-service-contracts');
-    Route::get('/servicecontracts/deleted', [ServiceContractController::class, 'getDeleted'])->middleware('permission:view-deleted-service-contracts');
-    Route::put('/servicecontracts/{id}/restore', [ServiceContractController::class, 'restore'])->middleware('permission:restore-service-contracts');
 
     // Ticket routes
     Route::get('/tickets', [TicketController::class, 'index'])->middleware('permission:view-tickets');
@@ -100,32 +107,34 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // User routes
     Route::get('/users', [UserController::class, 'index'])->middleware('permission:view-users');
+    Route::get('/users/deleted', [UserController::class, 'getDeleted'])->middleware('permission:view-deleted-users');
+    Route::put('/users/{id}/restore', [UserController::class, 'restore'])->middleware('permission:restore-users');
     Route::post('/users', [UserController::class, 'store'])->middleware('permission:create-users');
     Route::get('/users/{user}', [UserController::class, 'show'])->middleware('permission:view-users');
     Route::put('/users/{user}', [UserController::class, 'update'])->middleware('permission:edit-users');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->middleware('permission:delete-users');
-    Route::get('/user', [UserController::class, 'getAuthenticatedUser'])->middleware('permission:view-authenticated-user');
-    Route::get('/users/deleted', [UserController::class, 'getDeleted'])->middleware('permission:view-deleted-users');
+    
     Route::put('/users/{id}/restore', [UserController::class, 'restore'])->middleware('permission:restore-users');
     Route::get('/users/byrole/{role}', [UserController::class, 'getUsersByRole'])->middleware('permission:view-users-by-role');
+    Route::get('/user', [UserController::class, 'getAuthenticatedUser'])->middleware('permission:view-authenticated-user');
 
     // Email routes
     Route::get('/emails', [EmailController::class, 'index'])->middleware('permission:view-emails');
+    Route::get('/emails/deleted', [EmailController::class, 'getDeleted'])->middleware('permission:view-deleted-emails');
+    Route::put('/emails/{id}/restore', [EmailController::class, 'restore'])->middleware('permission:restore-emails');
     Route::post('/emails', [EmailController::class, 'store'])->middleware('permission:create-emails');
     Route::get('/emails/{email}', [EmailController::class, 'show'])->middleware('permission:view-emails');
     Route::put('/emails/{email}', [EmailController::class, 'update'])->middleware('permission:edit-emails');
     Route::delete('/emails/{email}', [EmailController::class, 'destroy'])->middleware('permission:delete-emails');
-    Route::get('/emails/deleted', [EmailController::class, 'getDeleted'])->middleware('permission:view-deleted-emails');
-    Route::put('/emails/{id}/restore', [EmailController::class, 'restore'])->middleware('permission:restore-emails');
 
     // Interval routes
     Route::get('/intervals', [IntervalController::class, 'index'])->middleware('permission:view-intervals');
+    Route::get('/intervals/deleted', [IntervalController::class, 'getDeleted'])->middleware('permission:view-deleted-intervals');
+    Route::put('/intervals/{id}/restore', [IntervalController::class, 'restore'])->middleware('permission:restore-intervals');
     Route::post('/intervals', [IntervalController::class, 'store'])->middleware('permission:create-intervals');
     Route::get('/intervals/{interval}', [IntervalController::class, 'show'])->middleware('permission:view-intervals');
     Route::put('/intervals/{interval}', [IntervalController::class, 'update'])->middleware('permission:edit-intervals');
     Route::delete('/intervals/{interval}', [IntervalController::class, 'destroy'])->middleware('permission:delete-intervals');
-    Route::get('/intervals/deleted', [IntervalController::class, 'getDeleted'])->middleware('permission:view-deleted-intervals');
-    Route::put('/intervals/{id}/restore', [IntervalController::class, 'restore'])->middleware('permission:restore-intervals');
 
     // Role routes
     Route::get('/roles', [RolesController::class, 'index'])->middleware('permission:view-roles');
@@ -146,6 +155,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/reports/technician/{user_id}/tickets-assigned-reassigned', [ReportController::class, 'getTechnicianTicketsAssignedAndReassigned'])->middleware('permission:view-technician-reports');
     Route::get('/reports/technician/{user_id}/current-tickets', [ReportController::class, 'getTechnicianCurrentTickets'])->middleware('permission:view-technician-reports');
     Route::get('/reports/technician/{user_id}/weekly-comparison', [ReportController::class, 'getTechnicianWeeklyComparison'])->middleware('permission:view-technician-reports');
+    Route::get('/reports/average-score-per-question', [ReportController::class, 'getAverageScorePerQuestion'])->middleware('permission:view-reports');
+    Route::get('/reports/technician/average-score-per-question', [ReportController::class, 'getTechnicianAverageScorePerQuestion'])->middleware('permission:view-technician-reports');
 
     // Survey routes
     Route::post('/surveys', [SurveyController::class, 'store'])->middleware('permission:create-surveys');

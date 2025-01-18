@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Classes\ApiResponseClass;
+use App\Models\SurveyQuestion;
 use App\Models\Ticket;
 use App\Models\TicketHistory;
+use App\Models\Survey;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
@@ -363,5 +365,68 @@ class ReportController extends Controller
             ->count();
 
         return ApiResponseClass::sendResponse(['current_week' => $currentWeek, 'previous_week' => $previousWeek], '', 200);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/reports/average-score-per-question",
+     *     summary="Get the average score per question",
+     *     tags={"Reports"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Average score per question",
+     *         @OA\JsonContent(type="array", @OA\Items(type="object", @OA\Property(property="question_id", type="integer"), @OA\Property(property="question", type="string"), @OA\Property(property="average_score", type="number", format="float")))
+     *     )
+     * )
+     */
+    public function getAverageScorePerQuestion(Request $request)
+    {
+        $query = Survey::select('question_id', DB::raw('AVG(score) as average_score'))
+            ->groupBy('question_id');
+
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
+        }
+
+        $averageScores = $query->get()->map(function ($item) {
+            $item->question = SurveyQuestion::find($item->question_id)->question;
+            return $item;
+        });
+
+        return ApiResponseClass::sendResponse($averageScores, '', 200);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/reports/technician/average-score-per-question",
+     *     summary="Get the average score per question for the logged-in technician",
+     *     tags={"Reports"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Average score per question for the logged-in technician",
+     *         @OA\JsonContent(type="array", @OA\Items(type="object", @OA\Property(property="question_id", type="integer"), @OA\Property(property="question", type="string"), @OA\Property(property="average_score", type="number", format="float")))
+     *     )
+     * )
+     */
+    public function getTechnicianAverageScorePerQuestion(Request $request)
+    {
+        $user_id = auth()->user()->id;
+
+        $query = Survey::whereHas('ticket', function ($query) use ($user_id) {
+                $query->where('user_id', $user_id);
+            })
+            ->select('question_id', DB::raw('AVG(score) as average_score'))
+            ->groupBy('question_id');
+
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
+        }
+
+        $averageScores = $query->get()->map(function ($item) {
+            $item->question = SurveyQuestion::find($item->question_id)->question;
+            return $item;
+        });
+
+        return ApiResponseClass::sendResponse($averageScores, '', 200);
     }
 }
