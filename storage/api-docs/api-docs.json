@@ -1492,6 +1492,78 @@
                 }
             }
         },
+        "/reports/average-score-per-question": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get the average score per question",
+                "operationId": "bf8c25419e6be36c35b7c84f324ba261",
+                "responses": {
+                    "200": {
+                        "description": "Average score per question",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "question_id": {
+                                                "type": "integer"
+                                            },
+                                            "question": {
+                                                "type": "string"
+                                            },
+                                            "average_score": {
+                                                "type": "number",
+                                                "format": "float"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/technician/average-score-per-question": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get the average score per question for the logged-in technician",
+                "operationId": "295537313e4dd7566dae7ebc83815542",
+                "responses": {
+                    "200": {
+                        "description": "Average score per question for the logged-in technician",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "question_id": {
+                                                "type": "integer"
+                                            },
+                                            "question": {
+                                                "type": "string"
+                                            },
+                                            "average_score": {
+                                                "type": "number",
+                                                "format": "float"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/roles": {
             "get": {
                 "tags": [
