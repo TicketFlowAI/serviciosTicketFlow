@@ -9,6 +9,7 @@ use App\Interfaces\ServiceTermRepositoryInterface;
 use App\Classes\ApiResponseClass;
 use App\Http\Resources\ServiceTermResource;
 use Illuminate\Support\Facades\DB;
+use App\Models\ServiceContract;
 
 /**
  * @OA\Tag(
@@ -170,6 +171,11 @@ class ServiceTermController extends Controller
      */
     public function destroy($id)
     {
+        $serviceTerm = $this->serviceTermRepositoryInterface->getById($id);
+        if ($serviceTerm->serviceContract()->exists()) {
+            return ApiResponseClass::sendResponse(null, 'Cannot delete, service contracts associated', 400);
+        }
+
         $this->serviceTermRepositoryInterface->delete($id);
         return ApiResponseClass::sendResponse('ServiceTerm Delete Successful', '', 204);
     }

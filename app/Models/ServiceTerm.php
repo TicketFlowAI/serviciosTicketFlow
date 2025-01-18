@@ -15,7 +15,7 @@ class ServiceTerm extends Model
         'months'
     ];
 
-    public function service_term(): HasMany
+    public function serviceContract(): HasMany
     {
         return $this->hasMany(ServiceContract::class);
     }
