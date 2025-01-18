@@ -475,4 +475,34 @@ class TicketController extends Controller
             return ApiResponseClass::rollback($ex);
         }
     }
+
+    /**
+     * @OA\Delete(
+     *     path="/tickets/{id}",
+     *     summary="Delete a ticket",
+     *     tags={"Tickets"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the ticket",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=204, description="Ticket deleted successfully"),
+     *     @OA\Response(response=404, description="Ticket not found"),
+     *     @OA\Response(response=400, description="Cannot delete, histories associated")
+     * )
+     */
+    public function destroy($id)
+    {
+        // Check for associated histories
+        $ticket = $this->ticketRepositoryInterface->getById($id);
+        if ($ticket->histories()->exists()) {
+            return ApiResponseClass::sendResponse(null, 'Cannot delete, histories associated', 400);
+        }
+
+        $this->ticketRepositoryInterface->delete($id);
+
+        return ApiResponseClass::sendResponse('Ticket Delete Successful', '', 204);
+    }
 }

@@ -168,12 +168,20 @@ class EmailController extends Controller
      *         description="ID of the email template"
      *     ),
      *     @OA\Response(response=204, description="Email template deleted successfully"),
-     *     @OA\Response(response=404, description="Email template not found")
+     *     @OA\Response(response=404, description="Email template not found"),
+     *     @OA\Response(response=400, description="Cannot delete, intervals associated")
      * )
      */
     public function destroy($id)
     {
+        // Check for associated intervals
+        $email = $this->emailRepositoryInterface->getById($id);
+        if ($email->interval()->exists()) {
+            return ApiResponseClass::sendResponse(null, 'Cannot delete, intervals associated', 400);
+        }
+
         $this->emailRepositoryInterface->delete($id);
+
         return ApiResponseClass::sendResponse('Email Delete Successful', '', 204);
     }
 

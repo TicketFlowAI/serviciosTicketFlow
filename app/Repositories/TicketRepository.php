@@ -79,4 +79,12 @@ class TicketRepository implements TicketRepositoryInterface
         return Ticket::withTrashed()->where('id', $id)->restore();
     }
 
+    /**
+     * Deletes a ticket by ID.
+     */
+    public function delete($id)
+    {
+        return Ticket::destroy($id);
+    }
+
 }

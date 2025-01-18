@@ -20,11 +20,11 @@ class Company extends Model
         'address'
     ];
 
-    public function Users(): HasMany
+    public function users(): HasMany
     {
         return $this->hasMany(User::class);
     }
-    public function comments(): HasMany
+    public function serviceContract(): HasMany
     {
         return $this->hasMany(ServiceContract::class);
     }

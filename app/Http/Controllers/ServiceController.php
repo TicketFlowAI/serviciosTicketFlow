@@ -181,11 +181,18 @@ class ServiceController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(response=204, description="Service deleted successfully"),
-     *     @OA\Response(response=404, description="Service not found")
+     *     @OA\Response(response=404, description="Service not found"),
+     *     @OA\Response(response=400, description="Cannot delete, service contracts associated")
      * )
      */
     public function destroy($id)
     {
+        // Check for associated service contracts
+        $service = $this->serviceRepositoryInterface->getById($id);
+        if ($service->serviceContract()->exists()) {
+            return ApiResponseClass::sendResponse(null, 'Cannot delete, service contracts associated', 400);
+        }
+
         $this->serviceRepositoryInterface->delete($id);
 
         return ApiResponseClass::sendResponse('Service Delete Successful', '', 204);

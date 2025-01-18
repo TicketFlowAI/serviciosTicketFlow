@@ -160,12 +160,20 @@ class CategoryController extends Controller
      *     @OA\Response(
      *         response=204,
      *         description="Category deleted successfully"
-     *     )
+     *     ),
+     *     @OA\Response(response=400, description="Cannot delete, services associated")
      * )
      */
     public function destroy($id)
     {
+        // Check for associated services
+        $category = $this->categoryRepositoryInterface->getById($id);
+        if ($category->services()->exists()) {
+            return ApiResponseClass::sendResponse(null, 'Cannot delete, services associated', 400);
+        }
+
         $this->categoryRepositoryInterface->delete($id);
+
         return ApiResponseClass::sendResponse('Category Delete Successful', '', 204);
     }
 

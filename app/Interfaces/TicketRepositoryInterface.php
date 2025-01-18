@@ -12,4 +12,5 @@ interface TicketRepositoryInterface
     public function getTicketsByTechnician($id);
     public function getDeleted();
     public function restore($id);
+    public function delete($id); // Add this line
 }

@@ -169,11 +169,18 @@ class TaxController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(response=204, description="Tax deleted successfully"),
-     *     @OA\Response(response=404, description="Tax not found")
-     * )
+     *     @OA\Response(response=404, description="Tax not found"),
+     *     @OA\Response(response=400, description="Cannot delete, services associated")
+     *   )
      */
     public function destroy($id)
     {
+        // Check for associated services
+        $tax = $this->taxRepositoryInterface->getById($id);
+        if ($tax->services()->exists()) {
+            return ApiResponseClass::sendResponse(null, 'Cannot delete, services associated', 400);
+        }
+
         $this->taxRepositoryInterface->delete($id);
 
         return ApiResponseClass::sendResponse('Tax Delete Successful', '', 204);

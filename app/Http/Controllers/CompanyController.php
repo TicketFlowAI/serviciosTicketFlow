@@ -172,12 +172,25 @@ class CompanyController extends Controller
      *         description="ID of the company"
      *     ),
      *     @OA\Response(response=204, description="Company deleted successfully"),
-     *     @OA\Response(response=404, description="Company not found")
+     *     @OA\Response(response=404, description="Company not found"),
+     *     @OA\Response(response=400, description="Cannot delete, users or service contracts associated")
      * )
      */
     public function destroy($id)
     {
+        // Check for associated users
+        $company = $this->companyRepositoryInterface->getById($id);
+        if ($company->users()->exists()) {
+            return ApiResponseClass::sendResponse(null, 'Cannot delete, users associated', 400);
+        }
+
+        // Check for associated service contracts
+        if ($company->serviceContract()->exists()) {
+            return ApiResponseClass::sendResponse(null, 'Cannot delete, service contracts associated', 400);
+        }
+
         $this->companyRepositoryInterface->delete($id);
+
         return ApiResponseClass::sendResponse('Company Delete Successful', '', 204);
     }
 
