@@ -15,7 +15,23 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'login', 'logout','user', 'forgot-password', 'reset-password', 'register', 'email/verify', 'email/verification-notification'],
+    'paths' => [
+        'api/*', 
+        'sanctum/csrf-cookie', 
+        'login', 
+        'logout',
+        'user', 
+        'forgot-password', 
+        'reset-password', 
+        'register', 
+        'email/verify', 
+        'email/verification-notification', 
+        '/user/two-factor-qr-code', 
+        '/user/confirmed-two-factor-authentication',
+        '/user/confirm-password',
+        '/user/two-factor-recovery-codes',
+        '/user/two-factor-challenge',
+    ],
 
     'allowed_methods' => ['*'],
 
