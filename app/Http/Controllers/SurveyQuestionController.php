@@ -77,7 +77,7 @@ class SurveyQuestionController extends Controller
      */
     public function store(StoreSurveyQuestionRequest $request)
     {
-        $details = ['question' => $request->question];
+        $details = ['question' => $request->question, 'status' => $request->status];
         DB::beginTransaction();
         try {
             $surveyQuestion = $this->surveyQuestionRepositoryInterface->store($details);
@@ -147,7 +147,7 @@ class SurveyQuestionController extends Controller
      */
     public function update(UpdateSurveyQuestionRequest $request, $id)
     {
-        $updateDetails = ['question' => $request->question];
+        $updateDetails = ['question' => $request->question, 'status' => $request->status];
         DB::beginTransaction();
         try {
             $this->surveyQuestionRepositoryInterface->update($updateDetails, $id);
