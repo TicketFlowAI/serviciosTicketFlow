@@ -51,31 +51,35 @@ class TicketController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        if ($user->hasRole('client')) {
-            $data = $this->ticketRepositoryInterface->getTicketsByCompany($user->company_id);
-        } elseif ($user->hasRole('technician')) {
-            $data = $this->ticketRepositoryInterface->getTicketsByTechnician($user->id);
-        } else {
-            $data = $this->ticketRepositoryInterface->index();
-        }
-
-        $data->load(self::SERVICE_CONTRACT_FIELDS, self::USER_FIELDS);
-        foreach ($data as $ticket) {
-            $ticket->company = Company::find($ticket->service_contract->company_id);
-            $ticket->service = Service::find($ticket->service_contract->service_id);
-            if (is_null($ticket->user)) {
-                $ticket->user = (object) ['name' => 'Asignando', 'lastname' => ''];
+            if ($user->hasRole('client')) {
+                $data = $this->ticketRepositoryInterface->getTicketsByCompany($user->company_id);
+            } elseif ($user->hasRole('technician')) {
+                $data = $this->ticketRepositoryInterface->getTicketsByTechnician($user->id);
+            } else {
+                $data = $this->ticketRepositoryInterface->index();
             }
-            if (is_null($ticket->priority) || is_null($ticket->complexity) || is_null($ticket->needsHumanInteraction)) {
-                $ticket->priority = 'Asignando';
-                $ticket->complexity = 'Asignando';
-                $ticket->needsHumanInteraction = 'Asignando';
-            }
-        }
 
-        return ApiResponseClass::sendResponse(TicketResource::collection($data), '', 200);
+            $data->load(self::SERVICE_CONTRACT_FIELDS, self::USER_FIELDS);
+            foreach ($data as $ticket) {
+                $ticket->company = Company::find($ticket->service_contract->company_id);
+                $ticket->service = Service::find($ticket->service_contract->service_id);
+                if (is_null($ticket->user)) {
+                    $ticket->user = (object) ['name' => 'Asignando', 'lastname' => ''];
+                }
+                if (is_null($ticket->priority) || is_null($ticket->complexity) || is_null($ticket->needsHumanInteraction)) {
+                    $ticket->priority = 'Asignando';
+                    $ticket->complexity = 'Asignando';
+                    $ticket->needsHumanInteraction = 'Asignando';
+                }
+            }
+
+            return ApiResponseClass::sendResponse(TicketResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve tickets', 500);
+        }
     }
 
     /**
@@ -115,8 +119,8 @@ class TicketController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse(new TicketResource($ticket), 'Ticket Create Successful', 201);
         } catch (\Exception $ex) {
-            DB::rollback();
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to create ticket', 500);
         }
     }
 
@@ -142,21 +146,25 @@ class TicketController extends Controller
      */
     public function show($id)
     {
-        $data = $this->ticketRepositoryInterface->getById($id);
+        try {
+            $data = $this->ticketRepositoryInterface->getById($id);
 
-        $data->load(self::SERVICE_CONTRACT_FIELDS, self::USER_FIELDS);
-        $data->company = Company::find($data->service_contract->company_id);
-        $data->service = Service::find($data->service_contract->service_id);
-        if (is_null($data->user)) {
-            $data->user = (object) ['name' => 'Asignando', 'lastname' => ''];
-        }
-        if (is_null($data->priority) || is_null($data->complexity) || is_null($data->needsHumanInteraction)) {
-            $data->priority = 'Asignando';
-            $data->complexity = 'Asignando';
-            $data->needsHumanInteraction = 'Asignando';
-        }
+            $data->load(self::SERVICE_CONTRACT_FIELDS, self::USER_FIELDS);
+            $data->company = Company::find($data->service_contract->company_id);
+            $data->service = Service::find($data->service_contract->service_id);
+            if (is_null($data->user)) {
+                $data->user = (object) ['name' => 'Asignando', 'lastname' => ''];
+            }
+            if (is_null($data->priority) || is_null($data->complexity) || is_null($data->needsHumanInteraction)) {
+                $data->priority = 'Asignando';
+                $data->complexity = 'Asignando';
+                $data->needsHumanInteraction = 'Asignando';
+            }
 
-        return ApiResponseClass::sendResponse(new TicketResource($data), '', 200);
+            return ApiResponseClass::sendResponse(new TicketResource($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve ticket', 500);
+        }
     }
 
     /**
@@ -197,8 +205,8 @@ class TicketController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('Ticket Update Successful', '', 201);
         } catch (\Exception $ex) {
-            DB::rollback();
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to update ticket', 500);
         }
     }
 
@@ -240,8 +248,8 @@ class TicketController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('Ticket Close Successful', '', 201);
         } catch (\Exception $ex) {
-            DB::rollback();
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to close ticket', 500);
         }
     }
 
@@ -277,8 +285,8 @@ class TicketController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('Ticket Open Successful', '', 201);
         } catch (\Exception $ex) {
-            DB::rollback();
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to open ticket', 500);
         }
     }
 
@@ -334,8 +342,8 @@ class TicketController extends Controller
             DB::commit();
             return $response;
         } catch (\Exception $ex) {
-            DB::rollback();
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to assign/reassign ticket', 500);
         }
     }
 
@@ -384,9 +392,13 @@ class TicketController extends Controller
      */
     public function retrieveTicketHistory($id)
     {
-        $history = TicketHistory::where('ticket_id', $id)->latest()->get();
-        $history->load('user:id,name,lastname');
-        return ApiResponseClass::sendResponse(TicketHistoryResource::collection($history), '', 200);
+        try {
+            $history = TicketHistory::where('ticket_id', $id)->latest()->get();
+            $history->load('user:id,name,lastname');
+            return ApiResponseClass::sendResponse(TicketHistoryResource::collection($history), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve ticket history', 500);
+        }
     }
 
     public function recordHistory($ticketId, $action)
@@ -416,8 +428,12 @@ class TicketController extends Controller
      */
     public function getDeleted()
     {
-        $data = $this->ticketRepositoryInterface->getDeleted();
-        return ApiResponseClass::sendResponse(TicketResource::collection($data), '', 200);
+        try {
+            $data = $this->ticketRepositoryInterface->getDeleted();
+            return ApiResponseClass::sendResponse(TicketResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve deleted tickets', 500);
+        }
     }
 
     /**
@@ -438,8 +454,15 @@ class TicketController extends Controller
      */
     public function restore($id)
     {
-        $this->ticketRepositoryInterface->restore($id);
-        return ApiResponseClass::sendResponse('Ticket Restore Successful', '', 200);
+        DB::beginTransaction();
+        try {
+            $this->ticketRepositoryInterface->restore($id);
+            DB::commit();
+            return ApiResponseClass::sendResponse('Ticket Restore Successful', '', 200);
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to restore ticket', 500);
+        }
     }
 
     /**
@@ -465,7 +488,7 @@ class TicketController extends Controller
             $ticket = $this->ticketRepositoryInterface->getById($id);
 
             if (!$ticket) {
-                DB::rollback();
+                DB::rollBack();
                 return ApiResponseClass::sendResponse('Ticket not found', '', 404);
             }
 
@@ -477,8 +500,8 @@ class TicketController extends Controller
             DB::commit();
             return $response;
         } catch (\Exception $ex) {
-            DB::rollback();
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to mark ticket as needing human interaction and assign', 500);
         }
     }
 
@@ -501,14 +524,17 @@ class TicketController extends Controller
      */
     public function destroy($id)
     {
-        // Check for associated histories
-        $ticket = $this->ticketRepositoryInterface->getById($id);
-        if ($ticket->histories()->exists()) {
-            return ApiResponseClass::sendResponse(null, 'Cannot delete, histories associated', 400);
+        try {
+            // Check for associated histories
+            $ticket = $this->ticketRepositoryInterface->getById($id);
+            if ($ticket->histories()->exists()) {
+                return ApiResponseClass::sendResponse(null, 'Cannot delete, histories associated', 400);
+            }
+
+            $this->ticketRepositoryInterface->delete($id);
+            return ApiResponseClass::sendResponse('Ticket Delete Successful', '', 204);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to delete ticket', 500);
         }
-
-        $this->ticketRepositoryInterface->delete($id);
-
-        return ApiResponseClass::sendResponse('Ticket Delete Successful', '', 204);
     }
 }

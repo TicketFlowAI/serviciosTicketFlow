@@ -42,8 +42,12 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $data = $this->categoryRepositoryInterface->index();
-        return ApiResponseClass::sendResponse(CategoryResource::collection($data), '', 200);
+        try {
+            $data = $this->categoryRepositoryInterface->index();
+            return ApiResponseClass::sendResponse(CategoryResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve categories', 500);
+        }
     }
 
     /**
@@ -76,7 +80,8 @@ class CategoryController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse(new CategoryResource($category), 'Category Create Successful', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to create category', 500);
         }
     }
 
@@ -101,8 +106,12 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        $category = $this->categoryRepositoryInterface->getById($id);
-        return ApiResponseClass::sendResponse(new CategoryResource($category), '', 200);
+        try {
+            $category = $this->categoryRepositoryInterface->getById($id);
+            return ApiResponseClass::sendResponse(new CategoryResource($category), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve category', 500);
+        }
     }
 
     /**
@@ -141,7 +150,8 @@ class CategoryController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('Category Update Successful', '', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to update category', 500);
         }
     }
 
@@ -166,15 +176,17 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        // Check for associated services
-        $category = $this->categoryRepositoryInterface->getById($id);
-        if ($category->services()->exists()) {
-            return ApiResponseClass::sendResponse(null, 'Cannot delete, services associated', 400);
+        try {
+            $category = $this->categoryRepositoryInterface->getById($id);
+            if ($category->services()->exists()) {
+                return ApiResponseClass::sendResponse(null, 'Cannot delete, services associated', 400);
+            }
+
+            $this->categoryRepositoryInterface->delete($id);
+            return ApiResponseClass::sendResponse('Category Delete Successful', '', 204);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to delete category', 500);
         }
-
-        $this->categoryRepositoryInterface->delete($id);
-
-        return ApiResponseClass::sendResponse('Category Delete Successful', '', 204);
     }
 
     /**
@@ -194,8 +206,12 @@ class CategoryController extends Controller
      */
     public function getDeleted()
     {
-        $data = $this->categoryRepositoryInterface->getDeleted();
-        return ApiResponseClass::sendResponse(CategoryResource::collection($data), '', 200);
+        try {
+            $data = $this->categoryRepositoryInterface->getDeleted();
+            return ApiResponseClass::sendResponse(CategoryResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve deleted categories', 500);
+        }
     }
 
     /**
@@ -225,7 +241,8 @@ class CategoryController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse(new CategoryResource($category), 'Category Restore Successful', 200);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to restore category', 500);
         }
     }
 }

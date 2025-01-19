@@ -68,7 +68,8 @@ class MessageController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse(new MessageResource($message), 'Message Create Successful', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to create message', 500);
         }
     }
 
@@ -97,22 +98,26 @@ class MessageController extends Controller
      */
     public function show($id, Request $request)
     {
-        $data = $this->messageRepositoryInterface->getById($id);
+        try {
+            $data = $this->messageRepositoryInterface->getById($id);
 
-        $data->load('user:id,name,lastname');
+            $data->load('user:id,name,lastname');
 
-        $user = $request->user();
+            $user = $request->user();
 
-        if ($user->hasRole('technician')) {
-            $data->first()->ticket->update(['NewClientMessage' => false]);
-        } elseif ($user->hasRole('client')) {
-            $data->first()->ticket->update(['NewTechnicianMessage' => false]);
+            if ($user->hasRole('technician')) {
+                $data->first()->ticket->update(['NewClientMessage' => false]);
+            } elseif ($user->hasRole('client')) {
+                $data->first()->ticket->update(['NewTechnicianMessage' => false]);
+            }
+
+            foreach ($data as $message) {
+                $message->userRole = $message->user->roles->first()->name;
+            }
+
+            return ApiResponseClass::sendResponse(MessageResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve messages', 500);
         }
-
-        foreach ($data as $message) {
-            $message->userRole = $message->user->roles->first()->name;
-        }
-
-        return ApiResponseClass::sendResponse(MessageResource::collection($data), '', 200);
     }
 }

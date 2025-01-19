@@ -44,12 +44,16 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        $data = $this->companyRepositoryInterface->index();
-        $user = Auth::user();
-        if ($user->hasRole('client')) {
-            $data = $data->where('id', $user->company_id);
+        try {
+            $data = $this->companyRepositoryInterface->index();
+            $user = Auth::user();
+            if ($user->hasRole('client')) {
+                $data = $data->where('id', $user->company_id);
+            }
+            return ApiResponseClass::sendResponse(CompanyResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve companies', 500);
         }
-        return ApiResponseClass::sendResponse(CompanyResource::collection($data), '', 200);
     }
 
     /**
@@ -90,7 +94,8 @@ class CompanyController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse(new CompanyResource($company), 'Company Create Successful', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to create company', 500);
         }
     }
 
@@ -115,8 +120,12 @@ class CompanyController extends Controller
      */
     public function show($id)
     {
-        $company = $this->companyRepositoryInterface->getById($id);
-        return ApiResponseClass::sendResponse(new CompanyResource($company), '', 200);
+        try {
+            $company = $this->companyRepositoryInterface->getById($id);
+            return ApiResponseClass::sendResponse(new CompanyResource($company), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve company', 500);
+        }
     }
 
     /**
@@ -156,7 +165,8 @@ class CompanyController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('Company Update Successful', '', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to update company', 500);
         }
     }
 
@@ -178,20 +188,23 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
-        // Check for associated users
-        $company = $this->companyRepositoryInterface->getById($id);
-        if ($company->users()->exists()) {
-            return ApiResponseClass::sendResponse(null, 'Cannot delete, users associated', 400);
+        try {
+            // Check for associated users
+            $company = $this->companyRepositoryInterface->getById($id);
+            if ($company->users()->exists()) {
+                return ApiResponseClass::sendResponse(null, 'Cannot delete, users associated', 400);
+            }
+
+            // Check for associated service contracts
+            if ($company->serviceContract()->exists()) {
+                return ApiResponseClass::sendResponse(null, 'Cannot delete, service contracts associated', 400);
+            }
+
+            $this->companyRepositoryInterface->delete($id);
+            return ApiResponseClass::sendResponse('Company Delete Successful', '', 204);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to delete company', 500);
         }
-
-        // Check for associated service contracts
-        if ($company->serviceContract()->exists()) {
-            return ApiResponseClass::sendResponse(null, 'Cannot delete, service contracts associated', 400);
-        }
-
-        $this->companyRepositoryInterface->delete($id);
-
-        return ApiResponseClass::sendResponse('Company Delete Successful', '', 204);
     }
 
     /**
@@ -219,12 +232,16 @@ class CompanyController extends Controller
      */
     public function getUsersByCompanyId($id)
     {
-        $company = $this->companyRepositoryInterface->getById($id);
-        if (!$company) {
-            return ApiResponseClass::sendResponse(null, 'Company not found', 404);
+        try {
+            $company = $this->companyRepositoryInterface->getById($id);
+            if (!$company) {
+                return ApiResponseClass::sendResponse(null, 'Company not found', 404);
+            }
+            $users = $company->users; // Assuming the Company model has a 'users' relationship
+            return ApiResponseClass::sendResponse(UserResource::collection($users), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve users', 500);
         }
-        $users = $company->users; // Assuming the Company model has a 'users' relationship
-        return ApiResponseClass::sendResponse(UserResource::collection($users), '', 200);
     }
 
     /**
@@ -245,8 +262,12 @@ class CompanyController extends Controller
      */
     public function getDeleted()
     {
-        $data = $this->companyRepositoryInterface->getDeleted();
-        return ApiResponseClass::sendResponse(CompanyResource::collection($data), '', 200);
+        try {
+            $data = $this->companyRepositoryInterface->getDeleted();
+            return ApiResponseClass::sendResponse(CompanyResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve deleted companies', 500);
+        }
     }
 
     /**
@@ -266,7 +287,14 @@ class CompanyController extends Controller
      */
     public function restore($id)
     {
-        $this->companyRepositoryInterface->restore($id);
-        return ApiResponseClass::sendResponse('Company Restore Successful', '', 200);
+        DB::beginTransaction();
+        try {
+            $this->companyRepositoryInterface->restore($id);
+            DB::commit();
+            return ApiResponseClass::sendResponse('Company Restore Successful', '', 200);
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to restore company', 500);
+        }
     }
 }

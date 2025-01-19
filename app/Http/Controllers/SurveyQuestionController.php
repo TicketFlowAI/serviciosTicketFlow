@@ -43,8 +43,12 @@ class SurveyQuestionController extends Controller
      */
     public function index()
     {
-        $data = $this->surveyQuestionRepositoryInterface->index();
-        return ApiResponseClass::sendResponse(SurveyQuestionResource::collection($data), '', 200);
+        try {
+            $data = $this->surveyQuestionRepositoryInterface->index();
+            return ApiResponseClass::sendResponse(SurveyQuestionResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve survey questions', 500);
+        }
     }
 
     /**
@@ -84,7 +88,8 @@ class SurveyQuestionController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse(new SurveyQuestionResource($surveyQuestion), 'Survey Question Created Successfully', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to create survey question', 500);
         }
     }
 
@@ -110,8 +115,12 @@ class SurveyQuestionController extends Controller
      */
     public function show($id)
     {
-        $surveyQuestion = $this->surveyQuestionRepositoryInterface->getById($id);
-        return ApiResponseClass::sendResponse(new SurveyQuestionResource($surveyQuestion), '', 200);
+        try {
+            $surveyQuestion = $this->surveyQuestionRepositoryInterface->getById($id);
+            return ApiResponseClass::sendResponse(new SurveyQuestionResource($surveyQuestion), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve survey question', 500);
+        }
     }
 
     /**
@@ -144,7 +153,6 @@ class SurveyQuestionController extends Controller
      *     @OA\Response(response=200, description="Survey question updated successfully"),
      *     @OA\Response(response=400, description="Invalid request")
      * )
-     */
     public function update(UpdateSurveyQuestionRequest $request, $id)
     {
         $updateDetails = ['question' => $request->question, 'status' => $request->status];
@@ -154,7 +162,8 @@ class SurveyQuestionController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('Survey Question Updated Successfully', '', 200);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to update survey question', 500);
         }
     }
 
@@ -176,8 +185,12 @@ class SurveyQuestionController extends Controller
      */
     public function destroy($id)
     {
-        $this->surveyQuestionRepositoryInterface->delete($id);
-        return ApiResponseClass::sendResponse('Survey Question Deleted Successfully', '', 204);
+        try {
+            $this->surveyQuestionRepositoryInterface->delete($id);
+            return ApiResponseClass::sendResponse('Survey Question Deleted Successfully', '', 204);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to delete survey question', 500);
+        }
     }
 
     /**
@@ -198,8 +211,12 @@ class SurveyQuestionController extends Controller
      */
     public function getDeleted()
     {
-        $data = $this->surveyQuestionRepositoryInterface->getDeleted();
-        return ApiResponseClass::sendResponse(SurveyQuestionResource::collection($data), '', 200);
+        try {
+            $data = $this->surveyQuestionRepositoryInterface->getDeleted();
+            return ApiResponseClass::sendResponse(SurveyQuestionResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve deleted survey questions', 500);
+        }
     }
 
     /**
@@ -226,7 +243,8 @@ class SurveyQuestionController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('Survey Question Restored Successfully', '', 200);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to restore survey question', 500);
         }
     }
 
@@ -248,7 +266,11 @@ class SurveyQuestionController extends Controller
      */
     public function getAll()
     {
-        $data = $this->surveyQuestionRepositoryInterface->getAll();
-        return ApiResponseClass::sendResponse(SurveyQuestionResource::collection($data), '', 200);
+        try {
+            $data = $this->surveyQuestionRepositoryInterface->getAll();
+            return ApiResponseClass::sendResponse(SurveyQuestionResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve all survey questions', 500);
+        }
     }
 }

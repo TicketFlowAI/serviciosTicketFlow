@@ -45,16 +45,20 @@ class RolesController extends Controller
      */
     public function index()
     {
-        $data = $this->roleRepositoryInterface->index();
+        try {
+            $data = $this->roleRepositoryInterface->index();
 
-        // Check if the current user is a technician
-        if (auth()->user()->hasRole('technician')) {
-            $data = $data->filter(function ($role) {
-                return $role->name !== 'super-admin';
-            });
+            // Check if the current user is a technician
+            if (auth()->user()->hasRole('technician')) {
+                $data = $data->filter(function ($role) {
+                    return $role->name !== 'super-admin';
+                });
+            }
+
+            return ApiResponseClass::sendResponse(RoleResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve roles', 500);
         }
-
-        return ApiResponseClass::sendResponse(RoleResource::collection($data), '', 200);
     }
 
     /**
@@ -79,8 +83,12 @@ class RolesController extends Controller
      */
     public function show($id)
     {
-        $role = $this->roleRepositoryInterface->getById($id);
-        return ApiResponseClass::sendResponse(new RoleResource($role), '', 200);
+        try {
+            $role = $this->roleRepositoryInterface->getById($id);
+            return ApiResponseClass::sendResponse(new RoleResource($role), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve role', 500);
+        }
     }
 
     /**
@@ -124,7 +132,8 @@ class RolesController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('Role Update Successful', '', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to update role', 500);
         }
     }
 
@@ -153,13 +162,16 @@ class RolesController extends Controller
      */
     public function listPermissions()
     {
-        $permissions = Permission::all();
-    
-        if ($permissions->isEmpty()) {
-            return ApiResponseClass::sendResponse('No permissions found', 404);
+        try {
+            $permissions = Permission::all();
+        
+            if ($permissions->isEmpty()) {
+                return ApiResponseClass::sendResponse('No permissions found', 404);
+            }
+            return ApiResponseClass::sendResponse(PermissionResource::collection($permissions), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve permissions', 500);
         }
-        return ApiResponseClass::sendResponse(PermissionResource::collection($permissions), '', 200);
     }
 
 }
-

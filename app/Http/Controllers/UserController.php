@@ -43,21 +43,25 @@ class UserController extends Controller
      */
     public function index()
     {
-        $currentUser = auth()->user();
-        $data = $this->userRepositoryInterface->index();
-        $data->load('company:id,name');
+        try {
+            $currentUser = auth()->user();
+            $data = $this->userRepositoryInterface->index();
+            $data->load('company:id,name');
 
-        if ($currentUser->hasRole('technician')) {
-            $data = $data->filter(function ($user) {
-                return !$user->hasRole('super-admin');
-            });
+            if ($currentUser->hasRole('technician')) {
+                $data = $data->filter(function ($user) {
+                    return !$user->hasRole('super-admin');
+                });
+            }
+
+            foreach ($data as $user) {
+                $user->role = $user->getRoleNames()->first();
+            }
+
+            return ApiResponseClass::sendResponse(UserResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve users', 500);
         }
-
-        foreach ($data as $user) {
-            $user->role = $user->getRoleNames()->first();
-        }
-
-        return ApiResponseClass::sendResponse(UserResource::collection($data), '', 200);
     }
 
     /**
@@ -113,8 +117,8 @@ class UserController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse(new UserResource($user), 'User Create Successful', 201);
         } catch (\Exception $ex) {
-            DB::rollback();
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to create user', 500);
         }
     }
 
@@ -140,9 +144,12 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = $this->userRepositoryInterface->getById($id);
-
-        return ApiResponseClass::sendResponse(new UserResource($user), '', 200);
+        try {
+            $user = $this->userRepositoryInterface->getById($id);
+            return ApiResponseClass::sendResponse(new UserResource($user), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve user', 500);
+        }
     }
 
     /**
@@ -205,8 +212,8 @@ class UserController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('User Update Successful', '', 201);
         } catch (\Exception $ex) {
-            DB::rollback();
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to update user', 500);
         }
     }
 
@@ -228,9 +235,12 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $this->userRepositoryInterface->delete($id);
-
-        return ApiResponseClass::sendResponse('User Delete Successful', '', 204);
+        try {
+            $this->userRepositoryInterface->delete($id);
+            return ApiResponseClass::sendResponse('User Delete Successful', '', 204);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to delete user', 500);
+        }
     }
 
     /**
@@ -247,11 +257,15 @@ class UserController extends Controller
      */
     public function getAuthenticatedUser(Request $request)
     {
-        $user = $this->userRepositoryInterface->getAuthenticatedUser($request);
-        $user->load('company:id,name');
-        $user->role = $user->getRoleNames()->first();
+        try {
+            $user = $this->userRepositoryInterface->getAuthenticatedUser($request);
+            $user->load('company:id,name');
+            $user->role = $user->getRoleNames()->first();
 
-        return ApiResponseClass::sendResponse(new UserResource($user), '', 200);
+            return ApiResponseClass::sendResponse(new UserResource($user), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve authenticated user', 500);
+        }
     }
 
     /**
@@ -295,7 +309,7 @@ class UserController extends Controller
 
             return ApiResponseClass::sendResponse(UserResource::collection($users), '', 200);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve users by role', 500);
         }
     }
 
@@ -317,8 +331,12 @@ class UserController extends Controller
      */
     public function getDeleted()
     {
-        $deletedUsers = $this->userRepositoryInterface->getDeleted();
-        return ApiResponseClass::sendResponse(UserResource::collection($deletedUsers), 'Deleted Users Retrieved Successfully', 200);
+        try {
+            $deletedUsers = $this->userRepositoryInterface->getDeleted();
+            return ApiResponseClass::sendResponse(UserResource::collection($deletedUsers), 'Deleted Users Retrieved Successfully', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve deleted users', 500);
+        }
     }
 
     /**
@@ -342,7 +360,14 @@ class UserController extends Controller
      */
     public function restore($id)
     {
-        $this->userRepositoryInterface->restore($id);
-        return ApiResponseClass::sendResponse('User Restored Successfully', '', 200);
+        DB::beginTransaction();
+        try {
+            $this->userRepositoryInterface->restore($id);
+            DB::commit();
+            return ApiResponseClass::sendResponse('User Restored Successfully', '', 200);
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to restore user', 500);
+        }
     }
 }

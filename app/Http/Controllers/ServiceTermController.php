@@ -44,8 +44,12 @@ class ServiceTermController extends Controller
      */
     public function index()
     {
-        $data = $this->serviceTermRepositoryInterface->index();
-        return ApiResponseClass::sendResponse(ServiceTermResource::collection($data), '', 200);
+        try {
+            $data = $this->serviceTermRepositoryInterface->index();
+            return ApiResponseClass::sendResponse(ServiceTermResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve service terms', 500);
+        }
     }
 
     /**
@@ -82,7 +86,8 @@ class ServiceTermController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse(new ServiceTermResource($serviceTerm), 'ServiceTerm Create Successful', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to create service term', 500);
         }
     }
 
@@ -108,8 +113,12 @@ class ServiceTermController extends Controller
      */
     public function show($id)
     {
-        $serviceTerm = $this->serviceTermRepositoryInterface->getById($id);
-        return ApiResponseClass::sendResponse(new ServiceTermResource($serviceTerm), '', 200);
+        try {
+            $serviceTerm = $this->serviceTermRepositoryInterface->getById($id);
+            return ApiResponseClass::sendResponse(new ServiceTermResource($serviceTerm), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve service term', 500);
+        }
     }
 
     /**
@@ -135,7 +144,6 @@ class ServiceTermController extends Controller
      *     @OA\Response(response=200, description="Service term updated successfully"),
      *     @OA\Response(response=400, description="Invalid request")
      * )
-     */
     public function update(UpdateServiceTermRequest $request, $id)
     {
         $updateDetails = [
@@ -149,7 +157,8 @@ class ServiceTermController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('ServiceTerm Update Successful', '', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to update service term', 500);
         }
     }
 
@@ -171,13 +180,17 @@ class ServiceTermController extends Controller
      */
     public function destroy($id)
     {
-        $serviceTerm = $this->serviceTermRepositoryInterface->getById($id);
-        if ($serviceTerm->serviceContract()->exists()) {
-            return ApiResponseClass::sendResponse(null, 'Cannot delete, service contracts associated', 400);
-        }
+        try {
+            $serviceTerm = $this->serviceTermRepositoryInterface->getById($id);
+            if ($serviceTerm->serviceContract()->exists()) {
+                return ApiResponseClass::sendResponse(null, 'Cannot delete, service contracts associated', 400);
+            }
 
-        $this->serviceTermRepositoryInterface->delete($id);
-        return ApiResponseClass::sendResponse('ServiceTerm Delete Successful', '', 204);
+            $this->serviceTermRepositoryInterface->delete($id);
+            return ApiResponseClass::sendResponse('ServiceTerm Delete Successful', '', 204);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to delete service term', 500);
+        }
     }
 
     /**
@@ -198,8 +211,12 @@ class ServiceTermController extends Controller
      */
     public function getDeleted()
     {
-        $data = $this->serviceTermRepositoryInterface->getDeleted();
-        return ApiResponseClass::sendResponse(ServiceTermResource::collection($data), '', 200);
+        try {
+            $data = $this->serviceTermRepositoryInterface->getDeleted();
+            return ApiResponseClass::sendResponse(ServiceTermResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve deleted service terms', 500);
+        }
     }
 
     /**
@@ -227,7 +244,8 @@ class ServiceTermController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('ServiceTerm Restore Successful', '', 200);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to restore service term', 500);
         }
     }
 }

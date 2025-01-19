@@ -43,10 +43,14 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        $data = $this->serviceRepositoryInterface->index();
-        $data->load('tax:id,description', 'category:id,category');
+        try {
+            $data = $this->serviceRepositoryInterface->index();
+            $data->load('tax:id,description', 'category:id,category');
 
-        return ApiResponseClass::sendResponse(ServiceResource::collection($data), '', 200);
+            return ApiResponseClass::sendResponse(ServiceResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve services', 500);
+        }
     }
 
     /**
@@ -89,7 +93,8 @@ class ServiceController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse(new ServiceResource($service), 'Service Create Successful', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to create service', 500);
         }
     }
 
@@ -115,10 +120,14 @@ class ServiceController extends Controller
      */
     public function show($id)
     {
-        $data = $this->serviceRepositoryInterface->getById($id);
-        $data->load('tax:id,description', 'category:id,category');
+        try {
+            $data = $this->serviceRepositoryInterface->getById($id);
+            $data->load('tax:id,description', 'category:id,category');
 
-        return ApiResponseClass::sendResponse(new ServiceResource($data), '', 200);
+            return ApiResponseClass::sendResponse(new ServiceResource($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve service', 500);
+        }
     }
 
     /**
@@ -164,7 +173,8 @@ class ServiceController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('Service Update Successful', '', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to update service', 500);
         }
     }
 
@@ -187,15 +197,18 @@ class ServiceController extends Controller
      */
     public function destroy($id)
     {
-        // Check for associated service contracts
-        $service = $this->serviceRepositoryInterface->getById($id);
-        if ($service->serviceContract()->exists()) {
-            return ApiResponseClass::sendResponse(null, 'Cannot delete, service contracts associated', 400);
+        try {
+            // Check for associated service contracts
+            $service = $this->serviceRepositoryInterface->getById($id);
+            if ($service->serviceContract()->exists()) {
+                return ApiResponseClass::sendResponse(null, 'Cannot delete, service contracts associated', 400);
+            }
+
+            $this->serviceRepositoryInterface->delete($id);
+            return ApiResponseClass::sendResponse('Service Delete Successful', '', 204);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to delete service', 500);
         }
-
-        $this->serviceRepositoryInterface->delete($id);
-
-        return ApiResponseClass::sendResponse('Service Delete Successful', '', 204);
     }
 
     /**
@@ -216,10 +229,14 @@ class ServiceController extends Controller
      */
     public function getDeleted()
     {
-        $data = $this->serviceRepositoryInterface->getDeleted();
-        $data->load('tax:id,description', 'category:id,category');
+        try {
+            $data = $this->serviceRepositoryInterface->getDeleted();
+            $data->load('tax:id,description', 'category:id,category');
 
-        return ApiResponseClass::sendResponse(ServiceResource::collection($data), '', 200);
+            return ApiResponseClass::sendResponse(ServiceResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve deleted services', 500);
+        }
     }
 
     /**
@@ -240,8 +257,14 @@ class ServiceController extends Controller
      */
     public function restore($id)
     {
-        $this->serviceRepositoryInterface->restore($id);
-
-        return ApiResponseClass::sendResponse('Service Restore Successful', '', 200);
+        DB::beginTransaction();
+        try {
+            $this->serviceRepositoryInterface->restore($id);
+            DB::commit();
+            return ApiResponseClass::sendResponse('Service Restore Successful', '', 200);
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to restore service', 500);
+        }
     }
 }

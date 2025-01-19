@@ -43,8 +43,12 @@ class EmailController extends Controller
      */
     public function index()
     {
-        $data = $this->emailRepositoryInterface->index();
-        return ApiResponseClass::sendResponse(EmailResource::collection($data), '', 200);
+        try {
+            $data = $this->emailRepositoryInterface->index();
+            return ApiResponseClass::sendResponse(EmailResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve email templates', 500);
+        }
     }
 
     /**
@@ -82,7 +86,8 @@ class EmailController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse(new EmailResource($email), 'Email Create Successful', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to create email template', 500);
         }
     }
 
@@ -108,8 +113,12 @@ class EmailController extends Controller
      */
     public function show($id)
     {
-        $email = $this->emailRepositoryInterface->getById($id);
-        return ApiResponseClass::sendResponse(new EmailResource($email), '', 200);
+        try {
+            $email = $this->emailRepositoryInterface->getById($id);
+            return ApiResponseClass::sendResponse(new EmailResource($email), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve email template', 500);
+        }
     }
 
     /**
@@ -151,7 +160,8 @@ class EmailController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('Email Update Successful', '', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to update email template', 500);
         }
     }
 
@@ -174,15 +184,18 @@ class EmailController extends Controller
      */
     public function destroy($id)
     {
-        // Check for associated intervals
-        $email = $this->emailRepositoryInterface->getById($id);
-        if ($email->interval()->exists()) {
-            return ApiResponseClass::sendResponse(null, 'Cannot delete, intervals associated', 400);
+        try {
+            // Check for associated intervals
+            $email = $this->emailRepositoryInterface->getById($id);
+            if ($email->interval()->exists()) {
+                return ApiResponseClass::sendResponse(null, 'Cannot delete, intervals associated', 400);
+            }
+
+            $this->emailRepositoryInterface->delete($id);
+            return ApiResponseClass::sendResponse('Email Delete Successful', '', 204);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to delete email template', 500);
         }
-
-        $this->emailRepositoryInterface->delete($id);
-
-        return ApiResponseClass::sendResponse('Email Delete Successful', '', 204);
     }
 
     /**
@@ -203,8 +216,12 @@ class EmailController extends Controller
      */
     public function getDeleted()
     {
-        $data = $this->emailRepositoryInterface->getDeleted();
-        return ApiResponseClass::sendResponse(EmailResource::collection($data), '', 200);
+        try {
+            $data = $this->emailRepositoryInterface->getDeleted();
+            return ApiResponseClass::sendResponse(EmailResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve deleted email templates', 500);
+        }
     }
 
     /**
@@ -230,7 +247,8 @@ class EmailController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('Email Restore Successful', '', 200);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to restore email template', 500);
         }
     }
 }

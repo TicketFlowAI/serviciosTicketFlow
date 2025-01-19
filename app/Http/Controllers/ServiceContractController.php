@@ -55,22 +55,26 @@ class ServiceContractController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        if ($user->hasRole('client')) {
-            $data = $this->serviceContractRepositoryInterface->getContractsByCompany($user->company_id);
-        } else {
-            $data = $this->serviceContractRepositoryInterface->index();
+            if ($user->hasRole('client')) {
+                $data = $this->serviceContractRepositoryInterface->getContractsByCompany($user->company_id);
+            } else {
+                $data = $this->serviceContractRepositoryInterface->index();
+            }
+
+            $data->load('company:id,name', 'service:id,description,price', 'serviceterm:id,months,term');
+
+            foreach ($data as $serviceContract) {
+                $serviceContract->price = ($serviceContract->service->price / 12) * $serviceContract->serviceterm->months;
+                $serviceContract->expiration_date = $serviceContract->created_at->addMonths($serviceContract->serviceTerm->months);
+            }
+
+            return ApiResponseClass::sendResponse(ServiceContractResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve service contracts', 500);
         }
-
-        $data->load('company:id,name', 'service:id,description,price', 'serviceterm:id,months,term');
-
-        foreach ($data as $serviceContract) {
-            $serviceContract->price = ($serviceContract->service->price / 12) * $serviceContract->serviceterm->months;
-            $serviceContract->expiration_date = $serviceContract->created_at->addMonths($serviceContract->serviceTerm->months);
-        }
-
-        return ApiResponseClass::sendResponse(ServiceContractResource::collection($data), '', 200);
     }
 
     /**
@@ -119,7 +123,8 @@ class ServiceContractController extends Controller
             $serviceContract->expiration_date = "En proceso";
             return ApiResponseClass::sendResponse(new ServiceContractResource($serviceContract), 'ServiceContract Create Successful', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to create service contract', 500);
         }
     }
 
@@ -153,12 +158,16 @@ class ServiceContractController extends Controller
      */
     public function show($id)
     {
-        $serviceContract = $this->serviceContractRepositoryInterface->getById($id);
-        $serviceContract->load('company:id,name', 'service:id,description', 'serviceterm:id,months,term');
-        $serviceContract->price = ($serviceContract->service->price / 12) * $serviceContract->serviceterm->months;
-        $serviceContract->expiration_date = $serviceContract->created_at->addMonths($serviceContract->serviceterm->months);
+        try {
+            $serviceContract = $this->serviceContractRepositoryInterface->getById($id);
+            $serviceContract->load('company:id,name', 'service:id,description', 'serviceterm:id,months,term');
+            $serviceContract->price = ($serviceContract->service->price / 12) * $serviceContract->serviceterm->months;
+            $serviceContract->expiration_date = $serviceContract->created_at->addMonths($serviceContract->serviceterm->months);
 
-        return ApiResponseClass::sendResponse(new ServiceContractResource($serviceContract), '', 200);
+            return ApiResponseClass::sendResponse(new ServiceContractResource($serviceContract), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve service contract', 500);
+        }
     }
 
     /**
@@ -207,7 +216,8 @@ class ServiceContractController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('ServiceContract Update Successful', '', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to update service contract', 500);
         }
     }
 
@@ -230,15 +240,18 @@ class ServiceContractController extends Controller
      */
     public function destroy($id)
     {
-        // Check for associated tickets
-        $serviceContract = $this->serviceContractRepositoryInterface->getById($id);
-        if ($serviceContract->tickets()->exists()) {
-            return ApiResponseClass::sendResponse(null, 'Cannot delete, tickets associated', 400);
+        try {
+            // Check for associated tickets
+            $serviceContract = $this->serviceContractRepositoryInterface->getById($id);
+            if ($serviceContract->tickets()->exists()) {
+                return ApiResponseClass::sendResponse(null, 'Cannot delete, tickets associated', 400);
+            }
+
+            $this->serviceContractRepositoryInterface->delete($id);
+            return ApiResponseClass::sendResponse('ServiceContract Delete Successful', '', 204);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to delete service contract', 500);
         }
-
-        $this->serviceContractRepositoryInterface->delete($id);
-
-        return ApiResponseClass::sendResponse('ServiceContract Delete Successful', '', 204);
     }
 
     /**
@@ -266,22 +279,26 @@ class ServiceContractController extends Controller
      */
     public function getContractsByCompany($id)
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        if ($user->hasRole('client') && $user->company_id != $id) {
-            abort(403, 'Unauthorized access to resource.');
+            if ($user->hasRole('client') && $user->company_id != $id) {
+                abort(403, 'Unauthorized access to resource.');
+            }
+
+            $data = $this->serviceContractRepositoryInterface->getContractsByCompany($id);
+
+            $data->load('company:id,name', 'service:id,description,price', 'serviceterm:id,months,term');
+
+            foreach ($data as $serviceContract) {
+                $serviceContract->price = ($serviceContract->service->price / 12) * $serviceContract->serviceterm->months;
+                $serviceContract->expiration_date = $serviceContract->created_at->addMonths($serviceContract->serviceterm->months);
+            }
+
+            return ApiResponseClass::sendResponse(ServiceContractResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve service contracts by company', 500);
         }
-
-        $data = $this->serviceContractRepositoryInterface->getContractsByCompany($id);
-
-        $data->load('company:id,name', 'service:id,description,price', 'serviceterm:id,months,term');
-
-        foreach ($data as $serviceContract) {
-            $serviceContract->price = ($serviceContract->service->price / 12) * $serviceContract->serviceterm->months;
-            $serviceContract->expiration_date = $serviceContract->created_at->addMonths($serviceContract->serviceterm->months);
-        }
-
-        return ApiResponseClass::sendResponse(ServiceContractResource::collection($data), '', 200);
     }
 
     /**
@@ -302,32 +319,36 @@ class ServiceContractController extends Controller
      */
     public function getExpiringContracts()
     {
-        $user = Auth::user();
-        $nextMonth = Carbon::now()->addMonth();
+        try {
+            $user = Auth::user();
+            $nextMonth = Carbon::now()->addMonth();
 
-        if ($user->hasRole('client')) {
-            $data = ServiceContract::where('company_id', $user->company_id)
-                ->whereHas('serviceterm', function ($query) {
+            if ($user->hasRole('client')) {
+                $data = ServiceContract::where('company_id', $user->company_id)
+                    ->whereHas('serviceterm', function ($query) {
+                        $query->where('months', '!=', 1);
+                    })
+                    ->where('expiration_date', '<=', $nextMonth)
+                    ->get();
+            } else {
+                $data = ServiceContract::whereHas('serviceterm', function ($query) {
                     $query->where('months', '!=', 1);
                 })
                 ->where('expiration_date', '<=', $nextMonth)
                 ->get();
-        } else {
-            $data = ServiceContract::whereHas('serviceterm', function ($query) {
-                $query->where('months', '!=', 1);
-            })
-            ->where('expiration_date', '<=', $nextMonth)
-            ->get();
+            }
+
+            $data->load('company:id,name', 'service:id,description,price', 'serviceterm:id,months,term');
+
+            foreach ($data as $serviceContract) {
+                $serviceContract->price = ($serviceContract->service->price / 12) * $serviceContract->serviceterm->months;
+                $serviceContract->expiration_date = $serviceContract->created_at->addMonths($serviceContract->serviceterm->months);
+            }
+
+            return ApiResponseClass::sendResponse(ServiceContractResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve expiring service contracts', 500);
         }
-
-        $data->load('company:id,name', 'service:id,description,price', 'serviceterm:id,months,term');
-
-        foreach ($data as $serviceContract) {
-            $serviceContract->price = ($serviceContract->service->price / 12) * $serviceContract->serviceterm->months;
-            $serviceContract->expiration_date = $serviceContract->created_at->addMonths($serviceContract->serviceterm->months);
-        }
-
-        return ApiResponseClass::sendResponse(ServiceContractResource::collection($data), '', 200);
     }
 
     /**
@@ -348,8 +369,12 @@ class ServiceContractController extends Controller
      */
     public function getDeleted()
     {
-        $data = $this->serviceContractRepositoryInterface->getDeleted();
-        return ApiResponseClass::sendResponse(ServiceContractResource::collection($data), '', 200);
+        try {
+            $data = $this->serviceContractRepositoryInterface->getDeleted();
+            return ApiResponseClass::sendResponse(ServiceContractResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve deleted service contracts', 500);
+        }
     }
 
     /**
@@ -370,7 +395,14 @@ class ServiceContractController extends Controller
      */
     public function restore($id)
     {
-        $this->serviceContractRepositoryInterface->restore($id);
-        return ApiResponseClass::sendResponse('ServiceContract Restore Successful', '', 200);
+        DB::beginTransaction();
+        try {
+            $this->serviceContractRepositoryInterface->restore($id);
+            DB::commit();
+            return ApiResponseClass::sendResponse('ServiceContract Restore Successful', '', 200);
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to restore service contract', 500);
+        }
     }
 }

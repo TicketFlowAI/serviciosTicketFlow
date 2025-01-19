@@ -43,11 +43,15 @@ class IntervalController extends Controller
      */
     public function index()
     {
-        $data = $this->intervalRepositoryInterface->index();
-        return ApiResponseClass::sendResponse(IntervalResource::collection($data->load('email')), '', 200);
+        try {
+            $data = $this->intervalRepositoryInterface->index();
+            return ApiResponseClass::sendResponse(IntervalResource::collection($data->load('email')), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve intervals', 500);
+        }
     }
 
-        /**
+    /**
      * @OA\Post(
      *     path="/intervals",
      *     summary="Create a new interval",
@@ -82,10 +86,10 @@ class IntervalController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse(new IntervalResource($interval), 'Interval Create Successful', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to create interval', 500);
         }
     }
-
 
     /**
      * @OA\Get(
@@ -108,11 +112,15 @@ class IntervalController extends Controller
      */
     public function show($id)
     {
-        $interval = $this->intervalRepositoryInterface->getById($id);
-        return ApiResponseClass::sendResponse(new IntervalResource($interval->load('email')), '', 200);
+        try {
+            $interval = $this->intervalRepositoryInterface->getById($id);
+            return ApiResponseClass::sendResponse(new IntervalResource($interval->load('email')), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve interval', 500);
+        }
     }
 
-        /**
+    /**
      * @OA\Put(
      *     path="/intervals/{id}",
      *     summary="Update an interval",
@@ -151,7 +159,8 @@ class IntervalController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse('Interval Update Successful', '', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to update interval', 500);
         }
     }
 
@@ -172,8 +181,12 @@ class IntervalController extends Controller
      */
     public function destroy($id)
     {
-        $this->intervalRepositoryInterface->delete($id);
-        return ApiResponseClass::sendResponse('Interval Delete Successful', '', 204);
+        try {
+            $this->intervalRepositoryInterface->delete($id);
+            return ApiResponseClass::sendResponse('Interval Delete Successful', '', 204);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to delete interval', 500);
+        }
     }
 
     /**
@@ -194,8 +207,12 @@ class IntervalController extends Controller
      */
     public function getDeleted()
     {
-        $data = $this->intervalRepositoryInterface->getDeleted();
-        return ApiResponseClass::sendResponse(IntervalResource::collection($data->load('email')), '', 200);
+        try {
+            $data = $this->intervalRepositoryInterface->getDeleted();
+            return ApiResponseClass::sendResponse(IntervalResource::collection($data->load('email')), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve deleted intervals', 500);
+        }
     }
 
     /**
@@ -219,7 +236,14 @@ class IntervalController extends Controller
      */
     public function restore($id)
     {
-        $this->intervalRepositoryInterface->restore($id);
-        return ApiResponseClass::sendResponse('Interval Restore Successful', '', 200);
+        DB::beginTransaction();
+        try {
+            $this->intervalRepositoryInterface->restore($id);
+            DB::commit();
+            return ApiResponseClass::sendResponse('Interval Restore Successful', '', 200);
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to restore interval', 500);
+        }
     }
 }

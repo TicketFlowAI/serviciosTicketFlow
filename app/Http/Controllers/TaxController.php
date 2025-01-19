@@ -43,9 +43,12 @@ class TaxController extends Controller
      */
     public function index()
     {
-        $data = $this->taxRepositoryInterface->index();
-
-        return ApiResponseClass::sendResponse(TaxResource::collection($data), '', 200);
+        try {
+            $data = $this->taxRepositoryInterface->index();
+            return ApiResponseClass::sendResponse(TaxResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve taxes', 500);
+        }
     }
 
     /**
@@ -81,9 +84,9 @@ class TaxController extends Controller
 
             DB::commit();
             return ApiResponseClass::sendResponse(new TaxResource($tax), 'Tax Create Successful', 201);
-
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to create tax', 500);
         }
     }
 
@@ -109,9 +112,12 @@ class TaxController extends Controller
      */
     public function show($id)
     {
-        $tax = $this->taxRepositoryInterface->getById($id);
-
-        return ApiResponseClass::sendResponse(new TaxResource($tax), '', 200);
+        try {
+            $tax = $this->taxRepositoryInterface->getById($id);
+            return ApiResponseClass::sendResponse(new TaxResource($tax), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve tax', 500);
+        }
     }
 
     /**
@@ -150,9 +156,9 @@ class TaxController extends Controller
 
             DB::commit();
             return ApiResponseClass::sendResponse('Tax Update Successful', '', 201);
-
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to update tax', 500);
         }
     }
 
@@ -175,15 +181,18 @@ class TaxController extends Controller
      */
     public function destroy($id)
     {
-        // Check for associated services
-        $tax = $this->taxRepositoryInterface->getById($id);
-        if ($tax->services()->exists()) {
-            return ApiResponseClass::sendResponse(null, 'Cannot delete, services associated', 400);
+        try {
+            // Check for associated services
+            $tax = $this->taxRepositoryInterface->getById($id);
+            if ($tax->services()->exists()) {
+                return ApiResponseClass::sendResponse(null, 'Cannot delete, services associated', 400);
+            }
+
+            $this->taxRepositoryInterface->delete($id);
+            return ApiResponseClass::sendResponse('Tax Delete Successful', '', 204);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to delete tax', 500);
         }
-
-        $this->taxRepositoryInterface->delete($id);
-
-        return ApiResponseClass::sendResponse('Tax Delete Successful', '', 204);
     }
 
     /**
@@ -204,9 +213,12 @@ class TaxController extends Controller
      */
     public function getDeleted()
     {
-        $data = $this->taxRepositoryInterface->getDeleted();
-
-        return ApiResponseClass::sendResponse(TaxResource::collection($data), '', 200);
+        try {
+            $data = $this->taxRepositoryInterface->getDeleted();
+            return ApiResponseClass::sendResponse(TaxResource::collection($data), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve deleted taxes', 500);
+        }
     }
 
     /**
@@ -230,12 +242,11 @@ class TaxController extends Controller
         DB::beginTransaction();
         try {
             $this->taxRepositoryInterface->restore($id);
-
             DB::commit();
             return ApiResponseClass::sendResponse('Tax Restore Successful', '', 200);
-
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to restore tax', 500);
         }
     }
 }

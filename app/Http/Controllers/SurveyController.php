@@ -56,9 +56,9 @@ class SurveyController extends Controller
 
             DB::commit();
             return ApiResponseClass::sendResponse(new SurveyResource($survey), 'Survey Create Successful', 201);
-
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            DB::rollBack();
+            return ApiResponseClass::sendResponse(null, 'Failed to create survey', 500);
         }
     }
 
@@ -84,8 +84,11 @@ class SurveyController extends Controller
      */
     public function show($id)
     {
-        $survey = $this->surveyRepositoryInterface->getById($id);
-
-        return ApiResponseClass::sendResponse(SurveyResource::collection($survey), '', 200);
+        try {
+            $survey = $this->surveyRepositoryInterface->getById($id);
+            return ApiResponseClass::sendResponse(SurveyResource::collection($survey), '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to retrieve survey', 500);
+        }
     }
 }
