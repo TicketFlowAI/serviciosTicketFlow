@@ -27,7 +27,6 @@ class StoreIntervalRequest extends FormRequest
             'days' => 'required|integer',
             'type' => 'required|string|unique:intervals',
             'template_name' => 'required|string',
-            'subject_template' => 'required|string',
         ];
     }
 

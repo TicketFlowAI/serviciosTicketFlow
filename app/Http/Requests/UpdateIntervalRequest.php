@@ -30,7 +30,6 @@ class UpdateIntervalRequest extends FormRequest
             'days' => 'required|integer',
             'type' => 'required|string|unique:intervals,type,' . $id,
             'template_name' => 'required|string',
-            'subject_template' => 'required|string',
         ];
     }
 
