@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Mindsoft',
             'lastname' => 'Admin',
-            'email' => 'info@mindsoft.biz',
+            'email' => 'notificaciones@mindsoft.biz',
             'password' => Hash::make($this->defaultPassword),
             'company_id' => 1
         ])->assignRole('super-admin');

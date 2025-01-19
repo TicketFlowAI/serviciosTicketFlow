@@ -2589,7 +2589,7 @@
                     "Service Terms"
                 ],
                 "summary": "Update a service term",
-                "operationId": "de5fce996f15f00370436a874858ab29",
+                "operationId": "982e68693cf3b45175288025e8a171b7",
                 "parameters": [
                     {
                         "name": "id",
@@ -2916,7 +2916,7 @@
                     "SurveyQuestions"
                 ],
                 "summary": "Update a survey question",
-                "operationId": "4ed36abfda0a79c314fe8799efb524d2",
+                "operationId": "f262783141d95761741ea0d2638237b8",
                 "parameters": [
                     {
                         "name": "id",

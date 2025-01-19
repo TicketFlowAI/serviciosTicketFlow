@@ -26,7 +26,7 @@ class CompanySeeder extends Seeder
             [
                 'name' => 'AGLOMERADOS COTOPAXI S.A.',
                 'idNumber' => '0590028665001',
-                'contactEmail' => 'grp.contabilidad@cotopaxi.com.ec',
+                'contactEmail' => 'info@mindsoft.biz',
                 'phone' => '023985200',
                 'state' => 'Pichincha',
                 'city' => 'Quito',

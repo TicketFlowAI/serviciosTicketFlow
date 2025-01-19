@@ -29,6 +29,7 @@ class SendContractExpiryNotifications extends Command
                 $query->where('months', 2); // Exclude monthly ServiceTerms
             })
             ->get();
+        
 
         foreach ($expiringContracts as $contract) {
             $expirationDate = $contract->created_at->copy()->addMonths($contract->serviceTerm->months);
