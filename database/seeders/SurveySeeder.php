@@ -16,7 +16,43 @@ class SurveySeeder extends Seeder
             Survey::create([
                 'ticket_id' => 1,
                 'question_id' => $i,
-                'user_id' => 1,
+                'user_id' => 5,
+                'score' => rand(1, 5)
+            ]);
+        }
+
+        for ($i = 1; $i <= 5; $i++) {
+            Survey::create([
+                'ticket_id' => 2,
+                'question_id' => $i,
+                'user_id' => 5,
+                'score' => rand(1, 5)
+            ]);
+        }
+
+        for ($i = 1; $i <= 5; $i++) {
+            Survey::create([
+                'ticket_id' => 3,
+                'question_id' => $i,
+                'user_id' => 5,
+                'score' => rand(1, 5)
+            ]);
+        }
+
+        for ($i = 1; $i <= 5; $i++) {
+            Survey::create([
+                'ticket_id' => 4,
+                'question_id' => $i,
+                'user_id' => 5,
+                'score' => rand(1, 5)
+            ]);
+        }
+
+        for ($i = 1; $i <= 5; $i++) {
+            Survey::create([
+                'ticket_id' => 5,
+                'question_id' => $i,
+                'user_id' => 5,
                 'score' => rand(1, 5)
             ]);
         }

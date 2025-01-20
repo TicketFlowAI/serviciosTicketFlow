@@ -231,8 +231,8 @@ class TicketController extends Controller
         DB::beginTransaction();
         try {
             $ticket = $this->ticketRepositoryInterface->getById($id);
-
-            if ($ticket->survey) {
+            Log::info('Checking if survey exists for ticket ID: ' . $ticket->survey()->exists());
+            if ($ticket->survey()->exists()) {
                 $details = ['status' => 0];
                 $historyMessage = 'Encuesta completada';
             } else {
