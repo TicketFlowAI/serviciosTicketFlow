@@ -2,8 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\ApiResponseClass;
 use Aws\Comprehend\ComprehendClient;
 use Illuminate\Http\Request;
+use App\Http\Resources\ClassifierResource;
+use App\Http\Resources\ClassifierPerformanceResource;
+use App\Http\Resources\NewClassifierResource;
+
+use Illuminate\Support\Facades\Auth;
 
 class ComprehendController extends Controller
 {
@@ -12,7 +18,7 @@ class ComprehendController extends Controller
     {
         return new ComprehendClient([
             'version' => 'latest',
-            'region'  => 'us-east-2', // Cambia a tu región si es diferente
+            'region'  => 'us-east-2', // Cambia según tu región
             'credentials' => [
                 'key'    => env('AWS_ACCESS_KEY_ID'),
                 'secret' => env('AWS_SECRET_ACCESS_KEY'),
@@ -23,59 +29,84 @@ class ComprehendController extends Controller
     // Método para listar todos los clasificadores y sus versiones
     public function listAllClassifiers()
     {
-        $client = $this->getComprehendClient();
-
         try {
-            // Llamada al API para listar clasificadores
-            $result = $client->listDocumentClassifierSummaries();
+            $client = $this->getComprehendClient();
 
-            $classifiers = $result['DocumentClassifierSummaries'] ?? [];
+            // Log antes de llamar a AWS
+            info('Iniciando llamada a AWS Comprehend para listar clasificadores.');
 
+            // Llamada al método correcto para listar clasificadores
+            $result = $client->listDocumentClassifiers();
+
+            // Log completo de la respuesta para depuración
+            info('Respuesta completa de AWS: ' . json_encode($result, JSON_PRETTY_PRINT));
+
+            // Extraer la lista de clasificadores
+            $classifiers = $result['DocumentClassifierPropertiesList'] ?? [];
+
+            // Log para ver el contenido de classifiers
+            info('Contenido de classifiers: ' . json_encode($classifiers, JSON_PRETTY_PRINT));
+
+            // Manejar el caso en que no haya clasificadores
+            if (empty($classifiers)) {
+                $message = 'No se encontraron clasificadores disponibles.';
+                info($message); // Imprimir el mensaje en el log
+                return ApiResponseClass::sendResponse(null, $message, 404);
+            }
+
+            // Construir la respuesta
             $response = [];
             foreach ($classifiers as $classifier) {
-                $classifierArn = $classifier['DocumentClassifierArn'];
-                $classifierName = explode('/', $classifierArn)[1]; // Extrae el nombre del clasificador
-                $version = last(explode('/', $classifierArn)); // Extrae la versión
+                // Extraer el nombre del clasificador desde el ARN
+                $arnParts = explode('/', $classifier['DocumentClassifierArn']);
+                $classifierName = $arnParts[1] ?? 'N/A';
 
-                $response[$classifierName][] = [
-                    'VersionArn' => $classifierArn,
-                    'VersionName' => $version,
-                    'Status' => $classifier['Status'] ?? 'Unknown',
+                $response[] = [
+                    'ClassifierName' => $classifierName, // Agregar el nombre del clasificador
+                    'ClassifierArn' => $classifier['DocumentClassifierArn'],
+                    'VersionName' => $classifier['VersionName'] ?? 'N/A',
+                    'Status' => $classifier['Status'],
+                    'LanguageCode' => $classifier['LanguageCode'],
+                    'SubmitTime' => $classifier['SubmitTime'],
+                    'EndTime' => $classifier['EndTime'] ?? null,
+                    'NumberOfLabels' => $classifier['ClassifierMetadata']['NumberOfLabels'] ?? 0,
+                    'Accuracy' => $classifier['ClassifierMetadata']['EvaluationMetrics']['Accuracy'] ?? 'N/A',
+                    'F1Score' => $classifier['ClassifierMetadata']['EvaluationMetrics']['F1Score'] ?? 'N/A',
+                    'Precision' => $classifier['ClassifierMetadata']['EvaluationMetrics']['Precision'] ?? 'N/A',
+                    'Recall' => $classifier['ClassifierMetadata']['EvaluationMetrics']['Recall'] ?? 'N/A',
                 ];
             }
 
-            if (empty($response)) {
-                $message = 'No se encontraron clasificadores disponibles.';
-                info($message); // Imprime el mensaje en la consola
-                return response()->json(['message' => $message], 404);
-            }
+            info('Respuesta formateada: ' . json_encode($response, JSON_PRETTY_PRINT)); // Log para depuración
+            return ApiResponseClass::sendResponse(($response), '', 200);
 
-            info(json_encode($response, JSON_PRETTY_PRINT)); // Imprime el JSON en la consola
-            return response()->json($response, 200);
         } catch (\Exception $e) {
             $error = 'Error al listar los clasificadores: ' . $e->getMessage();
-            info($error); // Imprime el error en la consola
-            return response()->json(['error' => $error], 500);
+            info($error); // Log para depuración
+            return ApiResponseClass::sendResponse(null, $error, 500);
         }
     }
 
     // Método para obtener el rendimiento de una versión específica del clasificador
     public function getClassifierPerformance(Request $request)
     {
-        // Validar la entrada de la versión
-        $request->validate([
-            'versionArn' => 'required|string',
-        ]);
-
-        $versionArn = $request->input('versionArn');
-
-        $client = $this->getComprehendClient();
-
         try {
+            // Validar la entrada de la versión
+            $request->validate([
+                'versionArn' => 'required|string',
+            ]);
+
+            $versionArn = $request->input('versionArn');
+
+            $client = $this->getComprehendClient();
+
             // Llamada para obtener detalles del clasificador
             $result = $client->describeDocumentClassifier([
                 'DocumentClassifierArn' => $versionArn,
             ]);
+
+            // Log completo de la respuesta para depuración
+            info('Respuesta completa de describeDocumentClassifier: ' . json_encode($result, JSON_PRETTY_PRINT));
 
             // Extraer detalles de performance
             $performanceMetrics = $result['DocumentClassifierProperties']['ClassifierMetadata'] ?? null;
@@ -83,7 +114,7 @@ class ComprehendController extends Controller
             if (!$performanceMetrics) {
                 $message = 'No se encontraron métricas de rendimiento para esta versión.';
                 info($message); // Imprime el mensaje en la consola
-                return response()->json(['message' => $message], 404);
+                return ApiResponseClass::sendResponse(null, $message, 404);
             }
 
             $response = [
@@ -94,34 +125,34 @@ class ComprehendController extends Controller
                 'Recall'    => $performanceMetrics['EvaluationMetrics']['Recall'] ?? 'N/A',
             ];
 
-            info(json_encode($response, JSON_PRETTY_PRINT)); // Imprime el JSON en la consola
-            return response()->json($response, 200);
+            info('Rendimiento del clasificador: ' . json_encode($response, JSON_PRETTY_PRINT)); // Log para depuración
+            return ApiResponseClass::sendResponse(($response), '', 200);
         } catch (\Exception $e) {
             $error = 'Error al obtener el rendimiento: ' . $e->getMessage();
             info($error); // Imprime el error en la consola
-            return response()->json(['error' => $error], 500);
+            return ApiResponseClass::sendResponse(null, $error, 500);
         }
     }
 
     // Método para entrenar un nuevo clasificador
     public function trainNewClassifierVersion(Request $request)
     {
-        // Validar los datos necesarios para entrenar
-        $request->validate([
-            'classifierName' => 'required|string',
-            'inputDataS3Uri' => 'required|url',
-            'outputDataS3Uri' => 'required|url',
-            'dataAccessRoleArn' => 'required|string',
-        ]);
-
-        $classifierName = $request->input('classifierName');
-        $inputDataS3Uri = $request->input('inputDataS3Uri');
-        $outputDataS3Uri = $request->input('outputDataS3Uri');
-        $dataAccessRoleArn = $request->input('dataAccessRoleArn');
-
-        $client = $this->getComprehendClient();
-
         try {
+            // Validar los datos necesarios para entrenar
+            $request->validate([
+                'classifierName' => 'required|string',
+                'inputDataS3Uri' => 'required|url',
+                'outputDataS3Uri' => 'required|url',
+                'dataAccessRoleArn' => 'required|string',
+            ]);
+
+            $classifierName = $request->input('classifierName');
+            $inputDataS3Uri = $request->input('inputDataS3Uri');
+            $outputDataS3Uri = $request->input('outputDataS3Uri');
+            $dataAccessRoleArn = $request->input('dataAccessRoleArn');
+
+            $client = $this->getComprehendClient();
+
             // Llamada al API para crear un nuevo clasificador
             $result = $client->createDocumentClassifier([
                 'DocumentClassifierName' => $classifierName,
@@ -135,15 +166,16 @@ class ComprehendController extends Controller
                 'LanguageCode' => 'en',
             ]);
 
-            return response()->json([
-                'message' => 'Clasificador creado exitosamente.',
-                'ClassifierArn' => $result['DocumentClassifierArn'],
-                'Status' => 'TRAINING',
-            ], 200);
+            info('Respuesta de creación del clasificador: ' . json_encode($result, JSON_PRETTY_PRINT)); // Log para depuración
+
+            return ApiResponseClass::sendResponse(($result), 'Clasificador creado exitosamente.', 200);
         } catch (\Exception $e) {
             $error = 'Error al crear el clasificador: ' . $e->getMessage();
             info($error); // Imprime el error en la consola
-            return response()->json(['error' => $error], 500);
+            return ApiResponseClass::sendResponse(null, $error, 500);
         }
     }
 }
+
+
+
