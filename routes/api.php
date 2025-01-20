@@ -16,7 +16,8 @@ use App\Http\Controllers\{
     ReportController,
     SurveyController,
     ClassifierController,
-    SurveyQuestionController
+    SurveyQuestionController,
+    ResetPassword
 };
 
 // Endpoint para listar clasificadores y versiones
@@ -24,6 +25,7 @@ Route::get('/classifiers', [ClassifierController::class, 'listAllClassifiers']);
 
 // Endpoint para obtener el rendimiento de una versión específica
 Route::post('/classifier/{id}/performance', [ClassifierController::class, 'getClassifierPerformance']);
+Route::post('/forgot-password', [ResetPassword::class, 'store'])->name('password.reset');
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -172,4 +174,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/survey-questions/{id}', [SurveyQuestionController::class, 'update'])->middleware('permission:edit-survey-questions');
     Route::delete('/survey-questions/{id}', [SurveyQuestionController::class, 'destroy'])->middleware('permission:delete-survey-questions');
     Route::put('/survey-questions/{id}/restore', [SurveyQuestionController::class, 'restore'])->middleware('permission:restore-survey-questions');
+    
 });
