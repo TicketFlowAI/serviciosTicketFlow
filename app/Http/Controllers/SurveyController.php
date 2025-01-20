@@ -49,7 +49,7 @@ class SurveyController extends Controller
      */
     public function store(StoreSurveyRequest $request)
     {
-        $details = $request->only(['ticket_id', 'survey_question_id', 'user_id', 'score']);
+        $details = $request->only(['ticket_id', 'question_id', 'user_id', 'score']);
         DB::beginTransaction();
         try {
             $survey = $this->surveyRepositoryInterface->store($details);
@@ -84,11 +84,11 @@ class SurveyController extends Controller
      */
     public function show($id)
     {
-        try {
+        // try {
             $survey = $this->surveyRepositoryInterface->getById($id);
             return ApiResponseClass::sendResponse(SurveyResource::collection($survey), '', 200);
-        } catch (\Exception $ex) {
-            return ApiResponseClass::sendResponse(null, 'Failed to retrieve survey', 500);
-        }
+        // } catch (\Exception $ex) {
+        //     return ApiResponseClass::sendResponse(null, 'Failed to retrieve survey', 500);
+        // }
     }
 }
