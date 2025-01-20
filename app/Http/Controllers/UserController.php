@@ -370,4 +370,38 @@ class UserController extends Controller
             return ApiResponseClass::sendResponse(null, 'Failed to restore user', 500);
         }
     }
+
+    /**
+     * @OA\Put(
+     *     path="/users/{id}/disable-two-factor",
+     *     summary="Disable two-factor authentication for a user",
+     *     tags={"Users"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the user",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Two-factor authentication disabled successfully"
+     *     ),
+     *     @OA\Response(response=404, description="User not found")
+     * )
+     */
+    public function disableTwoFactorAuthentication($id)
+    {
+        try {
+            $user = $this->userRepositoryInterface->getById($id);
+            $user->two_factor_secret = null;
+            $user->two_factor_recovery_codes = null;
+            $user->two_factor_confirmed_at = null;
+            $user->save();
+
+            return ApiResponseClass::sendResponse('Two-factor authentication disabled successfully', '', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to disable two-factor authentication', 500);
+        }
+    }
 }

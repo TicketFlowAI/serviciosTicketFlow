@@ -44,7 +44,8 @@ class RoleAndPermissionSeeder extends Seeder
             'view-roles', 'edit-roles', 'view-permissions',
             'view-reports', 'view-technician-reports',
             'create-surveys', 'edit-surveys', 'delete-surveys',
-            'view-survey-questions', 'create-survey-questions', 'edit-survey-questions', 'delete-survey-questions', 'view-deleted-survey-questions', 'restore-survey-questions', 'view-all-survey-questions'
+            'view-survey-questions', 'create-survey-questions', 'edit-survey-questions', 'delete-survey-questions', 'view-deleted-survey-questions', 'restore-survey-questions', 'view-all-survey-questions',
+            'disable-two-factor-authentication'
         ];
 
         foreach ($permissions as $permissionName) {
@@ -59,8 +60,10 @@ class RoleAndPermissionSeeder extends Seeder
         $superAdminRole->givePermissionTo($permissions);
 
         $technicianPermissions = array_filter($permissions, function($permission) {
-            return !str_contains($permission, 'delete') && !str_contains($permission, 'view-reports') && !str_contains($permission, 'delete-surveys') && !str_contains($permission, 'edit-surveys') && !str_contains($permission, 'create-survey-questions') && !str_contains($permission, 'edit-survey-questions') && !str_contains($permission, 'delete-survey-questions') && !str_contains($permission, 'view-deleted-survey-questions') && !str_contains($permission, 'restore-survey-questions') && !str_contains($permission, 'view-all-survey-questions');
+            return !str_contains($permission, 'delete') && !str_contains($permission, 'view-reports') && !str_contains($permission, 'delete-surveys') && !str_contains($permission, 'edit-surveys') && !str_contains($permission, 'create-survey-questions') && !str_contains($permission, 'edit-survey-questions') && !str_contains($permission, 'delete-survey-questions') && !str_contains($permission, 'view-deleted-survey-questions') && !str_contains($permission, 'restore-survey-questions') && !str_contains($permission, 'view-all-survey-questions') && !str_contains($permission, 'disable-two-factor-authentication');
         });
+
+        $technicianPermissions[] = 'view-survey-questions';
 
         $technicianRole->givePermissionTo($technicianPermissions);
 
@@ -70,7 +73,8 @@ class RoleAndPermissionSeeder extends Seeder
             'view-tickets', 'create-tickets', 'edit-tickets', 'close-tickets', 'open-tickets', 'mark-needs-human-interaction', 'view-ticket-history',
             'view-messages', 'create-messages',
             'view-users', 'create-users', 'edit-users', 'view-authenticated-user',
-            'create-surveys','view-services'
+            'create-surveys','view-services',
+            'view-survey-questions'
         ];
 
         $clientRole->givePermissionTo($clientPermissions);

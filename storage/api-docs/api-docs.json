@@ -4049,6 +4049,34 @@
                     }
                 }
             }
+        },
+        "/users/{id}/disable-two-factor": {
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Disable two-factor authentication for a user",
+                "operationId": "c21bb30f2f3422cef70c28bc9b373da3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Two-factor authentication disabled successfully"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
         }
     },
     "components": {

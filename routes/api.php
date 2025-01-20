@@ -17,14 +17,15 @@ use App\Http\Controllers\{
     SurveyController,
     ClassifierController,
     SurveyQuestionController,
-    ResetPassword
+    ResetPassword,
+    ComprehendController
 };
 
 // Endpoint para listar clasificadores y versiones
-Route::get('/classifiers', [ClassifierController::class, 'listAllClassifiers']);
+Route::get('/classifiers', [ComprehendController::class, 'listAllClassifiers']);
 
 // Endpoint para obtener el rendimiento de una versión específica
-Route::post('/classifier/{id}/performance', [ClassifierController::class, 'getClassifierPerformance']);
+Route::post('/classifier/{id}/performance', [ComprehendController::class, 'getClassifierPerformance']);
 Route::post('/forgot-password', [ResetPassword::class, 'store'])->name('password.reset');
 
 
@@ -120,6 +121,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/users/{id}/restore', [UserController::class, 'restore'])->middleware('permission:restore-users');
     Route::get('/users/byrole/{role}', [UserController::class, 'getUsersByRole'])->middleware('permission:view-users-by-role');
     Route::get('/user', [UserController::class, 'getAuthenticatedUser'])->middleware('permission:view-authenticated-user');
+    Route::put('/users/{id}/disable-two-factor', [UserController::class, 'disableTwoFactorAuthentication'])->middleware('permission:disable-two-factor-authentication');
 
     // Email routes
     Route::get('/emails', [EmailController::class, 'index'])->middleware('permission:view-emails');
@@ -174,5 +176,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/survey-questions/{id}', [SurveyQuestionController::class, 'update'])->middleware('permission:edit-survey-questions');
     Route::delete('/survey-questions/{id}', [SurveyQuestionController::class, 'destroy'])->middleware('permission:delete-survey-questions');
     Route::put('/survey-questions/{id}/restore', [SurveyQuestionController::class, 'restore'])->middleware('permission:restore-survey-questions');
+    
     
 });
