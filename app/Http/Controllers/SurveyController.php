@@ -49,7 +49,7 @@ class SurveyController extends Controller
      */
     public function store(StoreSurveyRequest $request)
     {
-        $details = $request->only(['ticket_id', 'question_id', 'user_id', 'score']);
+        $details = $request->only(['ticket_id', 'survey_question_id', 'user_id', 'score']);
         DB::beginTransaction();
         try {
             $survey = $this->surveyRepositoryInterface->store($details);
