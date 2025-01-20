@@ -29,7 +29,7 @@ class UpdateIntervalRequest extends FormRequest
         return [
             'days' => 'required|integer',
             'type' => 'required|string|unique:intervals,type,' . $id,
-            'template_name' => 'required|string',
+            'email_id' => 'required|integer',
         ];
     }
 

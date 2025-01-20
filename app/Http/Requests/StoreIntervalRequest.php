@@ -26,7 +26,7 @@ class StoreIntervalRequest extends FormRequest
         return [
             'days' => 'required|integer',
             'type' => 'required|string|unique:intervals',
-            'template_name' => 'required|string',
+            'email_id' => 'required|integer',
         ];
     }
 
