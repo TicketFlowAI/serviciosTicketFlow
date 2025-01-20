@@ -13,54 +13,21 @@ class TicketSeeder extends Seeder
      */
     public function run(): void
     {
-        Ticket::create([
-            'service_contract_id' => 1,
-            'title' => 'Errores con los correos',
-        ]);
+        $tickets = [
+            ['service_contract_id' => 1, 'title' => 'Errores con los correos'],
+            ['service_contract_id' => 2, 'title' => 'Como conectar una cuenta de correo'],
+            ['service_contract_id' => 3, 'title' => 'Necesito espacio en mi hosting'],
+            ['service_contract_id' => 4, 'title' => 'Problemas con la base de datos'],
+            ['service_contract_id' => 1, 'title' => 'Error 404 en la página web'],
+            ['service_contract_id' => 2, 'title' => 'Problemas con el servidor'],
+            ['service_contract_id' => 3, 'title' => 'Necesito actualizar mi plan'],
+            ['service_contract_id' => 4, 'title' => 'Problemas con el certificado SSL'],
+            ['service_contract_id' => 1, 'title' => 'Necesito ayuda con la configuración de DNS'],
+            ['service_contract_id' => 2, 'title' => 'Problemas con el correo electrónico'],
+        ];
 
-        Ticket::create([
-            'service_contract_id' => 2,
-            'title' => 'Como conectar una cuenta de correo',
-        ]);
-
-        Ticket::create([
-            'service_contract_id' => 3,
-            'title' => 'Necesito espacio en mi hosting',
-        ]);
-
-        Ticket::create([
-            'service_contract_id' => 4,
-            'title' => 'Problemas con la base de datos',
-        ]);
-
-        Ticket::create([
-            'service_contract_id' => 5,
-            'title' => 'Error 404 en la página web',
-        ]);
-
-        Ticket::create([
-            'service_contract_id' => 6,
-            'title' => 'Problemas con el servidor',
-        ]);
-
-        Ticket::create([
-            'service_contract_id' => 7,
-            'title' => 'Necesito actualizar mi plan',
-        ]);
-
-        Ticket::create([
-            'service_contract_id' => 8,
-            'title' => 'Problemas con el certificado SSL',
-        ]);
-
-        Ticket::create([
-            'service_contract_id' => 9,
-            'title' => 'Necesito ayuda con la configuración de DNS',
-        ]);
-
-        Ticket::create([
-            'service_contract_id' => 10,
-            'title' => 'Problemas con el correo electrónico',
-        ]);
+        foreach ($tickets as $ticket) {
+            Ticket::create($ticket);
+        }
     }
 }
