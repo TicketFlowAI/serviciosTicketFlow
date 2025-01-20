@@ -32,7 +32,7 @@ class ReportController extends Controller
      */
     public function getTicketsSolved(Request $request)
     {
-        $query = Ticket::where('status', 0);
+        $query = Ticket::whereIn('status', [0, 3]);
 
         if ($request->has('start_date') && $request->has('end_date')) {
             $query->whereBetween('updated_at', [$request->start_date, $request->end_date]);
@@ -56,7 +56,7 @@ class ReportController extends Controller
      */
     public function getAverageTimeToClose(Request $request)
     {
-        $query = Ticket::where('status', 0);
+        $query = Ticket::whereIn('status', [0, 3]);
 
         if ($request->has('start_date') && $request->has('end_date')) {
             $query->whereBetween('updated_at', [$request->start_date, $request->end_date]);
@@ -191,7 +191,7 @@ class ReportController extends Controller
      */
     public function getTechnicianTicketsSolved(Request $request, $user_id)
     {
-        $query = Ticket::where('status', 0)->where('user_id', $user_id);
+        $query = Ticket::whereIn('status', [0, 3])->where('user_id', $user_id);
 
         if ($request->has('start_date') && $request->has('end_date')) {
             $query->whereBetween('updated_at', [$request->start_date, $request->end_date]);
@@ -236,7 +236,7 @@ class ReportController extends Controller
      */
     public function getTechnicianAverageTimeToSolve(Request $request, $user_id)
     {
-        $query = Ticket::where('status', 0)->where('user_id', $user_id);
+        $query = Ticket::whereIn('status', [0, 3])->where('user_id', $user_id);
 
         if ($request->has('start_date') && $request->has('end_date')) {
             $query->whereBetween('updated_at', [$request->start_date, $request->end_date]);
