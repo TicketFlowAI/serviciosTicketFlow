@@ -14,6 +14,6 @@ class SurveyQuestion extends Model
 
     public function surveys()
     {
-        return $this->hasMany(Survey::class);
+        return $this->hasMany(Survey::class); // Ensure the foreign key is correctly specified
     }
 }

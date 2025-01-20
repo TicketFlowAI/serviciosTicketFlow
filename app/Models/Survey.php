@@ -7,19 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Survey extends Model
 {
-
     use HasFactory;
 
     protected $fillable = [
         'ticket_id',
-        'question_id',
+        'survey_question_id',
         'user_id',
         'score',
     ];
 
-    public function questions()
+    public function survey_questions()
     {
-        return $this->belongsTo(SurveyQuestion::class);
+        return $this->belongsTo(SurveyQuestion::class, 'survey_question_id');
     }
 
     public function ticket()

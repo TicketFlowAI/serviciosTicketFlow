@@ -27,10 +27,11 @@ class SurveyResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id,
             'ticket_id' => $this->ticket_id,
             'user_name' => $this->user->name,
             'user_lastname' => $this->user->lastname,
-            'question' => $this->questions->question,
+            'survey_questions' => $this->survey_questions->question,
             'score' => $this->score,
         ];
     }

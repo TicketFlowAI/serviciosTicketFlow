@@ -10,10 +10,7 @@ class SurveyRepository implements SurveyRepositoryInterface
     // Retrieve surveys by ticket_id and load specific fields in relationships
     public function getById($id)
     {
-        return Survey::with([
-            'user:id,name,lastname',
-            'questions:id,question'
-        ])->where('ticket_id', $id)->get();
+        return Survey::where('ticket_id', $id)->get()->load('user:id,name,lastname', 'survey_questions:id,question');
     }
 
     // Store a new survey
