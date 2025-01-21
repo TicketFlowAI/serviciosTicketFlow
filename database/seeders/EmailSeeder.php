@@ -34,6 +34,16 @@ class EmailSeeder extends Seeder
                 'subject' => 'Urgente - Su {service} caduca en {days} días',
                 'body' => file_get_contents(resource_path('views/emails/expiring_soon.blade.php')),
             ],
+            [
+                'template_name' => 'Solicitud de cancelación de servicios',
+                'subject' => '{company} ha solicitado la cancelación de su {service}',
+                'body' => file_get_contents(resource_path('views/emails/serviceCancellation.blade.php')),
+            ],
+            [
+                'template_name' => 'Solicitud de servicios',
+                'subject' => '{company} ha solicitado un nuevo servicio',
+                'body' => file_get_contents(resource_path('views/emails/serviceRequest.blade.php')),
+            ],
         ];
 
         foreach ($emailTemplates as $template) {
