@@ -437,24 +437,34 @@ class ServiceContractController extends Controller
     {
         try {
             $user = Auth::user();
-            $details = [
+            $user->load('company'); // Load the company relation
+            $serviceData = [
                 'company_id' => $request->company_id,
                 'service_id' => $request->service_id,
                 'service_term_id' => $request->service_term_id,
-                'user' => $user
+                'user' => $user,
+                'user_name' => $user->name,
+                'user_email' => $user->email,
+                'user_last_name' => $user->lastname,
             ];
+            $serviceData['service'] = Service::find($request->service_id)->description;
+            $serviceData['term'] = ServiceTerm::find($request->service_term_id)->term;
 
             $emailTemplate = Email::where('template_name', 'Solicitud de servicios')->first();
-            $subjectLine = $emailTemplate->subject;
+            $subjectLine = str_replace(
+                ['{company}', '{service}', '{term}'],
+                [$user->company->name, $serviceData['service'], $serviceData['term']],
+                $emailTemplate->subject
+            );
             $emailBody = $emailTemplate->body;
 
-            foreach ($details as $key => $value) {
+            foreach ($serviceData as $key => $value) {
                 $emailBody = str_replace('{{ $details[\'' . $key . '\'] }}', $value, $emailBody);
             }
 
             $template = 'emails.custom_template';
             $recipient = env('MAIL_NOTIFICATIONS', 'info@mindsoft.biz');
-            Mail::to($recipient)->send(new ServiceRequestMail($details, $template, $subjectLine, $emailBody));
+            Mail::to($recipient)->send(new ServiceRequestMail($serviceData, $template, $subjectLine, $emailBody));
 
             return ApiResponseClass::sendResponse(null, 'Service request sent successfully', 200);
         } catch (\Exception $ex) {
@@ -486,22 +496,34 @@ class ServiceContractController extends Controller
     {
         try {
             $user = Auth::user();
-            $details = [
+            $user->load('company'); // Load the company relation
+            $serviceData = [
                 'contract_id' => $request->contract_id,
-                'user' => $user
+                'user' => $user,
+                'service' => ServiceContract::with('service')->find($request->contract_id)->service->description,
+                'company' => $user->company->name,
+                'user_name' => $user->name,
+                'user_email' => $user->email,
+                'user_last_name' => $user->lastname,
+                
             ];
 
             $emailTemplate = Email::where('template_name', 'Solicitud de cancelación de servicios')->first();
-            $subjectLine = $emailTemplate->subject;
+            $subjectLine = str_replace(
+                ['{service}', '{company}'],
+                [$serviceData['company'], $user->company->name], // Use the company's name
+                $emailTemplate->subject
+            );
+
             $emailBody = $emailTemplate->body;
 
-            foreach ($details as $key => $value) {
+            foreach ($serviceData as $key => $value) {
                 $emailBody = str_replace('{{ $details[\'' . $key . '\'] }}', $value, $emailBody);
             }
 
             $template = 'emails.custom_template';
             $recipient = env('MAIL_NOTIFICATIONS', 'info@mindsoft.biz');
-            Mail::to($recipient)->send(new ServiceCancellationMail($details, $template, $subjectLine, $emailBody));
+            Mail::to($recipient)->send(new ServiceCancellationMail($serviceData, $template, $subjectLine, $emailBody));
 
             return ApiResponseClass::sendResponse(null, 'Service cancellation request sent successfully', 200);
         } catch (\Exception $ex) {

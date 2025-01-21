@@ -18,8 +18,11 @@ use App\Http\Controllers\{
     ClassifierController,
     SurveyQuestionController,
     ResetPassword,
-    ComprehendController
+    ComprehendController,
+    NovaMicroController
 };
+
+Route::match(['get', 'post'], '/nova-micro', [NovaMicroController::class, 'handleRequest']);
 
 // Endpoint para listar clasificadores y versiones
 Route::get('/classifiers', [ComprehendController::class, 'listAllClassifiers']);
@@ -87,6 +90,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/servicecontracts/{servicecontract}', [ServiceContractController::class, 'destroy'])->middleware('permission:delete-service-contracts');
     Route::get('/servicecontracts/bycompany/{id}', [ServiceContractController::class, 'getContractsByCompany'])->middleware('permission:view-service-contracts');
     Route::get('/servicecontracts/expiring', [ServiceContractController::class, 'getExpiringContracts'])->middleware('permission:view-service-contracts');
+    Route::post('/servicecontracts/request', [ServiceContractController::class, 'requestService'])->middleware('permission:request-service-contracts'); // Add this route
+    Route::post('/servicecontracts/cancel', [ServiceContractController::class, 'requestCancellation'])->middleware('permission:cancel-service-contracts'); // Add this route
 
     // Ticket routes
     Route::get('/tickets', [TicketController::class, 'index'])->middleware('permission:view-tickets');

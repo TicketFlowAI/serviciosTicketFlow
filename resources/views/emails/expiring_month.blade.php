@@ -685,7 +685,7 @@
                                                                     style="padding:0;Margin:0;padding-top:20px">
                                                                     <p
                                                                         style="Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:21px;letter-spacing:0;color:#2D3142;font-size:14px">
-                                                                        Copyright © 2024 Mindsoft</p>
+                                                                        Copyright © 2025 Mindsoft</p>
                                                                 </td>
                                                             </tr>
                                                         </table>

@@ -483,14 +483,14 @@
                                                                 <td align="left" style="padding:20px;Margin:0">
                                                                     <h3
                                                                         style="Margin:0;font-family:Imprima, Arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:28px;font-style:normal;font-weight:bold;line-height:33.6px;color:#2D3142">
-                                                                        Estimados {{ $serviceData['company'] }},</h3>
+                                                                        {{ $serviceData['company'] }} ha solicitado {{ $serviceData['service'] }</h3>
                                                                     <p
                                                                         style="Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:27px;letter-spacing:0;color:#2D3142;font-size:18px">
                                                                         <br></p>
                                                                     <p
                                                                         style="Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:27px;letter-spacing:0;color:#2D3142;font-size:18px">
-                                                                        Le recordamos que su servicio <strong>{{ $serviceData['serviceName'] }}</strong> caduca MAÑANA, el día <strong>{{ $serviceData['endDate'] }}</p>
-                                                                        <p class="urgent">Es urgente el contactarnos para así renovar su servicio, en caso de no hacerlo puede existir pérdida de información y se dará de baja su servicio.</p>
+                                                                        <strong>{{ $serviceData['company'] }}</strong> ha solicitado el servicio <strong>{{ $serviceData['service'] }}</strong> por el periodo <strong>{{ $serviceData['term'] }}</strong></p> 
+                                                                        <p class="urgent">Favor contactate con el cliente {{ $serviceData['user_name'] }} {{ $serviceData['user_last_name'] }} al correo $serviceData['user_email'] }} para gestionar la contratación y levantamiento de requerimientos.</p>
                                                                 </td>
                                                             </tr>
                                                         </table>
@@ -521,31 +521,7 @@
                                                         <table cellpadding="0" cellspacing="0" width="100%"
                                                             role="presentation"
                                                             style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                                                            <tr>
-                                                                <td align="center" style="padding:0;Margin:0"><!--[if mso]><a href="https://wa.me/593984258842?text=Hola%20Mindsoft,%20quiero%20renovar%20mi%20servicio%20{{ $serviceData['serviceName'] }}!" target="_blank" hidden>
-	<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" esdevVmlButton href="https://wa.me/593984258842?text=Hola%20Mindsoft,%20quiero%20renovar%20mi%20servicio%20{{ $serviceData['serviceName'] }}!" 
-                style="height:56px; v-text-anchor:middle; width:520px" arcsize="50%" stroke="f"  fillcolor="#ff4438 ">
-		<w:anchorlock></w:anchorlock>
-		<center style='color:#ffffff; font-family:Imprima, Arial, sans-serif; font-size:22px; font-weight:700; line-height:22px;  mso-text-raise:1px'>Contáctanos</center>
-	</v:roundrect></a>
-<![endif]--><!--[if !mso]> --><span class="es-button-border msohide"
-                                                                        style="border-style:solid;border-color:#2CB543;background:#ff4438 ;border-width:0px;display:block;border-radius:30px;width:auto;mso-hide:all;mso-border-alt:10px"><a
-                                                                            href="https://wa.me/593984258842?text=Hola%20Mindsoft,%20quiero%20renovar%20mi%20servicio%20{{ $serviceData['serviceName'] }}!" target="_blank"
-                                                                            class="es-button msohide"
-                                                                            style="mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:22px;padding:15px 20px 15px 20px;display:block;background:#ff4438 ;border-radius:30px;font-family:Imprima, Arial, sans-serif;font-weight:bold;font-style:normal;line-height:26.4px;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid #4114F7;mso-hide:all;padding-left:5px;padding-right:5px;border-color:#ff4438 ">áctanos</a></span><!--<![endif]--></td>
-                                                            </tr>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td align="left" data-custom-paddings="true"
-                                            style="padding:0;Margin:0;padding-right:40px;padding-left:40px">
-                                            <table cellpadding="0" cellspacing="0" width="100%" role="none"
-                                                style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                                                <tr>
+                                                            
                                                     <td align="center" valign="top"
                                                         style="padding:0;Margin:0;width:520px">
                                                         <table cellpadding="0" cellspacing="0" width="100%"
@@ -555,7 +531,7 @@
                                                                 <td align="left" style="padding:0;Margin:0">
                                                                     <p
                                                                         style="Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:27px;letter-spacing:0;color:#2D3142;font-size:18px">
-                                                                        Es un placer atenderte,<br>Equipo Mindsoft</p>
+                                                                        Un saludo desde la nube,<br>Asistente Digital Mindsoft</p>
                                                                 </td>
                                                             </tr>
                                                             <tr>
