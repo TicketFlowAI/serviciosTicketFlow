@@ -8,11 +8,16 @@ use App\Http\Requests\UpdateServiceContractRequest;
 use App\Interfaces\ServiceContractRepositoryInterface;
 use App\Classes\ApiResponseClass;
 use App\Http\Resources\ServiceContractResource;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Service; // Add this import
 use App\Models\ServiceTerm; // Add this import
+use App\Models\Email; // Add this import
 use Carbon\Carbon; // Add this import
+use Illuminate\Support\Facades\Mail; // Add this import
+use App\Mail\ServiceRequestMail; // Add this import
+use App\Mail\ServiceCancellationMail; // Add this import
 
 /**
  * @OA\Tag(
@@ -403,6 +408,104 @@ class ServiceContractController extends Controller
         } catch (\Exception $ex) {
             DB::rollBack();
             return ApiResponseClass::sendResponse(null, 'Failed to restore service contract', 500);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/service-contracts/request",
+     *     summary="Request a new service",
+     *     tags={"Service Contracts"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"company_id", "service_id", "service_term_id"},
+     *             @OA\Property(property="company_id", type="integer", example=1),
+     *             @OA\Property(property="service_id", type="integer", example=10),
+     *             @OA\Property(property="service_term_id", type="integer", example=2)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Service request sent successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/ServiceContractResource")
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
+     */
+    public function requestService(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $details = [
+                'company_id' => $request->company_id,
+                'service_id' => $request->service_id,
+                'service_term_id' => $request->service_term_id,
+                'user' => $user
+            ];
+
+            $emailTemplate = Email::where('template_name', 'Solicitud de servicios')->first();
+            $subjectLine = $emailTemplate->subject;
+            $emailBody = $emailTemplate->body;
+
+            foreach ($details as $key => $value) {
+                $emailBody = str_replace('{{ $details[\'' . $key . '\'] }}', $value, $emailBody);
+            }
+
+            $template = 'emails.custom_template';
+            $recipient = env('MAIL_NOTIFICATIONS', 'support@example.com');
+            Mail::to($recipient)->send(new ServiceRequestMail($details, $template, $subjectLine, $emailBody));
+
+            return ApiResponseClass::sendResponse(null, 'Service request sent successfully', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to send service request', 500);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/service-contracts/cancel",
+     *     summary="Request service cancellation",
+     *     tags={"Service Contracts"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"contract_id"},
+     *             @OA\Property(property="contract_id", type="integer", example=1)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Service cancellation request sent successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/ServiceContractResource")
+     *     ),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
+     */
+    public function requestCancellation(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $details = [
+                'contract_id' => $request->contract_id,
+                'user' => $user
+            ];
+
+            $emailTemplate = Email::where('template_name', 'Solicitud de cancelación de servicios')->first();
+            $subjectLine = $emailTemplate->subject;
+            $emailBody = $emailTemplate->body;
+
+            foreach ($details as $key => $value) {
+                $emailBody = str_replace('{{ $details[\'' . $key . '\'] }}', $value, $emailBody);
+            }
+
+            $template = 'emails.custom_template';
+            $recipient = env('MAIL_NOTIFICATIONS', 'support@example.com');
+            Mail::to($recipient)->send(new ServiceCancellationMail($details, $template, $subjectLine, $emailBody));
+
+            return ApiResponseClass::sendResponse(null, 'Service cancellation request sent successfully', 200);
+        } catch (\Exception $ex) {
+            return ApiResponseClass::sendResponse(null, 'Failed to send service cancellation request', 500);
         }
     }
 }

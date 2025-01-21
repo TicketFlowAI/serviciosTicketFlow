@@ -30,6 +30,7 @@ class SurveyResource extends JsonResource
             'ticket_id' => $this->ticket_id,
             'user_name' => $this->user->name,
             'user_lastname' => $this->user->lastname,
+            'question_id' => $this->questions->id,
             'question' => $this->questions->question,
             'score' => $this->score,
         ];
