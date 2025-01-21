@@ -453,7 +453,7 @@ class ServiceContractController extends Controller
             }
 
             $template = 'emails.custom_template';
-            $recipient = env('MAIL_NOTIFICATIONS', 'support@example.com');
+            $recipient = env('MAIL_NOTIFICATIONS', 'info@mindsoft.biz');
             Mail::to($recipient)->send(new ServiceRequestMail($details, $template, $subjectLine, $emailBody));
 
             return ApiResponseClass::sendResponse(null, 'Service request sent successfully', 200);
@@ -500,7 +500,7 @@ class ServiceContractController extends Controller
             }
 
             $template = 'emails.custom_template';
-            $recipient = env('MAIL_NOTIFICATIONS', 'support@example.com');
+            $recipient = env('MAIL_NOTIFICATIONS', 'info@mindsoft.biz');
             Mail::to($recipient)->send(new ServiceCancellationMail($details, $template, $subjectLine, $emailBody));
 
             return ApiResponseClass::sendResponse(null, 'Service cancellation request sent successfully', 200);
