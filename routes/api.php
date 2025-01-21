@@ -122,7 +122,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/users/{user}', [UserController::class, 'show'])->middleware('permission:view-users');
     Route::put('/users/{user}', [UserController::class, 'update'])->middleware('permission:edit-users');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->middleware('permission:delete-users');
-    
     Route::put('/users/{id}/restore', [UserController::class, 'restore'])->middleware('permission:restore-users');
     Route::get('/users/byrole/{role}', [UserController::class, 'getUsersByRole'])->middleware('permission:view-users-by-role');
     Route::get('/user', [UserController::class, 'getAuthenticatedUser'])->middleware('permission:view-authenticated-user');

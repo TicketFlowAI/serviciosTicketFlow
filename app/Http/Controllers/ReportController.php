@@ -429,4 +429,34 @@ class ReportController extends Controller
 
         return ApiResponseClass::sendResponse($averageScores, '', 200);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/reports/technician/average-score",
+     *     summary="Get the average score for the logged-in technician",
+     *     tags={"Reports"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Average score for the logged-in technician",
+     *         @OA\JsonContent(type="number", format="float", example=4.5)
+     *     )
+     * )
+     */
+    public function getTechnicianAverageScore(Request $request)
+    {
+        $user_id = auth()->user()->id;
+
+        $query = Survey::whereHas('ticket', function ($query) use ($user_id) {
+                $query->where('user_id', $user_id);
+            });
+
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
+        }
+
+        $averageScore = $query->avg('score');
+        return ApiResponseClass::sendResponse($averageScore, '', 200);
+    }
+
+    
 }

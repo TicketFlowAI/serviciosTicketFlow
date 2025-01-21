@@ -245,7 +245,7 @@ class UserController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/users/authenticated",
+     *     path="/user",
      *     summary="Get details of the authenticated user",
      *     tags={"Users"},
      *     @OA\Response(

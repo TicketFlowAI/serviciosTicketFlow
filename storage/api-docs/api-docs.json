@@ -1670,6 +1670,29 @@
                 }
             }
         },
+        "/reports/technician/average-score": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get the average score for the logged-in technician",
+                "operationId": "297539fd0ee834d1cfc42e9a5a1f4935",
+                "responses": {
+                    "200": {
+                        "description": "Average score for the logged-in technician",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "number",
+                                    "format": "float"
+                                },
+                                "example": 4.5
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/roles": {
             "get": {
                 "tags": [
@@ -4031,13 +4054,13 @@
                 }
             }
         },
-        "/users/authenticated": {
+        "/user": {
             "get": {
                 "tags": [
                     "Users"
                 ],
                 "summary": "Get details of the authenticated user",
-                "operationId": "ed98cef0014a89630f79a37b6a82c4b4",
+                "operationId": "68da8368cc218f46c3fd874d45d6cbbf",
                 "responses": {
                     "200": {
                         "description": "Authenticated user details",
