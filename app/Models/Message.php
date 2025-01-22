@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
+use Log;
 
 class Message extends Model
 {
@@ -37,13 +38,13 @@ class Message extends Model
     {
         static::created(function ($message) {
             $user = Auth::user(); // Get the currently authenticated user
-
+            Log ::info('User: ' . $user->name . ' created a message with content: ' . $message->content);
             if ($user->hasRole('technician' ) || $user->hasRole('super-admin')) {
                 // Set NewTechnicianMessage if the message is from a technician
-                $message->ticket->update(['NewTechnicianMessage' => true]);
+                $message->ticket->update(['newTechnicianMessage' => true]);
             } elseif ($user->hasRole('client')) {
                 // Set NewClientMessage if the message is from a client
-                $message->ticket->update(['NewClientMessage' => true]);
+                $message->ticket->update(['newClientMessage' => true]);
             }
         });
     }

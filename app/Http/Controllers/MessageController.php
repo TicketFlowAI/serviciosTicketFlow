@@ -10,6 +10,7 @@ use App\Http\Resources\MessageResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Log;
 
 /**
  * @OA\Tag(
@@ -104,11 +105,10 @@ class MessageController extends Controller
             $data->load('user:id,name,lastname');
 
             $user = $request->user();
-
-            if ($user->hasRole('technician')) {
-                $data->first()->ticket->update(['NewClientMessage' => false]);
+            if ($user->hasRole('technician') || $user->hasRole('super-admin')) {
+                $data->first()->ticket->update(['newClientMessage' => false]);
             } elseif ($user->hasRole('client')) {
-                $data->first()->ticket->update(['NewTechnicianMessage' => false]);
+                $data->first()->ticket->update(['newTechnicianMessage' => false]);
             }
 
             foreach ($data as $message) {

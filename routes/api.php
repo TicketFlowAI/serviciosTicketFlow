@@ -163,7 +163,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/reports/technician/{user_id}/current-tickets', [ReportController::class, 'getTechnicianCurrentTickets'])->middleware('permission:view-technician-reports');
     Route::get('/reports/technician/{user_id}/weekly-comparison', [ReportController::class, 'getTechnicianWeeklyComparison'])->middleware('permission:view-technician-reports');
     Route::get('/reports/average-score-per-question', [ReportController::class, 'getAverageScorePerQuestion'])->middleware('permission:view-reports');
-    Route::get('/reports/technician/average-score-per-question', [ReportController::class, 'getTechnicianAverageScorePerQuestion'])->middleware('permission:view-technician-reports');
+    Route::get('/reports/technician/{$id}/average-score', [ReportController::class, 'getTechnicianAverageScorePerQuestion'])->middleware('permission:view-technician-reports');
 
     // Survey routes
     Route::post('/surveys', [SurveyController::class, 'store'])->middleware('permission:create-surveys');

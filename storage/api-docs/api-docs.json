@@ -1670,13 +1670,13 @@
                 }
             }
         },
-        "/reports/technician/average-score": {
+        "/reports/technician/{$id}/average-score": {
             "get": {
                 "tags": [
                     "Reports"
                 ],
                 "summary": "Get the average score for the logged-in technician",
-                "operationId": "297539fd0ee834d1cfc42e9a5a1f4935",
+                "operationId": "3065b4ea5ebb94e4544e7c25a48db937",
                 "responses": {
                     "200": {
                         "description": "Average score for the logged-in technician",
@@ -2708,7 +2708,7 @@
                     "Service Terms"
                 ],
                 "summary": "Update a service term",
-                "operationId": "982e68693cf3b45175288025e8a171b7",
+                "operationId": "de5fce996f15f00370436a874858ab29",
                 "parameters": [
                     {
                         "name": "id",
@@ -2848,27 +2848,32 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "ticket_id",
-                                    "question_id",
-                                    "user_id",
-                                    "score"
+                                    "SurveyAnswers"
                                 ],
                                 "properties": {
-                                    "ticket_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "question_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "user_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "score": {
-                                        "type": "integer",
-                                        "example": 5
+                                    "SurveyAnswers": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "ticket_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "score": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -3035,7 +3040,7 @@
                     "SurveyQuestions"
                 ],
                 "summary": "Update a survey question",
-                "operationId": "f262783141d95761741ea0d2638237b8",
+                "operationId": "4ed36abfda0a79c314fe8799efb524d2",
                 "parameters": [
                     {
                         "name": "id",
