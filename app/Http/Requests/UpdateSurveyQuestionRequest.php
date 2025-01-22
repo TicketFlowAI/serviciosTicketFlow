@@ -23,10 +23,11 @@ class UpdateSurveyQuestionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('survey_question'); // Ensure 'survey_question' matches your route parameter
+        $id = $this->route('id'); // Ensure 'survey_question' matches your route parameter
 
         return [
             'question' => "required|string|unique:survey_questions,question,{$id}",
+            'status' => 'required|boolean',
         ];
     }
 

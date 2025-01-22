@@ -9,6 +9,7 @@ use App\Interfaces\SurveyQuestionRepositoryInterface;
 use App\Classes\ApiResponseClass;
 use App\Http\Resources\SurveyQuestionResource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @OA\Tag(
@@ -153,15 +154,19 @@ class SurveyQuestionController extends Controller
      *     @OA\Response(response=200, description="Survey question updated successfully"),
      *     @OA\Response(response=400, description="Invalid request")
      * )
+     */
     public function update(UpdateSurveyQuestionRequest $request, $id)
     {
         $updateDetails = ['question' => $request->question, 'status' => $request->status];
+        Log::info(json_encode($updateDetails));
+        
         DB::beginTransaction();
         try {
             $this->surveyQuestionRepositoryInterface->update($updateDetails, $id);
             DB::commit();
             return ApiResponseClass::sendResponse('Survey Question Updated Successfully', '', 200);
         } catch (\Exception $ex) {
+            Log::error($ex);
             DB::rollBack();
             return ApiResponseClass::sendResponse(null, 'Failed to update survey question', 500);
         }

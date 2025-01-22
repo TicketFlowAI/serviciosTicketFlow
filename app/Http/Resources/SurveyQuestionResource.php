@@ -26,7 +26,7 @@ class SurveyQuestionResource extends JsonResource
         return [
             'id' => $this->id,
             'question' => $this->question,
-            'active' => $this->active,
+            'status' => $this->status,
         ];
     }
 }
