@@ -26,16 +26,19 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'=>'required',
-            'lastname'=>'required',
-            'company_id'=>'required',
+            'name' => 'required',
+            'lastname' => 'required',
+            'company_id' => 'required',
             'email' => 'required|email|unique:users',
-            'password' => ['required', Password::min(8)
-            ->letters()
-            ->mixedCase()
-            ->numbers()
-            ->symbols()
-            ->uncompromised()]
+            'password' => [
+                'required',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised()
+            ]
         ];
     }
 
@@ -46,9 +49,9 @@ class StoreUserRequest extends FormRequest
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
-            'success'   => false,
-            'message'   => 'Validation errors',
-            'data'      => $validator->errors()
-        ]));
+            'success' => false,
+            'message' => 'Validation errors',
+            'data' => $validator->errors(),
+        ], 500));
     }
 }

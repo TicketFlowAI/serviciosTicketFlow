@@ -31,14 +31,14 @@ class StoreTicketRequest extends FormRequest
 
     /**
      * Sends an httpException stating what went wrong with the validation.
-     */
+    */
 
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
-            'success'   => false,
-            'message'   => 'Validation errors',
-            'data'      => $validator->errors()
-        ]));
+            'success' => false,
+            'message' => 'Validation errors',
+            'data' => $validator->errors(),
+        ], 500));
     }
 }

@@ -41,7 +41,7 @@ class UpdateIntervalRequest extends FormRequest
         throw new HttpResponseException(response()->json([
             'success' => false,
             'message' => 'Validation errors',
-            'data' => $validator->errors()
-        ]));
+            'data' => $validator->errors(),
+        ], 500));
     }
 }

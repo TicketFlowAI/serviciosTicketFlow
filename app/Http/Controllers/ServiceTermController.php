@@ -10,6 +10,7 @@ use App\Classes\ApiResponseClass;
 use App\Http\Resources\ServiceTermResource;
 use Illuminate\Support\Facades\DB;
 use App\Models\ServiceContract;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @OA\Tag(
@@ -144,8 +145,10 @@ class ServiceTermController extends Controller
      *     @OA\Response(response=200, description="Service term updated successfully"),
      *     @OA\Response(response=400, description="Invalid request")
      * )
+     */
     public function update(UpdateServiceTermRequest $request, $id)
     {
+        Log::info($request);
         $updateDetails = [
             'term' => $request->term,
             'months' => $request->months,

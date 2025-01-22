@@ -24,9 +24,9 @@ class StoreMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ticket_id'=> 'required|numeric',
-            'content'=> 'required|string',
-            'user_id'=> 'required|numeric'
+            'ticket_id' => 'required|numeric',
+            'content' => 'required|string',
+            'user_id' => 'required|numeric'
         ];
     }
 
@@ -36,9 +36,9 @@ class StoreMessageRequest extends FormRequest
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
-            'success'   => false,
-            'message'   => 'Validation errors',
-            'data'      => $validator->errors()
-        ]));
+            'success' => false,
+            'message' => 'Validation errors',
+            'data' => $validator->errors(),
+        ], 500));
     }
 }

@@ -27,13 +27,13 @@ class StoreCompanyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'=> self::REQUIRED_STRING,
-            'idNumber'=> 'required|numeric|unique:companies',
-            'contactEmail'=> 'required|email',
-            'phone'=> 'required',
-            'state'=> self::REQUIRED_STRING,
-            'city'=> self::REQUIRED_STRING,
-            'address'=> self::REQUIRED_STRING
+            'name' => self::REQUIRED_STRING,
+            'idNumber' => 'required|numeric|unique:companies',
+            'contactEmail' => 'required|email',
+            'phone' => 'required',
+            'state' => self::REQUIRED_STRING,
+            'city' => self::REQUIRED_STRING,
+            'address' => self::REQUIRED_STRING
         ];
     }
 
@@ -43,9 +43,9 @@ class StoreCompanyRequest extends FormRequest
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
-            'success'   => false,
-            'message'   => 'Validation errors',
-            'data'      => $validator->errors()
-        ]));
+            'success' => false,
+            'message' => 'Validation errors',
+            'data' => $validator->errors(),
+        ], 500));
     }
 }

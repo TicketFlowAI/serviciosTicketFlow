@@ -37,6 +37,7 @@ class UpdateServiceTermRequest extends FormRequest
             'months' => [
                 'required',
                 'numeric',
+                'between:1,36',
                 Rule::unique('service_terms', 'months')->ignore($id),
             ],
         ];
@@ -53,6 +54,6 @@ class UpdateServiceTermRequest extends FormRequest
             'success' => false,
             'message' => 'Validation errors',
             'data' => $validator->errors(),
-        ]));
+        ], 500));
     }
 }
