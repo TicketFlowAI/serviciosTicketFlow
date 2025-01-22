@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('service_terms', function (Blueprint $table) {
             $table->id();
             $table->string('term');
-            $table->tinyInteger('months');
+            $table->tinyInteger('months')->unsigned()->check('months between 1 and 36');
             $table->softDeletes();
             $table->timestamps();
         });

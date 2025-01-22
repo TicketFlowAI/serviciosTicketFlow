@@ -46,8 +46,8 @@ class RoleAndPermissionSeeder extends Seeder
             'create-surveys', 'edit-surveys', 'delete-surveys',
             'view-survey-questions', 'create-survey-questions', 'edit-survey-questions', 'delete-survey-questions', 'view-deleted-survey-questions', 'restore-survey-questions', 'view-all-survey-questions',
             'disable-two-factor-authentication',
-            'request-service-contracts', // Add this permission
-            'cancel-service-contracts' // Add this permission
+            'request-service-contracts',
+            'cancel-service-contracts' 
         ];
 
         foreach ($permissions as $permissionName) {
@@ -66,8 +66,8 @@ class RoleAndPermissionSeeder extends Seeder
         });
 
         $technicianPermissions[] = 'view-survey-questions';
-        $technicianPermissions[] = 'request-service-contracts'; // Add this permission
-        $technicianPermissions[] = 'cancel-service-contracts'; // Add this permission
+        $technicianPermissions[] = 'request-service-contracts';
+        $technicianPermissions[] = 'cancel-service-contracts'; 
 
         $technicianRole->givePermissionTo($technicianPermissions);
 
@@ -79,8 +79,9 @@ class RoleAndPermissionSeeder extends Seeder
             'view-users', 'create-users', 'edit-users', 'view-authenticated-user',
             'create-surveys','view-services',
             'view-survey-questions',
-            'request-service-contracts', // Add this permission
-            'cancel-service-contracts' // Add this permission
+            'request-service-contracts',
+            'cancel-service-contracts',
+            'view-services'
         ];
 
         $clientRole->givePermissionTo($clientPermissions);
