@@ -398,7 +398,7 @@ class ReportController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/reports/technician/average-score-per-question",
+     *     path="/reports/technician/{$id}/average-score-per-question",
      *     summary="Get the average score per question for the logged-in technician",
      *     tags={"Reports"},
      *     @OA\Response(

@@ -1634,13 +1634,13 @@
                 }
             }
         },
-        "/reports/technician/average-score-per-question": {
+        "/reports/technician/{$id}/average-score-per-question": {
             "get": {
                 "tags": [
                     "Reports"
                 ],
                 "summary": "Get the average score per question for the logged-in technician",
-                "operationId": "295537313e4dd7566dae7ebc83815542",
+                "operationId": "e843a7ce505c8451379d17780865925f",
                 "responses": {
                     "200": {
                         "description": "Average score per question for the logged-in technician",
