@@ -46,7 +46,10 @@ class ServiceCancellationMail extends Mailable
     {
         return new Content(
             view: $this->template,
-            with: ['details' => $this->details, 'emailBody' => $this->emailBody],
+            with: [
+                'serviceData' => $this->details,
+                'content' => $this->emailBody // Pass content to view
+            ],
         );
     }
 

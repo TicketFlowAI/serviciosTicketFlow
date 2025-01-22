@@ -447,7 +447,7 @@ class ServiceContractController extends Controller
                 'service'=> Service::find($request->service_id)->description,
                 'term'=> ServiceTerm::find($request->service_term_id)->term,
             ];
-            Log::info(json_encode($serviceData));
+
             $emailTemplate = Email::where('template_name', 'Solicitud de servicios')->first();
             $subjectLine = str_replace(
                 ['{company}', '{service}', '{term}'],
@@ -455,7 +455,6 @@ class ServiceContractController extends Controller
                 $emailTemplate->subject
             );
             $emailBody = $emailTemplate->body;
-            Log::info(json_encode($serviceData));
 
             foreach ($serviceData as $key => $value) {
                 $emailBody = str_replace('{{ $serviceData[\'' . $key . '\'] }}', $value, $emailBody);
@@ -465,7 +464,6 @@ class ServiceContractController extends Controller
 
             return ApiResponseClass::sendResponse(null, 'Service request sent successfully', 200);
         } catch (\Exception $ex) {
-            Log::info($ex);
             return ApiResponseClass::sendResponse(null, 'Failed to send service request', 500);
         }
     }
@@ -497,7 +495,6 @@ class ServiceContractController extends Controller
             $user->load('company'); // Load the company relation
             $serviceData = [
                 'contract_id' => $request->contract_id,
-                'user' => $user,
                 'service' => ServiceContract::with('service')->find($request->contract_id)->service->description,
                 'company' => $user->company->name,
                 'user_name' => $user->name,
@@ -516,12 +513,11 @@ class ServiceContractController extends Controller
             $emailBody = $emailTemplate->body;
 
             foreach ($serviceData as $key => $value) {
-                $emailBody = str_replace('{{ $details[\'' . $key . '\'] }}', $value, $emailBody);
+                $emailBody = str_replace('{{ $serviceData[\'' . $key . '\'] }}', $value, $emailBody);
             }
 
-            $template = 'emails.custom_template';
             $recipient = env('MAIL_NOTIFICATIONS', 'info@mindsoft.biz');
-            Mail::to($recipient)->send(new ServiceCancellationMail($serviceData, $template, $subjectLine, $emailBody));
+            Mail::to($recipient)->send(new ServiceCancellationMail($serviceData, 'emails.custom_template', $subjectLine, $emailBody));
 
             return ApiResponseClass::sendResponse(null, 'Service cancellation request sent successfully', 200);
         } catch (\Exception $ex) {

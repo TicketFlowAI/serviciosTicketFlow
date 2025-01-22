@@ -490,7 +490,7 @@
                                                                     <p
                                                                         style="Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:27px;letter-spacing:0;color:#2D3142;font-size:18px">
                                                                         <strong>{{ $serviceData['company'] }}</strong> ha solicitado el servicio <strong>{{ $serviceData['service'] }}</strong> por el periodo <strong>{{ $serviceData['term'] }}</strong></p> 
-                                                                        <p class="urgent">Favor contactate con el cliente {{ $serviceData['user_name'] }} {{ $serviceData['user_last_name'] }} al correo {{ $serviceData['user_email'] }} para gestionar la contratación y levantamiento de requerimientos.</p>
+                                                                        <p class="urgent">Favor contactate con el cliente <strong>{{ $serviceData['user_name'] }} {{ $serviceData['user_last_name'] }}</strong> al correo <strong>{{ $serviceData['user_email'] }}</strong> para gestionar la contratación y levantamiento de requerimientos.</p>
                                                                 </td>
                                                             </tr>
                                                         </table>
