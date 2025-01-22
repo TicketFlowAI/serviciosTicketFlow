@@ -244,6 +244,7 @@ class ExcecuteComprehend extends Command
                 $ticket->save();
 
                 $this->info("Updated priority for Ticket #{$ticket->id} to {$priorityValue}");
+                $this->updateComplexity($ticket);
                 return;
             }
         }
@@ -290,33 +291,37 @@ class ExcecuteComprehend extends Command
     }
 
     protected function createJobsSequentially(Ticket $ticket, ComprehendClient $comprehendClient)
-    {
-        if (!$ticket->job_id_classifier) {
-            $jobId = $this->startJob(
-                $ticket,
-                'arn:aws:comprehend:us-east-2:115894170195:document-classifier/PriorityClassifier/version/v1',
-                's3://comprenhend-dataset/output/classifier/',
-                $comprehendClient
-            );
-            if ($jobId) {
-                $ticket->update(['job_id_classifier' => $jobId]);
-            }
-        }
+{
+    // Leer ARN desde el archivo de configuración
+    $priorityClassifierArn = config('classifiers.priority_classifier_arn');
+    $humanInterventionArn = config('classifiers.human_intervention_classifier_arn');
 
-        if (!$ticket->job_id_human_intervention) {
-            $jobId = $this->startJob(
-                $ticket,
-                'arn:aws:comprehend:us-east-2:115894170195:document-classifier/PriorityClassifierHumanIntervention/version/v4',
-                's3://comprenhend-dataset/output/human_intervention/',
-                $comprehendClient
-            );
-            if ($jobId) {
-                $ticket->update(['job_id_human_intervention' => $jobId]);
-            }
+    if (!$ticket->job_id_classifier) {
+        $jobId = $this->startJob(
+            $ticket,
+            $priorityClassifierArn, // Usar ARN configurado
+            's3://comprenhend-dataset/output/classifier/',
+            $comprehendClient
+        );
+        if ($jobId) {
+            $ticket->update(['job_id_classifier' => $jobId]);
         }
-
-        $ticket->update(['status' => 1]);
     }
+
+    if (!$ticket->job_id_human_intervention) {
+        $jobId = $this->startJob(
+            $ticket,
+            $humanInterventionArn, // Usar ARN configurado
+            's3://comprenhend-dataset/output/human_intervention/',
+            $comprehendClient
+        );
+        if ($jobId) {
+            $ticket->update(['job_id_human_intervention' => $jobId]);
+        }
+    }
+
+    $ticket->update(['status' => 1]);
+}
 
     protected function startJob(Ticket $ticket, string $classifierArn, string $outputUri, ComprehendClient $comprehendClient): ?string
     {
@@ -361,5 +366,31 @@ class ExcecuteComprehend extends Command
         $this->error("Max attempts reached for Ticket #{$ticket->id}, Job Type: {$classifierArn}. Job could not be started.");
         return null;
     }
+
+    protected function updateComplexity(Ticket $ticket)
+{
+    $priority = $ticket->priority;
+    $needsHumanInteraction = $ticket->needsHumanInteraction;
+
+    // Determinar el valor de complexity según la tabla
+    if ($priority === 1 || $priority === 2) {
+        $complexity = 3; // Prioridad 1 y 2 siempre tienen complexity 3
+    } elseif ($priority === 3) {
+        $complexity = 2; // Prioridad 3 siempre tiene complexity 2
+    } elseif ($priority === 4 || $priority === 5) {
+        // Para Prioridad 4 y 5 depende de la intervención humana
+        $complexity = $needsHumanInteraction ? 2 : 1;
+    } else {
+        $this->warn("Unknown priority {$priority} for Ticket #{$ticket->id}. Complexity not updated.");
+        return;
+    }
+
+    // Actualizar el atributo complexity en el ticket
+    $ticket->complexity = $complexity;
+    $ticket->save();
+
+    $this->info("Updated complexity for Ticket #{$ticket->id} to {$complexity}.");
+}
+
 }
 

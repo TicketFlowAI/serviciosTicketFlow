@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\File;
+use Illuminate\Http\Request;
 
 /**
  * @OA\Tag(
@@ -547,4 +549,7 @@ class TicketController extends Controller
             return ApiResponseClass::sendResponse(null, 'Failed to delete ticket', 500);
         }
     }
+
+    
+    
 }

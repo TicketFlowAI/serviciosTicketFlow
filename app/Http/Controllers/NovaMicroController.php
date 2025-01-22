@@ -2,105 +2,146 @@
 
 namespace App\Http\Controllers;
 
+use Aws\BedrockAgentRuntime\BedrockAgentRuntimeClient;
+use Aws\Signature\SignatureV4;
+use Aws\Credentials\Credentials;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class NovaMicroController extends Controller
 {
-    public function handleRequest(Request $request)
+    private $region;
+    private $credentials;
+    private $client;
+
+    public function __construct()
     {
-        // Capturar la solicitud del usuario desde los parámetros
-        $userInput = $request->query('solicitud'); // Para GET
-        // Si prefieres POST, usa: $userInput = $request->input('solicitud');
+        Log::info('Inicializando NovaMicroController');
 
-        if (!$userInput) {
-            return response()->json(['error' => 'El parámetro "solicitud" es requerido.'], 400);
-        }
+        $this->region = env('AWS_REGION', 'us-east-2'); // Cambia según tu región
+        $this->credentials = new Credentials(
+            env('AWS_ACCESS_KEY_ID'),
+            env('AWS_SECRET_ACCESS_KEY')
+        );
+        $this->client = new BedrockAgentRuntimeClient();
 
-        // Leer el archivo JSON usando storage_path para obtener la ruta completa
-        $filePath = storage_path('app/private/promps/promps.json');
+        Log::info('Configuración de AWS inicializada', [
+            'region' => $this->region,
+        ]);
+    }
 
-        // Verificar si el archivo existe
-        if (!file_exists($filePath)) {
-            return response()->json(['error' => 'El archivo JSON no existe.'], 500);
-        }
+    public function getResponse(Request $request)
+    {
+        Log::info('Iniciando el método getResponse');
 
-        // Leer el contenido del archivo
-        $jsonContent = file_get_contents($filePath);
-        $prompts = json_decode($jsonContent, true);
+        // Validar el parámetro recibido
+        $userInput = $request->input('solicitud');
+        Log::info('Solicitud recibida', ['solicitud' => $userInput]);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return response()->json(['error' => 'Error al decodificar el archivo JSON.'], 500);
-        }
-
-        // Buscar el prompt más relevante
-        $selectedPrompt = null;
-        foreach ($prompts as $prompt) {
-            if (stripos($prompt['pregunta'], $userInput) !== false) {
-                $selectedPrompt = $prompt;
-                break;
-            }
-        }
-
-        // Crear el contexto para Nova Micro
-        $context = "";
-        if (!$selectedPrompt) {
-            foreach ($prompts as $prompt) {
-                $context .= "Pregunta: {$prompt['pregunta']}\nRespuesta: {$prompt['respuesta']}\n\n";
-            }
-            $context .= "Por favor, responde a esta solicitud basada en la información anterior:\n{$userInput}";
-        } else {
-            $context = "Pregunta: {$selectedPrompt['pregunta']}\nRespuesta esperada: {$selectedPrompt['respuesta']}";
-        }
-
-        // Configurar cliente de Amazon Bedrock
         try {
-            $bedrock = new \Aws\Bedrock\BedrockClient([
-                'region' => config('aws.region'),
-                'version' => 'latest',
-                'credentials' => [
-                    'key'    => env('AWS_ACCESS_KEY_ID'),
-                    'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            // Validar si el parámetro es nulo o vacío
+            if (empty($userInput)) {
+                Log::error('El parámetro solicitud está vacío o no fue enviado');
+                return response()->json([
+                    'success' => false,
+                    'error' => 'El parámetro solicitud es requerido.',
+                ], 400);
+            }
+
+            // ARN del perfil de inferencia
+            $inferenceProfileArn = 'arn:aws:bedrock:us-east-2:115894170195:inference-profile/us.amazon.nova-micro-v1:0';
+            Log::info('ARN de inferencia configurado', ['arn' => $inferenceProfileArn]);
+
+            // Construir el endpoint y el path
+            $endpoint = "https://bedrock-runtime.{$this->region}.amazonaws.com";
+            $path = "/model/amazon.nova-micro-v1:0/invoke";
+            Log::info('Endpoint y path configurados', ['endpoint' => $endpoint, 'path' => $path]);
+
+            // Cuerpo de la solicitud
+            $body = json_encode([
+                'inferenceProfileArn' => $inferenceProfileArn,
+                'inputText' => $userInput,
+            ]);
+            Log::info('Cuerpo de la solicitud creado', ['body' => $body]);
+
+            // Registrar el JSON enviado a Amazon
+            Log::info('Enviando JSON a Amazon Bedrock', ['json' => $body]);
+
+            // Crear la firma de la solicitud
+            $signature = new SignatureV4('bedrock', $this->region);
+            Log::info('Iniciando la firma de la solicitud');
+
+            $requestToSign = new \GuzzleHttp\Psr7\Request(
+                'POST',
+                $endpoint . $path,
+                [
+                    'Content-Type' => 'application/json',
                 ],
+                $body
+            );
+
+            $signedRequest = $signature->signRequest($requestToSign, $this->credentials);
+            Log::info('Solicitud firmada correctamente', ['headers' => $signedRequest->getHeaders()]);
+
+            // Enviar la solicitud firmada
+            Log::info('Enviando la solicitud a Bedrock Runtime', [
+                'url' => $endpoint . $path,
+                'headers' => $signedRequest->getHeaders(),
+                'body' => $body,
             ]);
+            $response = $this->client->send($signedRequest);
 
-            // Llamar al modelo Nova Micro
-            $response = $bedrock->invokeModel([
-                'modelId' => 'amazon.nova-micro-v1:0',
-                'contentType' => 'application/json',
-                'accept' => 'application/json',
-                'body' => json_encode([
-                    'inferenceConfig' => [
-                        'max_new_tokens' => 300,
-                        'temperature' => 0.7,
-                    ],
-                    'messages' => [
-                        [
-                            'role' => 'user',
-                            'content' => [
-                                'text' => $context,
-                            ],
-                        ],
-                    ],
-                ]),
+            $responseBody = $response->getBody()->getContents();
+            $responseData = json_decode($responseBody, true);
+            Log::info('Respuesta recibida de Bedrock Runtime', ['response' => $responseData]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $responseData,
             ]);
-
-            // Procesar la respuesta del modelo
-            $body = json_decode($response['body']->getContents(), true);
-
-            // Registrar la respuesta en los logs para depuración
-            info('Respuesta de Nova Micro: ' . json_encode($body));
-
-            return response()->json(['response' => $body]);
-
         } catch (\Exception $e) {
-            // Registrar el error en los logs para análisis
-            info('Error al invocar Nova Micro: ' . $e->getMessage());
+            Log::error('Error en el método getResponse', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
 
-            return response()->json(['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Http\Resources\ClassifierResource;
 use App\Http\Resources\ClassifierPerformanceResource;
 use App\Http\Resources\NewClassifierResource;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -32,25 +34,18 @@ class ComprehendController extends Controller
         try {
             $client = $this->getComprehendClient();
 
-            // Log antes de llamar a AWS
-            info('Iniciando llamada a AWS Comprehend para listar clasificadores.');
-
             // Llamada al método correcto para listar clasificadores
             $result = $client->listDocumentClassifiers();
 
-            // Log completo de la respuesta para depuración
-            info('Respuesta completa de AWS: ' . json_encode($result, JSON_PRETTY_PRINT));
+
 
             // Extraer la lista de clasificadores
             $classifiers = $result['DocumentClassifierPropertiesList'] ?? [];
 
-            // Log para ver el contenido de classifiers
-            info('Contenido de classifiers: ' . json_encode($classifiers, JSON_PRETTY_PRINT));
 
             // Manejar el caso en que no haya clasificadores
             if (empty($classifiers)) {
                 $message = 'No se encontraron clasificadores disponibles.';
-                info($message); // Imprimir el mensaje en el log
                 return ApiResponseClass::sendResponse(null, $message, 404);
             }
 
@@ -77,7 +72,6 @@ class ComprehendController extends Controller
                 ];
             }
 
-            info('Respuesta formateada: ' . json_encode($response, JSON_PRETTY_PRINT)); // Log para depuración
             return ApiResponseClass::sendResponse(($response), '', 200);
 
         } catch (\Exception $e) {
@@ -175,6 +169,56 @@ class ComprehendController extends Controller
             return ApiResponseClass::sendResponse(null, $error, 500);
         }
     }
+
+    public function updateClassifierArns(Request $request)
+    {
+        // Validar la entrada
+        $request->validate([
+            'priority_classifier_arn' => 'nullable|string',
+            'human_intervention_classifier_arn' => 'nullable|string',
+        ]);
+    
+        // Ruta absoluta al archivo de configuración
+        $configPath = '/home/servicios/htdocs/servicios.mindsoftdev.com/serviciosTicketFlow/config/classifiers.php';
+    
+        // Log: Ruta del archivo
+        Log::info("Using configuration file path: {$configPath}");
+    
+        // Depuración: Verificar si el archivo existe
+        if (!File::exists($configPath)) {
+            Log::error("Configuration file not found at path: {$configPath}");
+            return response()->json(['message' => 'Configuration file not found.'], 500);
+        }
+    
+        // Leer el archivo de configuración actual
+        try {
+            $currentConfig = include($configPath);
+            Log::info("Successfully loaded current configuration: ", $currentConfig);
+        } catch (\Exception $e) {
+            Log::error("Failed to load configuration file: {$e->getMessage()}");
+            return response()->json(['message' => 'Failed to load configuration file.'], 500);
+        }
+    
+        // Actualizar la configuración con los valores recibidos
+        $updatedConfig = array_merge($currentConfig, array_filter([
+            'priority_classifier_arn' => $request->input('priority_classifier_arn'),
+            'human_intervention_classifier_arn' => $request->input('human_intervention_classifier_arn'),
+        ]));
+    
+        Log::info("Updated configuration to be written: ", $updatedConfig);
+    
+        // Intentar sobrescribir el archivo de configuración
+        try {
+            File::put($configPath, "<?php\n\nreturn " . var_export($updatedConfig, true) . ";");
+            Log::info("Configuration file updated successfully at path: {$configPath}");
+        } catch (\Exception $e) {
+            Log::error("Failed to write to configuration file: {$e->getMessage()}");
+            return response()->json(['message' => 'Failed to update configuration file.'], 500);
+        }
+    
+        return response()->json(['message' => 'Classifiers updated successfully.']);
+    }
+
 }
 
 

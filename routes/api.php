@@ -22,6 +22,7 @@ use App\Http\Controllers\{
     NovaMicroController
 };
 
+Route::post('/classifiers/update-classifiers', [ComprehendController::class, 'updateClassifierArns']);
 Route::post('/nova-micro', [NovaMicroController::class, 'getResponse']);
 
 // Endpoint para listar clasificadores y versiones
