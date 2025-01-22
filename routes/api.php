@@ -22,7 +22,7 @@ use App\Http\Controllers\{
     NovaMicroController
 };
 
-Route::match(['get', 'post'], '/nova-micro', [NovaMicroController::class, 'handleRequest']);
+Route::post('/nova-micro', [NovaMicroController::class, 'getResponse']);
 
 // Endpoint para listar clasificadores y versiones
 Route::get('/classifiers', [ComprehendController::class, 'listAllClassifiers']);

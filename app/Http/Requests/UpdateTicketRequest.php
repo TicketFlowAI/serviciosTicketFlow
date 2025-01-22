@@ -26,6 +26,10 @@ class UpdateTicketRequest extends FormRequest
         return [
             'service_contract_id' => 'required|numeric',
             'title' => 'required|string',
+            'needsHumanInteraction' => 'required|boolean',
+            'status' => 'required|integer',
+            'priority' => 'required|integer|between:1,5',
+            'complexity' => 'required|integer|between:1,3',
         ];
     }
 
