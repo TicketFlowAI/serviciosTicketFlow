@@ -81,7 +81,7 @@ class RoleAndPermissionSeeder extends Seeder
             'view-survey-questions',
             'request-service-contracts',
             'cancel-service-contracts',
-            'view-services'
+            'view-service-terms'
         ];
 
         $clientRole->givePermissionTo($clientPermissions);

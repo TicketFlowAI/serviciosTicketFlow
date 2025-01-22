@@ -483,14 +483,14 @@
                                                                 <td align="left" style="padding:20px;Margin:0">
                                                                     <h3
                                                                         style="Margin:0;font-family:Imprima, Arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:28px;font-style:normal;font-weight:bold;line-height:33.6px;color:#2D3142">
-                                                                        {{ $serviceData['company'] }} ha solicitado {{ $serviceData['service'] }</h3>
+                                                                        {{ $serviceData['company'] }} ha solicitado {{ $serviceData['service'] }}</h3>
                                                                     <p
                                                                         style="Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:27px;letter-spacing:0;color:#2D3142;font-size:18px">
                                                                         <br></p>
                                                                     <p
                                                                         style="Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:27px;letter-spacing:0;color:#2D3142;font-size:18px">
                                                                         <strong>{{ $serviceData['company'] }}</strong> ha solicitado el servicio <strong>{{ $serviceData['service'] }}</strong> por el periodo <strong>{{ $serviceData['term'] }}</strong></p> 
-                                                                        <p class="urgent">Favor contactate con el cliente {{ $serviceData['user_name'] }} {{ $serviceData['user_last_name'] }} al correo $serviceData['user_email'] }} para gestionar la contratación y levantamiento de requerimientos.</p>
+                                                                        <p class="urgent">Favor contactate con el cliente {{ $serviceData['user_name'] }} {{ $serviceData['user_last_name'] }} al correo {{ $serviceData['user_email'] }} para gestionar la contratación y levantamiento de requerimientos.</p>
                                                                 </td>
                                                             </tr>
                                                         </table>
