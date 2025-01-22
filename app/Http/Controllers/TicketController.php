@@ -338,7 +338,7 @@ class TicketController extends Controller
                     }
                 }
             }
-
+            
             DB::commit();
             return $response;
         } catch (\Exception $ex) {
@@ -493,12 +493,22 @@ class TicketController extends Controller
             }
 
             $ticket->needsHumanInteraction = 1;
+            if (is_null($ticket->priority)) {
+                $ticket->priority = 1;
+            }
+            if (is_null($ticket->complexity)) {
+                $ticket->complexity = 2;
+            }
+            Log::info('Ticket priority: ' . $ticket);
+            $ticket->status = 1;
+            Log::info('Ticket status: ' . $ticket);
             $ticket->save();
-
-            $response = $this->assignTicket($id);
+            Log::info('Ticket saved: ' . $ticket);
+            $this->assignTicket($ticket);
+            Log::info('Ticket assigned: ' . $ticket);
 
             DB::commit();
-            return $response;
+            return ApiResponseClass::sendResponse(null, 'Marked ticket as needing human interaction and assign', 200);;
         } catch (\Exception $ex) {
             DB::rollBack();
             return ApiResponseClass::sendResponse(null, 'Failed to mark ticket as needing human interaction and assign', 500);

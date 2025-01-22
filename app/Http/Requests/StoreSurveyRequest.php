@@ -26,10 +26,11 @@ class StoreSurveyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ticket_id' => self::INTEGER_RULES,
-            'question_id' => self::INTEGER_RULES,
-            'user_id' => self::INTEGER_RULES,
-            'score' => 'required|integer|min:0|max:5',
+            'SurveyAnswers' => 'required|array',
+            'SurveyAnswers.*.ticket_id' => self::INTEGER_RULES,
+            'SurveyAnswers.*.question_id' => self::INTEGER_RULES,
+            'SurveyAnswers.*.user_id' => self::INTEGER_RULES,
+            'SurveyAnswers.*.score' => 'required|integer|min:0|max:5',
         ];
     }
 

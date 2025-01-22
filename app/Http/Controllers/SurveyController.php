@@ -32,11 +32,17 @@ class SurveyController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"ticket_id", "question_id", "user_id", "score"},
-     *             @OA\Property(property="ticket_id", type="integer", example=1),
-     *             @OA\Property(property="question_id", type="integer", example=1),
-     *             @OA\Property(property="user_id", type="integer", example=1),
-     *             @OA\Property(property="score", type="integer", example=5)
+     *             required={"SurveyAnswers"},
+     *             @OA\Property(
+     *                 property="SurveyAnswers",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="ticket_id", type="integer", example=1),
+     *                     @OA\Property(property="question_id", type="integer", example=1),
+     *                     @OA\Property(property="user_id", type="integer", example=1),
+     *                     @OA\Property(property="score", type="integer", example=5)
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -49,16 +55,27 @@ class SurveyController extends Controller
      */
     public function store(StoreSurveyRequest $request)
     {
-        $details = $request->only(['ticket_id', 'question_id', 'user_id', 'score']);
         DB::beginTransaction();
+
         try {
-            $survey = $this->surveyRepositoryInterface->store($details);
+            $surveyAnswers = $request->input('SurveyAnswers');
+
+            foreach ($surveyAnswers as $answer) {
+                $details = [
+                    'ticket_id' => $answer['ticket_id'],
+                    'question_id' => $answer['question_id'],
+                    'user_id' => $answer['user_id'],
+                    'score' => $answer['score'],
+                ];
+
+                $this->surveyRepositoryInterface->store($details);
+            }
 
             DB::commit();
-            return ApiResponseClass::sendResponse(new SurveyResource($survey), 'Survey Create Successful', 201);
+            return ApiResponseClass::sendResponse(null, 'Survey answers stored successfully', 201);
         } catch (\Exception $ex) {
             DB::rollBack();
-            return ApiResponseClass::sendResponse(null, 'Failed to create survey', 500);
+            return ApiResponseClass::sendResponse(null, 'Failed to create survey answers', 500);
         }
     }
 
@@ -81,7 +98,7 @@ class SurveyController extends Controller
      *     ),
      *     @OA\Response(response=404, description="Survey not found")
      * )
-     */
+    */
     public function show($id)
     {
         // try {
