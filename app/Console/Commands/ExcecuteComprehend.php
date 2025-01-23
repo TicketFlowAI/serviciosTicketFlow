@@ -79,29 +79,32 @@ class ExcecuteComprehend extends Command
     }
 
     protected function checkJobStatus(Ticket $ticket, string $jobType, ComprehendClient $comprehendClient)
-    {
-        $jobIdField = $jobType === 'classifier' ? 'job_id_classifier' : 'job_id_human_intervention';
-        $jobId = $ticket->{$jobIdField};
+{
+    $jobIdField = $jobType === 'classifier' ? 'job_id_classifier' : 'job_id_human_intervention';
+    $jobId = $ticket->{$jobIdField};
 
-        if (!$jobId) {
-            return;
-        }
+    if (!$jobId) {
+        return;
+    }
 
-        try {
-            $response = $comprehendClient->describeDocumentClassificationJob([
-                'JobId' => $jobId,
-            ]);
+    try {
+        $response = $comprehendClient->describeDocumentClassificationJob([
+            'JobId' => $jobId,
+        ]);
 
-            $status = $response['DocumentClassificationJobProperties']['JobStatus'];
-            $this->info("Ticket #{$ticket->id}, Job Type: {$jobType}, Job ID: {$jobId}, Status: {$status}");
+        $status = $response['DocumentClassificationJobProperties']['JobStatus'];
+        $this->info("Ticket #{$ticket->id}, Job Type: {$jobType}, Job ID: {$jobId}, Status: {$status}");
 
-            if ($status === 'COMPLETED') {
+        if ($status === 'COMPLETED') {
+            // Verificar si priority o needsHumanInteraction están ausentes
+            if (is_null($ticket->priority) || is_null($ticket->needsHumanInteraction)) {
                 $this->processResults($ticket, $response['DocumentClassificationJobProperties'], $jobType);
             }
-        } catch (\Exception $e) {
-            $this->error("Error checking job status for Ticket #{$ticket->id}, Job Type: {$jobType}: " . $e->getMessage());
         }
+    } catch (\Exception $e) {
+        $this->error("Error checking job status for Ticket #{$ticket->id}, Job Type: {$jobType}: " . $e->getMessage());
     }
+}
 
     protected function processResults(Ticket $ticket, array $jobProps, string $jobType)
     {
@@ -133,8 +136,6 @@ class ExcecuteComprehend extends Command
             $localTarGzPath = "{$localDir}/output.tar.gz";
             file_put_contents($localTarGzPath, $fileContents);
 
-            $this->info("File downloaded and stored locally at: {$localTarGzPath}");
-
             $this->extractTarGz($localTarGzPath, $localDir);
 
             $jsonFilePath = "{$localDir}/predictions.jsonl";
@@ -143,8 +144,6 @@ class ExcecuteComprehend extends Command
                 $this->error("Extracted JSONL file not found for Ticket #{$ticket->id}, Job Type: {$jobType}.");
                 return;
             }
-
-            $this->info("Found extracted JSONL file for Ticket #{$ticket->id} at: {$jsonFilePath}");
 
             $lines = file($jsonFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             if (count($lines) < 2) {
@@ -173,7 +172,6 @@ class ExcecuteComprehend extends Command
 
     protected function extractTarGz(string $tarFilePath, string $extractToDir)
     {
-        $this->info("Extracting: {$tarFilePath}");
 
         if (!file_exists($tarFilePath)) {
             throw new \Exception("File not found: {$tarFilePath}");
@@ -197,7 +195,6 @@ class ExcecuteComprehend extends Command
             $pharTar = new \PharData($tarPath);
             $pharTar->extractTo($extractToDir);
 
-            $this->info("Extraction completed successfully to: {$extractToDir}");
         } catch (\Exception $e) {
             throw new \Exception("Error extracting {$tarFilePath}: " . $e->getMessage());
         }
@@ -319,7 +316,6 @@ class ExcecuteComprehend extends Command
             $ticket->update(['job_id_human_intervention' => $jobId]);
         }
     }
-
     $ticket->update(['status' => 1]);
 }
 

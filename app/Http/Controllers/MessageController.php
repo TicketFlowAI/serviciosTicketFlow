@@ -10,6 +10,7 @@ use App\Http\Resources\MessageResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @OA\Tag(
@@ -53,6 +54,8 @@ class MessageController extends Controller
      */
     public function store(StoreMessageRequest $request)
     {
+
+
         $details = [
             'ticket_id' => $request->ticket_id,
             'content' => $request->content,
@@ -68,6 +71,7 @@ class MessageController extends Controller
             DB::commit();
             return ApiResponseClass::sendResponse(new MessageResource($message), 'Message Create Successful', 201);
         } catch (\Exception $ex) {
+            Log::info($ex);
             DB::rollBack();
             return ApiResponseClass::sendResponse(null, 'Failed to create message', 500);
         }
@@ -82,6 +86,7 @@ class MessageController extends Controller
      */
     public function createAIMessage($ticket_id, $content)
     {
+        
         $user = \App\Models\User::where('email', 'noreply@mindsoft.biz')->first();
         $request = new StoreMessageRequest();
         $request->merge([
@@ -92,7 +97,6 @@ class MessageController extends Controller
             'user_lastname' => $user->lastname,
             'user_role' => $user->getRoleNames()->first()
         ]);
-
         return $this->store($request);
     }
 

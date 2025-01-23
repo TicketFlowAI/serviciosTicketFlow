@@ -24,6 +24,7 @@ return new class extends Migration
             $table->boolean('newTechnicianMessage')->default(0);
             $table->string('job_id_classifier')->nullable();
             $table->string('job_id_human_intervention')->nullable();
+            $table->boolean('AIresponse')->nullable()->default(0);
             $table->softDeletes();
             $table->timestamps();
         });

@@ -22,7 +22,8 @@ class Ticket extends Model
         'newClientMessage',
         'newTechnicianMessage',
         'job_id_classifier',
-        'job_id_human_intervention'
+        'job_id_human_intervention',
+        'AIresponse',
     ];
 
     public function service_contract(): BelongsTo

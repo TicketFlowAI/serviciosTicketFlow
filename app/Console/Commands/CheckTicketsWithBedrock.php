@@ -2,10 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Controllers\MessageController;
 use Aws\BedrockRuntime\BedrockRuntimeClient;
 use Aws\Credentials\Credentials;
 use Illuminate\Console\Command;
 use App\Models\Ticket;
+use Illuminate\Support\Facades\App;
+use Log;
 
 class CheckTicketsWithBedrock extends Command
 {
@@ -28,6 +31,7 @@ class CheckTicketsWithBedrock extends Command
         $tickets = Ticket::whereNotNull('priority')
             ->whereNotNull('needsHumanInteraction')
             ->where('complexity', 1)
+            ->where('AIresponse', 0)
             ->with('message')
             ->get();
 
@@ -115,8 +119,17 @@ class CheckTicketsWithBedrock extends Command
                 $response = $BedrockClient->invokeModel($payload);
                 $responseBody = $response['body']->getContents();
 
-                $this->info("Ticket ID: {$ticket->id}");
-                $this->info("Model Response: " . $responseBody);
+                // Extraer solo el contenido del texto como string
+                $responseArray = json_decode($responseBody, true);
+                $textContent = $responseArray['output']['message']['content'][0]['text'] ?? '';
+
+                // Guardar la respuesta como un mensaje AI usando el contenedor de Laravel
+                $messageController = App::make(MessageController::class);
+                $messageController->createAIMessage($ticket->id, (string)$textContent);
+
+                $ticket->update(['AIresponse' => 1]);
+
+                $this->info("Ticket #{$ticket->id} procesado y marcado como respondido por la IA.");
 
             } catch (\Exception $e) {
                 $this->error("Error processing Ticket #{$ticket->id}: " . $e->getMessage());

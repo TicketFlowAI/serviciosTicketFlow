@@ -62,6 +62,6 @@ class UserSeeder extends Seeder
             'email' => 'noreply@mindsoft.biz',
             'password' => Hash::make($this->defaultPassword),
             'company_id' => 1
-        ])->assignRole('techician');
+        ])->assignRole('technician');
     }
 }
