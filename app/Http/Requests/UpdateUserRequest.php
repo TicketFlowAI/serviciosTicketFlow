@@ -32,7 +32,7 @@ class UpdateUserRequest extends FormRequest
             'name'=>'required',
             'lastname'=>'required',
             'company_id'=>'required',
-            'password' => ['required', Password::min(8)
+            'password' => ['nullable', Password::min(8)
             ->letters()
             ->mixedCase()
             ->numbers()
