@@ -10,7 +10,6 @@ use App\Http\Resources\MessageResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Log;
 
 /**
  * @OA\Tag(
@@ -57,10 +56,10 @@ class MessageController extends Controller
         $details = [
             'ticket_id' => $request->ticket_id,
             'content' => $request->content,
-            'user_id' => Auth::user()->id,
-            'user_name' => Auth::user()->name,
-            'user_lastname' => Auth::user()->lastname,
-            'user_role' => Auth::user()->getRoleNames()->first()
+            'user_id' => $request->user_id ?? Auth::user()->id,
+            'user_name' => $request->user_name ?? Auth::user()->name,
+            'user_lastname' => $request->user_lastname ?? Auth::user()->lastname,
+            'user_role' => $request->user_role ?? Auth::user()->getRoleNames()->first()
         ];
 
         DB::beginTransaction();
@@ -72,6 +71,29 @@ class MessageController extends Controller
             DB::rollBack();
             return ApiResponseClass::sendResponse(null, 'Failed to create message', 500);
         }
+    }
+
+    /**
+     * Create a message with given ticket_id and content.
+     *
+     * @param int $ticket_id
+     * @param string $content
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function createAIMessage($ticket_id, $content)
+    {
+        $user = \App\Models\User::where('email', 'noreply@mindsoft.biz')->first();
+        $request = new StoreMessageRequest();
+        $request->merge([
+            'ticket_id' => $ticket_id,
+            'content' => $content,
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'user_lastname' => $user->lastname,
+            'user_role' => $user->getRoleNames()->first()
+        ]);
+
+        return $this->store($request);
     }
 
     /**
@@ -120,4 +142,6 @@ class MessageController extends Controller
             return ApiResponseClass::sendResponse(null, 'Failed to retrieve messages', 500);
         }
     }
+
+    
 }

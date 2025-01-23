@@ -140,9 +140,7 @@ class ReportController extends Controller
      */
     public function getTicketsHumanInteraction(Request $request)
     {
-        $query = Ticket::whereHas('history', function ($query) {
-            $query->where('action', '!=', 'created');
-        });
+        $query = Ticket::where('needsHumanInteraction', true);
 
         if ($request->has('start_date') && $request->has('end_date')) {
             $query->whereBetween('updated_at', [$request->start_date, $request->end_date]);
