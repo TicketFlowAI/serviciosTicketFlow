@@ -31,7 +31,8 @@ return [
         '/user/confirm-password',
         '/user/two-factor-recovery-codes',
         '/user/two-factor-challenge',
-        '/user/two-factor-authentication'
+        '/user/two-factor-authentication',
+        'two-factor-challenge',
     ],
 
     'allowed_methods' => ['*'],
