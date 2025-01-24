@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Email;
 use App\Http\Requests\StoreEmailRequest;
 use App\Http\Requests\UpdateEmailRequest;
 use App\Interfaces\EmailRepositoryInterface;

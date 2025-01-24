@@ -411,8 +411,8 @@ class ReportController extends Controller
         $user_id = auth()->user()->id;
 
         $query = Survey::whereHas('ticket', function ($query) use ($user_id) {
-                $query->where('user_id', $user_id);
-            })
+            $query->where('user_id', $user_id);
+        })
             ->select('question_id', DB::raw('AVG(score) as average_score'))
             ->groupBy('question_id');
 
@@ -445,8 +445,8 @@ class ReportController extends Controller
         $user_id = auth()->user()->id;
 
         $query = Survey::whereHas('ticket', function ($query) use ($user_id) {
-                $query->where('user_id', $user_id);
-            });
+            $query->where('user_id', $user_id);
+        });
 
         if ($request->has('start_date') && $request->has('end_date')) {
             $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
@@ -456,5 +456,5 @@ class ReportController extends Controller
         return ApiResponseClass::sendResponse($averageScore, '', 200);
     }
 
-    
+
 }

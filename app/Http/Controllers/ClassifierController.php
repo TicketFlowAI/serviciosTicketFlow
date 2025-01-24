@@ -7,14 +7,14 @@ use Illuminate\Http\Request;
 
 class ClassifierController extends Controller
 {
-    // Configuración general del cliente AWS Comprehend
+    // General configuration of the AWS Comprehend client
     private function getComprehendClient()
     {
         return new ComprehendClient([
             'version' => 'latest',
-            'region'  => 'us-east-2', // Cambia a tu región si es diferente
+            'region' => 'us-east-2', // Change to your region if different
             'credentials' => [
-                'key'    => env('AWS_ACCESS_KEY_ID'),
+                'key' => env('AWS_ACCESS_KEY_ID'),
                 'secret' => env('AWS_SECRET_ACCESS_KEY'),
             ],
         ]);
@@ -55,7 +55,7 @@ class ClassifierController extends Controller
         $client = $this->getComprehendClient();
 
         try {
-            // Llamada al API para listar clasificadores
+            // API call to list classifiers
             $result = $client->listDocumentClassifierSummaries();
 
             $classifiers = $result['DocumentClassifierSummaries'] ?? [];
@@ -63,8 +63,8 @@ class ClassifierController extends Controller
             $response = [];
             foreach ($classifiers as $classifier) {
                 $classifierArn = $classifier['DocumentClassifierArn'];
-                $classifierName = explode('/', $classifierArn)[1]; // Extrae el nombre del clasificador
-                $version = last(explode('/', $classifierArn)); // Extrae la versión
+                $classifierName = explode('/', $classifierArn)[1]; // Extract classifier name
+                $version = last(explode('/', $classifierArn)); // Extract version
 
                 $response[$classifierName][] = [
                     'VersionArn' => $classifierArn,
@@ -75,14 +75,14 @@ class ClassifierController extends Controller
 
             if (empty($response)) {
                 return response()->json([
-                    'message' => 'No se encontraron clasificadores disponibles.',
+                    'message' => 'No classifiers available.',
                 ], 404);
             }
 
             return response()->json($response, 200);
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'Error al listar los clasificadores: ' . $e->getMessage(),
+                'error' => 'Error listing classifiers: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -122,7 +122,7 @@ class ClassifierController extends Controller
      */
     public function getClassifierPerformance(Request $request)
     {
-        // Validar la entrada de la versión
+        // Validate version input
         $request->validate([
             'versionArn' => 'required|string',
         ]);
@@ -132,30 +132,30 @@ class ClassifierController extends Controller
         $client = $this->getComprehendClient();
 
         try {
-            // Llamada para obtener detalles del clasificador
+            // Call to get classifier details
             $result = $client->describeDocumentClassifier([
                 'DocumentClassifierArn' => $versionArn,
             ]);
 
-            // Extraer detalles de performance
+            // Extract performance details
             $performanceMetrics = $result['DocumentClassifierProperties']['ClassifierMetadata'] ?? null;
 
             if (!$performanceMetrics) {
                 return response()->json([
-                    'message' => 'No se encontraron métricas de rendimiento para esta versión.',
+                    'message' => 'No performance metrics found for this version.',
                 ], 404);
             }
 
             return response()->json([
                 'VersionArn' => $versionArn,
                 'Accuracy' => $performanceMetrics['EvaluationMetrics']['Accuracy'] ?? 'N/A',
-                'F1Score'  => $performanceMetrics['EvaluationMetrics']['F1Score'] ?? 'N/A',
+                'F1Score' => $performanceMetrics['EvaluationMetrics']['F1Score'] ?? 'N/A',
                 'Precision' => $performanceMetrics['EvaluationMetrics']['Precision'] ?? 'N/A',
-                'Recall'    => $performanceMetrics['EvaluationMetrics']['Recall'] ?? 'N/A',
+                'Recall' => $performanceMetrics['EvaluationMetrics']['Recall'] ?? 'N/A',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'Error al obtener el rendimiento: ' . $e->getMessage(),
+                'error' => 'Error getting performance: ' . $e->getMessage(),
             ], 500);
         }
     }

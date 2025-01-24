@@ -15,15 +15,12 @@ use App\Http\Controllers\{
     RolesController,
     ReportController,
     SurveyController,
-    ClassifierController,
     SurveyQuestionController,
     ResetPassword,
     ComprehendController,
-    NovaMicroController
 };
 
 Route::post('/classifiers/update-classifiers', [ComprehendController::class, 'updateClassifierArns']);
-Route::post('/nova-micro', [NovaMicroController::class, 'getResponse']);
 
 // Endpoint para listar clasificadores y versiones
 Route::get('/classifiers', [ComprehendController::class, 'listAllClassifiers']);

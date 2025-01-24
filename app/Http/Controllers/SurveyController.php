@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSurveyRequest;
-use App\Http\Requests\UpdateSurveyRequest;
 use App\Interfaces\SurveyRepositoryInterface;
 use App\Classes\ApiResponseClass;
 use App\Http\Resources\SurveyResource;

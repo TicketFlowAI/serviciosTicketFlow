@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ServiceTerm;
 use App\Http\Requests\StoreServiceTermRequest;
 use App\Http\Requests\UpdateServiceTermRequest;
 use App\Interfaces\ServiceTermRepositoryInterface;
 use App\Classes\ApiResponseClass;
 use App\Http\Resources\ServiceTermResource;
 use Illuminate\Support\Facades\DB;
-use App\Models\ServiceContract;
-use Illuminate\Support\Facades\Log;
 
 /**
  * @OA\Tag(
@@ -148,7 +145,6 @@ class ServiceTermController extends Controller
      */
     public function update(UpdateServiceTermRequest $request, $id)
     {
-        Log::info($request);
         $updateDetails = [
             'term' => $request->term,
             'months' => $request->months,

@@ -85,7 +85,13 @@ class CompanyController extends Controller
     public function store(StoreCompanyRequest $request)
     {
         $details = $request->only([
-            'name', 'idNumber', 'contactEmail', 'phone', 'state', 'city', 'address'
+            'name',
+            'idNumber',
+            'contactEmail',
+            'phone',
+            'state',
+            'city',
+            'address'
         ]);
 
         DB::beginTransaction();

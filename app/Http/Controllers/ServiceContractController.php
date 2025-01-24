@@ -11,14 +11,13 @@ use App\Http\Resources\ServiceContractResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Service; // Add this import
-use App\Models\ServiceTerm; // Add this import
-use App\Models\Email; // Add this import
-use Carbon\Carbon; // Add this import
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail; // Add this import
-use App\Mail\ServiceRequestMail; // Add this import
-use App\Mail\ServiceCancellationMail; // Add this import
+use App\Models\Service;
+use App\Models\ServiceTerm;
+use App\Models\Email;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ServiceRequestMail;
+use App\Mail\ServiceCancellationMail;
 
 /**
  * @OA\Tag(
@@ -249,7 +248,7 @@ class ServiceContractController extends Controller
         try {
             // Check for associated tickets
             $serviceContract = $this->serviceContractRepositoryInterface->getById($id);
-            if ($serviceContract->tickets()->exists()) {
+            if ($serviceContract->ticket()->exists()) {
                 return ApiResponseClass::sendResponse(null, 'Cannot delete, tickets associated', 400);
             }
 
@@ -340,8 +339,8 @@ class ServiceContractController extends Controller
                 $data = ServiceContract::whereHas('serviceterm', function ($query) {
                     $query->where('months', '!=', 1);
                 })
-                ->where('expiration_date', '<=', $nextMonth)
-                ->get();
+                    ->where('expiration_date', '<=', $nextMonth)
+                    ->get();
             }
 
             $data->load('company:id,name', 'service:id,description,price', 'serviceterm:id,months,term');
@@ -443,9 +442,9 @@ class ServiceContractController extends Controller
                 'user_name' => $user->name,
                 'user_email' => $user->email,
                 'user_last_name' => $user->lastname,
-                'company'=> $user->company->name,
-                'service'=> Service::find($request->service_id)->description,
-                'term'=> ServiceTerm::find($request->service_term_id)->term,
+                'company' => $user->company->name,
+                'service' => Service::find($request->service_id)->description,
+                'term' => ServiceTerm::find($request->service_term_id)->term,
             ];
 
             $emailTemplate = Email::where('template_name', 'Solicitud de servicios')->first();
@@ -500,7 +499,7 @@ class ServiceContractController extends Controller
                 'user_name' => $user->name,
                 'user_email' => $user->email,
                 'user_last_name' => $user->lastname,
-                
+
             ];
 
             $emailTemplate = Email::where('template_name', 'Solicitud de cancelación de servicios')->first();

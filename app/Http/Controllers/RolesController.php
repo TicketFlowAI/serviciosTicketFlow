@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\PermissionResource;
-use App\Models\Role;
-use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use App\Interfaces\RoleRepositoryInterface;
 use App\Classes\ApiResponseClass;
@@ -164,7 +162,7 @@ class RolesController extends Controller
     {
         try {
             $permissions = Permission::all();
-        
+
             if ($permissions->isEmpty()) {
                 return ApiResponseClass::sendResponse('No permissions found', 404);
             }

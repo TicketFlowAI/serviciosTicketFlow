@@ -14,10 +14,6 @@ use App\Models\TicketHistory;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\File;
-use Illuminate\Http\Request;
 
 /**
  * @OA\Tag(
@@ -327,7 +323,6 @@ class TicketController extends Controller
                     $response = ApiResponseClass::sendResponse('No technicians available', '', 400);
                 } else {
                     if ($ticket->user_id && !$ticket->complexity==3) {
-                        Log::info('Ticket complexity is not 3, incrementing complexity');
                         $ticket->complexity += 1;
                         $technicians = $this->getAvailableTechnicians($ticket, $ticket->user_id);
                         if ($technicians->isEmpty()) {
@@ -348,7 +343,6 @@ class TicketController extends Controller
             DB::commit();
             return $response;
         } catch (\Exception $ex) {
-            Log::error($ex);
             DB::rollBack();
             return ApiResponseClass::sendResponse(null, 'Failed to assign/reassign ticket', 500);
         }

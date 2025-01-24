@@ -5,59 +5,50 @@ namespace App\Http\Controllers;
 use App\Classes\ApiResponseClass;
 use Aws\Comprehend\ComprehendClient;
 use Illuminate\Http\Request;
-use App\Http\Resources\ClassifierResource;
-use App\Http\Resources\ClassifierPerformanceResource;
-use App\Http\Resources\NewClassifierResource;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
-
-use Illuminate\Support\Facades\Auth;
 
 class ComprehendController extends Controller
 {
-    // Configuración general del cliente AWS Comprehend
+    // General configuration of the AWS Comprehend client
     private function getComprehendClient()
     {
         return new ComprehendClient([
             'version' => 'latest',
-            'region'  => 'us-east-2', // Cambia según tu región
+            'region' => 'us-east-2', // Change according to your region
             'credentials' => [
-                'key'    => env('AWS_ACCESS_KEY_ID'),
+                'key' => env('AWS_ACCESS_KEY_ID'),
                 'secret' => env('AWS_SECRET_ACCESS_KEY'),
             ],
         ]);
     }
 
-    // Método para listar todos los clasificadores y sus versiones
+    // Method to list all classifiers and their versions
     public function listAllClassifiers()
     {
         try {
             $client = $this->getComprehendClient();
 
-            // Llamada al método correcto para listar clasificadores
+            // Call the correct method to list classifiers
             $result = $client->listDocumentClassifiers();
 
-
-
-            // Extraer la lista de clasificadores
+            // Extract the list of classifiers
             $classifiers = $result['DocumentClassifierPropertiesList'] ?? [];
 
-
-            // Manejar el caso en que no haya clasificadores
+            // Handle the case where there are no classifiers
             if (empty($classifiers)) {
-                $message = 'No se encontraron clasificadores disponibles.';
+                $message = 'No classifiers found.';
                 return ApiResponseClass::sendResponse(null, $message, 404);
             }
 
-            // Construir la respuesta
+            // Build the response
             $response = [];
             foreach ($classifiers as $classifier) {
-                // Extraer el nombre del clasificador desde el ARN
+                // Extract the classifier name from the ARN
                 $arnParts = explode('/', $classifier['DocumentClassifierArn']);
                 $classifierName = $arnParts[1] ?? 'N/A';
 
                 $response[] = [
-                    'ClassifierName' => $classifierName, // Agregar el nombre del clasificador
+                    'ClassifierName' => $classifierName, // Add the classifier name
                     'ClassifierArn' => $classifier['DocumentClassifierArn'],
                     'VersionName' => $classifier['VersionName'] ?? 'N/A',
                     'Status' => $classifier['Status'],
@@ -75,17 +66,17 @@ class ComprehendController extends Controller
             return ApiResponseClass::sendResponse(($response), '', 200);
 
         } catch (\Exception $e) {
-            $error = 'Error al listar los clasificadores: ' . $e->getMessage();
-            info($error); // Log para depuración
+            $error = 'Error listing classifiers: ' . $e->getMessage();
+            info($error); // Log for debugging
             return ApiResponseClass::sendResponse(null, $error, 500);
         }
     }
 
-    // Método para obtener el rendimiento de una versión específica del clasificador
+    // Method to get the performance of a specific classifier version
     public function getClassifierPerformance(Request $request)
     {
         try {
-            // Validar la entrada de la versión
+            // Validate the version input
             $request->validate([
                 'versionArn' => 'required|string',
             ]);
@@ -94,45 +85,45 @@ class ComprehendController extends Controller
 
             $client = $this->getComprehendClient();
 
-            // Llamada para obtener detalles del clasificador
+            // Call to get classifier details
             $result = $client->describeDocumentClassifier([
                 'DocumentClassifierArn' => $versionArn,
             ]);
 
-            // Log completo de la respuesta para depuración
-            info('Respuesta completa de describeDocumentClassifier: ' . json_encode($result, JSON_PRETTY_PRINT));
+            // Full response log for debugging
+            info('Full response from describeDocumentClassifier: ' . json_encode($result, JSON_PRETTY_PRINT));
 
-            // Extraer detalles de performance
+            // Extract performance details
             $performanceMetrics = $result['DocumentClassifierProperties']['ClassifierMetadata'] ?? null;
 
             if (!$performanceMetrics) {
-                $message = 'No se encontraron métricas de rendimiento para esta versión.';
-                info($message); // Imprime el mensaje en la consola
+                $message = 'No performance metrics found for this version.';
+                info($message); // Print the message to the console
                 return ApiResponseClass::sendResponse(null, $message, 404);
             }
 
             $response = [
                 'VersionArn' => $versionArn,
                 'Accuracy' => $performanceMetrics['EvaluationMetrics']['Accuracy'] ?? 'N/A',
-                'F1Score'  => $performanceMetrics['EvaluationMetrics']['F1Score'] ?? 'N/A',
+                'F1Score' => $performanceMetrics['EvaluationMetrics']['F1Score'] ?? 'N/A',
                 'Precision' => $performanceMetrics['EvaluationMetrics']['Precision'] ?? 'N/A',
-                'Recall'    => $performanceMetrics['EvaluationMetrics']['Recall'] ?? 'N/A',
+                'Recall' => $performanceMetrics['EvaluationMetrics']['Recall'] ?? 'N/A',
             ];
 
-            info('Rendimiento del clasificador: ' . json_encode($response, JSON_PRETTY_PRINT)); // Log para depuración
+            info('Classifier performance: ' . json_encode($response, JSON_PRETTY_PRINT)); // Log for debugging
             return ApiResponseClass::sendResponse(($response), '', 200);
         } catch (\Exception $e) {
-            $error = 'Error al obtener el rendimiento: ' . $e->getMessage();
-            info($error); // Imprime el error en la consola
+            $error = 'Error getting performance: ' . $e->getMessage();
+            info($error); // Print the error to the console
             return ApiResponseClass::sendResponse(null, $error, 500);
         }
     }
 
-    // Método para entrenar un nuevo clasificador
+    // Method to train a new classifier
     public function trainNewClassifierVersion(Request $request)
     {
         try {
-            // Validar los datos necesarios para entrenar
+            // Validate the necessary data for training
             $request->validate([
                 'classifierName' => 'required|string',
                 'inputDataS3Uri' => 'required|url',
@@ -147,7 +138,7 @@ class ComprehendController extends Controller
 
             $client = $this->getComprehendClient();
 
-            // Llamada al API para crear un nuevo clasificador
+            // Call the API to create a new classifier
             $result = $client->createDocumentClassifier([
                 'DocumentClassifierName' => $classifierName,
                 'DataAccessRoleArn' => $dataAccessRoleArn,
@@ -160,62 +151,52 @@ class ComprehendController extends Controller
                 'LanguageCode' => 'en',
             ]);
 
-            info('Respuesta de creación del clasificador: ' . json_encode($result, JSON_PRETTY_PRINT)); // Log para depuración
+            info('Classifier creation response: ' . json_encode($result, JSON_PRETTY_PRINT)); // Log for debugging
 
-            return ApiResponseClass::sendResponse(($result), 'Clasificador creado exitosamente.', 200);
+            return ApiResponseClass::sendResponse(($result), 'Classifier created successfully.', 200);
         } catch (\Exception $e) {
-            $error = 'Error al crear el clasificador: ' . $e->getMessage();
-            info($error); // Imprime el error en la consola
+            $error = 'Error creating classifier: ' . $e->getMessage();
+            info($error); // Print the error to the console
             return ApiResponseClass::sendResponse(null, $error, 500);
         }
     }
 
     public function updateClassifierArns(Request $request)
     {
-        // Validar la entrada
+        // Validate the input
         $request->validate([
             'priority_classifier_arn' => 'nullable|string',
             'human_intervention_classifier_arn' => 'nullable|string',
         ]);
-    
-        // Ruta absoluta al archivo de configuración
+
+        // Absolute path to the configuration file
         $configPath = '/home/servicios/htdocs/servicios.mindsoftdev.com/serviciosTicketFlow/config/classifiers.php';
-    
-        // Log: Ruta del archivo
-        Log::info("Using configuration file path: {$configPath}");
-    
-        // Depuración: Verificar si el archivo existe
+
+        // Debugging: Check if the file exists
         if (!File::exists($configPath)) {
-            Log::error("Configuration file not found at path: {$configPath}");
             return response()->json(['message' => 'Configuration file not found.'], 500);
         }
-    
-        // Leer el archivo de configuración actual
+
+        // Read the current configuration file
         try {
             $currentConfig = include($configPath);
-            Log::info("Successfully loaded current configuration: ", $currentConfig);
         } catch (\Exception $e) {
-            Log::error("Failed to load configuration file: {$e->getMessage()}");
             return response()->json(['message' => 'Failed to load configuration file.'], 500);
         }
-    
-        // Actualizar la configuración con los valores recibidos
+
+        // Update the configuration with the received values
         $updatedConfig = array_merge($currentConfig, array_filter([
             'priority_classifier_arn' => $request->input('priority_classifier_arn'),
             'human_intervention_classifier_arn' => $request->input('human_intervention_classifier_arn'),
         ]));
-    
-        Log::info("Updated configuration to be written: ", $updatedConfig);
-    
-        // Intentar sobrescribir el archivo de configuración
+
+        // Attempt to overwrite the configuration file
         try {
             File::put($configPath, "<?php\n\nreturn " . var_export($updatedConfig, true) . ";");
-            Log::info("Configuration file updated successfully at path: {$configPath}");
         } catch (\Exception $e) {
-            Log::error("Failed to write to configuration file: {$e->getMessage()}");
             return response()->json(['message' => 'Failed to update configuration file.'], 500);
         }
-    
+
         return response()->json(['message' => 'Classifiers updated successfully.']);
     }
 
