@@ -44,7 +44,7 @@ class CheckTicketsWithBedrock extends Command
         $tickets2  = Ticket::whereNotNull('priority')
         ->whereNotNull('needsHumanInteraction')
         ->where('complexity','!=', 1)
-        ->whereNull('user_id')
+        ->where('user_id', null)
         ->get();
 
         if ($tickets2->isNotEmpty()) {
