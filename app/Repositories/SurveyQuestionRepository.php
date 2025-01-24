@@ -20,7 +20,7 @@ class SurveyQuestionRepository implements SurveyQuestionRepositoryInterface
      */
     public function index()
     {
-        return SurveyQuestion::where('active', true)->get();
+        return SurveyQuestion::where('status', true)->get();
     }
 
     /**
