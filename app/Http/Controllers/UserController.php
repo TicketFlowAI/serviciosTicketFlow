@@ -9,6 +9,7 @@ use App\Classes\ApiResponseClass;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @OA\Tag(
@@ -261,6 +262,7 @@ class UserController extends Controller
             $user = $this->userRepositoryInterface->getAuthenticatedUser($request);
             $user->load('company:id,name');
             $user->role = $user->getRoleNames()->first();
+            $user->twoFactorEnabled = $user->two_factor_confirmed_at ? 1 : 0;
 
             return ApiResponseClass::sendResponse(new UserResource($user), '', 200);
         } catch (\Exception $ex) {

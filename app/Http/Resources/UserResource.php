@@ -71,6 +71,7 @@ class UserResource extends JsonResource
             'role' => $this->role,
             'company_id' => $this->company->id,
             'company_name' => $this->company->name,
+            'twoFactorEnabled' => $this->twoFactorEnabled ?? 'N/A',
         ];
     }
 }
