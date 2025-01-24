@@ -20,13 +20,7 @@ use App\Http\Controllers\{
     ComprehendController,
 };
 
-Route::post('/classifiers/update-classifiers', [ComprehendController::class, 'updateClassifierArns']);
-
-// Endpoint para listar clasificadores y versiones
-Route::get('/classifiers', [ComprehendController::class, 'listAllClassifiers']);
-
 Route::post('/forgot-password', [ResetPassword::class, 'store'])->name('password.reset');
-
 
 Route::middleware(['auth:sanctum'])->group(function () {
     
@@ -177,6 +171,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/survey-questions/{id}', [SurveyQuestionController::class, 'update'])->middleware('permission:edit-survey-questions');
     Route::delete('/survey-questions/{id}', [SurveyQuestionController::class, 'destroy'])->middleware('permission:delete-survey-questions');
     Route::put('/survey-questions/{id}/restore', [SurveyQuestionController::class, 'restore'])->middleware('permission:restore-survey-questions');
-    
+
+    // Classifier routes
+    Route::post('/classifiers/update-classifiers', [ComprehendController::class, 'updateClassifierArns'])->middleware('permission:update-classifiers');
+    Route::get('/classifiers', [ComprehendController::class, 'listAllClassifiers'])->middleware('permission:view-classifiers');
     
 });

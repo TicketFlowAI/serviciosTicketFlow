@@ -47,7 +47,9 @@ class RoleAndPermissionSeeder extends Seeder
             'view-survey-questions', 'create-survey-questions', 'edit-survey-questions', 'delete-survey-questions', 'view-deleted-survey-questions', 'restore-survey-questions', 'view-all-survey-questions',
             'disable-two-factor-authentication',
             'request-service-contracts',
-            'cancel-service-contracts' 
+            'cancel-service-contracts',
+            'update-classifiers', // Add this permission
+            'view-classifiers' // Add this permission
         ];
 
         foreach ($permissions as $permissionName) {
@@ -61,8 +63,21 @@ class RoleAndPermissionSeeder extends Seeder
 
         $superAdminRole->givePermissionTo($permissions);
 
-        $technicianPermissions = array_filter($permissions, function($permission) {
-            return !str_contains($permission, 'delete') && !str_contains($permission, 'view-reports') && !str_contains($permission, 'delete-surveys') && !str_contains($permission, 'edit-surveys') && !str_contains($permission, 'create-survey-questions') && !str_contains($permission, 'edit-survey-questions') && !str_contains($permission, 'delete-survey-questions') && !str_contains($permission, 'view-deleted-survey-questions') && !str_contains($permission, 'restore-survey-questions') && !str_contains($permission, 'view-all-survey-questions') && !str_contains($permission, 'disable-two-factor-authentication');
+        $excludedPermissions = [
+            'delete', 'view-reports', 'delete-surveys', 'edit-surveys', 
+            'create-survey-questions', 'edit-survey-questions', 'delete-survey-questions', 
+            'view-deleted-survey-questions', 'restore-survey-questions', 
+            'view-all-survey-questions', 'disable-two-factor-authentication', 
+            'update-classifiers', 'view-classifiers'
+        ];
+
+        $technicianPermissions = array_filter($permissions, function($permission) use ($excludedPermissions) {
+            foreach ($excludedPermissions as $excluded) {
+            if (str_contains($permission, $excluded)) {
+                return false;
+            }
+            }
+            return true;
         });
 
         $technicianPermissions[] = 'view-survey-questions';
