@@ -42,21 +42,21 @@ class CheckTicketsWithBedrock extends Command
         $prompsPath = env('AWS_BEDROCK_PROMPS_PATH');
 
         if (!file_exists($prompsPath)) {
-            $this->error("No se encontró el archivo de promps en {$prompsPath}");
+            $this->error("Prompts file not found at {$prompsPath}");
             return;
         }
 
         $rawPrompsContent = file_get_contents($prompsPath);
 
         if (empty($rawPrompsContent)) {
-            $this->error("El archivo de promps está vacío.");
+            $this->error("The prompts file is empty.");
             return;
         }
 
         $promps = json_decode($rawPrompsContent, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            $this->error("Error al decodificar el JSON: " . json_last_error_msg());
+            $this->error("Error decoding JSON: " . json_last_error_msg());
             return;
         }
 
@@ -118,17 +118,17 @@ class CheckTicketsWithBedrock extends Command
                 $response = $BedrockClient->invokeModel($payload);
                 $responseBody = $response['body']->getContents();
 
-                // Extraer solo el contenido del texto como string
+                // Extract only the text content as a string
                 $responseArray = json_decode($responseBody, true);
                 $textContent = $responseArray['output']['message']['content'][0]['text'] ?? '';
 
-                // Guardar la respuesta como un mensaje AI usando el contenedor de Laravel
+                // Save the response as an AI message using the Laravel container
                 $messageController = App::make(MessageController::class);
                 $messageController->createAIMessage($ticket->id, (string)$textContent);
 
                 $ticket->update(['AIresponse' => 1]);
 
-                $this->info("Ticket #{$ticket->id} procesado y marcado como respondido por la IA.");
+                $this->info("Ticket #{$ticket->id} processed and marked as AI responded.");
 
             } catch (\Exception $e) {
                 $this->error("Error processing Ticket #{$ticket->id}: " . $e->getMessage());
