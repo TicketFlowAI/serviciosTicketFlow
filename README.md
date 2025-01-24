@@ -26,6 +26,7 @@ To run this application, follow these steps:
 3. Run `composer u` to update dependencies.
 4. Run `composer i` to install missing dependencies.
 5. Run `npm i` and `npm run build` to load the JavaScript files and dependencies for Swagger.
+6. Configure the link structure for resetting passwords in `AppServiceProvider.php`.
 
 ## Security Vulnerabilities
 
