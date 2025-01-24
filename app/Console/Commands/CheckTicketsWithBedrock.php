@@ -8,6 +8,7 @@ use Aws\Credentials\Credentials;
 use Illuminate\Console\Command;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\App;
+use \App\Http\Controllers\TicketController;
 use Log;
 
 class CheckTicketsWithBedrock extends Command
@@ -34,6 +35,20 @@ class CheckTicketsWithBedrock extends Command
             ->where('AIresponse', 0)
             ->with('message')
             ->get();
+
+        $tickets2  = Ticket::whereNotNull('priority')
+        ->whereNotNull('needsHumanInteraction')
+        ->where('complexity','!=', 1)
+        ->get();
+
+        if ($tickets2->isNotEmpty()) {
+            foreach ($tickets2 as $ticket) {
+                $ticketController = App::make(TicketController::class);
+                $ticketController->assignTicket($ticket->id);
+            }
+            return;
+        }
+
 
         if ($tickets->isEmpty()) {
             $this->info('No tickets found with the required attributes.');
@@ -126,10 +141,6 @@ class CheckTicketsWithBedrock extends Command
                 // Guardar la respuesta como un mensaje AI usando el contenedor de Laravel
                 $messageController = App::make(MessageController::class);
                 $messageController->createAIMessage($ticket->id, (string)$textContent);
-
-                $ticket->update(['AIresponse' => 1]);
-
-                $this->info("Ticket #{$ticket->id} procesado y marcado como respondido por la IA.");
 
             } catch (\Exception $e) {
                 $this->error("Error processing Ticket #{$ticket->id}: " . $e->getMessage());
