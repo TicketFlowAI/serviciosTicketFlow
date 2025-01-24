@@ -43,13 +43,13 @@ class RoleAndPermissionSeeder extends Seeder
             'view-intervals', 'create-intervals', 'edit-intervals', 'delete-intervals', 'view-deleted-intervals', 'restore-intervals',
             'view-roles', 'edit-roles', 'view-permissions',
             'view-reports', 'view-technician-reports',
-            'create-surveys', 'edit-surveys', 'delete-surveys',
+            'create-surveys', 'edit-surveys', 'delete-surveys','view-surveys',
             'view-survey-questions', 'create-survey-questions', 'edit-survey-questions', 'delete-survey-questions', 'view-deleted-survey-questions', 'restore-survey-questions', 'view-all-survey-questions',
             'disable-two-factor-authentication',
             'request-service-contracts',
             'cancel-service-contracts',
-            'update-classifiers', // Add this permission
-            'view-classifiers' // Add this permission
+            'update-classifiers',
+            'view-classifiers'
         ];
 
         foreach ($permissions as $permissionName) {
