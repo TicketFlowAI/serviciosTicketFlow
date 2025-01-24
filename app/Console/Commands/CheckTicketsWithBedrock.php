@@ -38,6 +38,7 @@ class CheckTicketsWithBedrock extends Command
 
         if ($tickets->isEmpty()) {
             $this->info('No tickets found with the required attributes.');
+            return;
         }
 
         $tickets2  = Ticket::whereNotNull('priority')
@@ -45,8 +46,6 @@ class CheckTicketsWithBedrock extends Command
         ->where('complexity','!=', 1)
         ->whereNull('user_id')
         ->get();
-
-        Log::info('Tickets encontrados para actualizar:', ['count' => $tickets2->count()]);
 
         if ($tickets2->isNotEmpty()) {
             foreach ($tickets2 as $ticket) {
