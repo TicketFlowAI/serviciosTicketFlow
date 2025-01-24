@@ -90,7 +90,7 @@ class ComprehendController extends Controller
 
         // Read the current configuration file
         try {
-            $currentConfig = include($configPath);
+            $currentConfig = include_once $configPath;
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to load configuration file.'], 500);
         }
