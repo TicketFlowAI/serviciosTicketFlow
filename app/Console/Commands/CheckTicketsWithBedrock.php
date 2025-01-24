@@ -39,6 +39,20 @@ class CheckTicketsWithBedrock extends Command
             return;
         }
 
+        $tickets2  = Ticket::whereNotNull('priority')
+        ->whereNotNull('needsHumanInteraction')
+        ->where('complexity','!=', 1)
+        ->where('user_id', null)
+        ->get();
+
+        if ($tickets2->isNotEmpty()) {
+            foreach ($tickets2 as $ticket) {
+                $ticketController = App::make(TicketController::class);
+                $ticketController->assignTicket($ticket->id);
+            }
+            return;
+        }
+        
         $prompsPath = env('AWS_BEDROCK_PROMPS_PATH');
 
         if (!file_exists($prompsPath)) {
