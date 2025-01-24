@@ -27,6 +27,13 @@ To run this application, follow these steps:
 4. Run `composer i` to install missing dependencies.
 5. Run `npm i` and `npm run build` to load the JavaScript files and dependencies for Swagger.
 6. Configure the link structure for resetting passwords in `AppServiceProvider.php`.
+7. Run `php artisan migrate` to run the database migrations.
+8. Run `php artisan db:seed` to seed the database.
+9. Navigate to `/app/Models/Message.php` and uncomment the code in the `booted` function to activate a notification flag for messages in ticket conversations.
+
+## Front End
+
+There is a ready-made front end for this implementation available in a different repository: [TicketFlowAI Front End](https://github.com/TicketFlowAI/ticketflow). We recommend using both of them together, but if you wish, you can create your own. We provide Swagger documentation at the route `/api/documentation` of your installation.
 
 ## Security Vulnerabilities
 
