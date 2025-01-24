@@ -8,8 +8,6 @@ use Aws\Credentials\Credentials;
 use Illuminate\Console\Command;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\App;
-use \App\Http\Controllers\TicketController;
-use Log;
 
 class CheckTicketsWithBedrock extends Command
 {
@@ -36,26 +34,12 @@ class CheckTicketsWithBedrock extends Command
             ->with('message')
             ->get();
 
-        $tickets2  = Ticket::whereNotNull('priority')
-        ->whereNotNull('needsHumanInteraction')
-        ->where('complexity','!=', 1)
-        ->get();
-
-        if ($tickets2->isNotEmpty()) {
-            foreach ($tickets2 as $ticket) {
-                $ticketController = App::make(TicketController::class);
-                $ticketController->assignTicket($ticket->id);
-            }
-            return;
-        }
-
-
         if ($tickets->isEmpty()) {
             $this->info('No tickets found with the required attributes.');
             return;
         }
 
-        $prompsPath = '/home/servicios/htdocs/servicios.mindsoftdev.com/serviciosTicketFlow/storage/app/private/promps/promps.json';
+        $prompsPath = env('AWS_BEDROCK_PROMPS_PATH');
 
         if (!file_exists($prompsPath)) {
             $this->error("No se encontró el archivo de promps en {$prompsPath}");
@@ -142,11 +126,13 @@ class CheckTicketsWithBedrock extends Command
                 $messageController = App::make(MessageController::class);
                 $messageController->createAIMessage($ticket->id, (string)$textContent);
 
+                $ticket->update(['AIresponse' => 1]);
+
+                $this->info("Ticket #{$ticket->id} procesado y marcado como respondido por la IA.");
+
             } catch (\Exception $e) {
                 $this->error("Error processing Ticket #{$ticket->id}: " . $e->getMessage());
             }
         }
     }
 }
-
-

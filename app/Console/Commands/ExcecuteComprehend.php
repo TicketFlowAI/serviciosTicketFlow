@@ -124,8 +124,7 @@ class ExcecuteComprehend extends Command
 
         try {
             $fileContents = Storage::disk('s3')->get($relativePath);
-
-            $baseTempPath = '/home/servicios/htdocs/servicios.mindsoftdev.com/storage/app/private/temp';
+            $baseTempPath = env('AWS_BASE_TEMP_PATH');
             $localDir = "{$baseTempPath}/{$jobId}";
 
             if (!file_exists($localDir)) {

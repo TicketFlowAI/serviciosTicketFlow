@@ -81,7 +81,8 @@ class ComprehendController extends Controller
         ]);
 
         // Absolute path to the configuration file
-        $configPath = '/home/servicios/htdocs/servicios.mindsoftdev.com/serviciosTicketFlow/config/classifiers.php';
+        //$configPath = '/home/ticketflowai-servicios/htdocs/servicios.ticketflowai.com/serviciosTicketFlow/config/classifiers.php';
+        $configPath = env('AWS_BEDROCK_CLASSIFIERS_PATH');
 
         // Debugging: Check if the file exists
         if (!File::exists($configPath)) {
