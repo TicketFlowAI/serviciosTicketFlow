@@ -183,7 +183,7 @@ class TaxController extends Controller
         try {
             // Check for associated services
             $tax = $this->taxRepositoryInterface->getById($id);
-            if ($tax->services()->exists()) {
+            if ($tax->service()->exists()) {
                 return ApiResponseClass::sendResponse(null, 'Cannot delete, services associated', 400);
             }
 
