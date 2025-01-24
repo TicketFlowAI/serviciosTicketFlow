@@ -3,7 +3,6 @@
 namespace App\Repositories;
 use App\Interfaces\TicketRepositoryInterface;
 use App\Models\Ticket;
-use Illuminate\Database\Eloquent\Builder;
 
 class TicketRepository implements TicketRepositoryInterface
 {

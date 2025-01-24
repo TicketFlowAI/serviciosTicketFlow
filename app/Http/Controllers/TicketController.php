@@ -11,6 +11,7 @@ use App\Interfaces\TicketRepositoryInterface;
 use App\Models\Company;
 use App\Models\Service;
 use App\Models\TicketHistory;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -195,8 +196,14 @@ class TicketController extends Controller
      */
     public function update(UpdateTicketRequest $request, $id)
     {
-        $updateDetails = $request->validated();
-
+        $updateDetails = [
+            'title' => $request->title,
+            'priority' => $request->priority,
+            'needsHumanInteraction' => $request->needsHumanInteraction,
+            'complexity' => $request->complexity,
+            'user_id' => $request->user_id,
+            'status' => $request->status,
+        ];
         DB::beginTransaction();
         try {
             $this->ticketRepositoryInterface->update($updateDetails, $id);
@@ -233,7 +240,6 @@ class TicketController extends Controller
         DB::beginTransaction();
         try {
             $ticket = $this->ticketRepositoryInterface->getById($id);
-            Log::info('Checking if survey exists for ticket ID: ' . $ticket->survey()->exists());
             if ($ticket->survey()->exists()) {
                 $details = ['status' => 0];
                 $historyMessage = 'Encuesta completada';
@@ -313,19 +319,17 @@ class TicketController extends Controller
         DB::beginTransaction();
         try {
             $ticket = $this->ticketRepositoryInterface->getById($id);
-
             if (!$ticket) {
                 $response = ApiResponseClass::sendResponse('Ticket not found', '', 404);
             } else {
                 $technicians = $this->getAvailableTechnicians($ticket);
-
                 if ($technicians->isEmpty()) {
                     $response = ApiResponseClass::sendResponse('No technicians available', '', 400);
                 } else {
-                    if ($ticket->user_id) {
+                    if ($ticket->user_id && !$ticket->complexity==3) {
+                        Log::info('Ticket complexity is not 3, incrementing complexity');
                         $ticket->complexity += 1;
                         $technicians = $this->getAvailableTechnicians($ticket, $ticket->user_id);
-
                         if ($technicians->isEmpty()) {
                             $response = ApiResponseClass::sendResponse('No available technicians other than the current assignee', '', 400);
                         } else {
@@ -344,18 +348,16 @@ class TicketController extends Controller
             DB::commit();
             return $response;
         } catch (\Exception $ex) {
+            Log::error($ex);
             DB::rollBack();
             return ApiResponseClass::sendResponse(null, 'Failed to assign/reassign ticket', 500);
         }
     }
 
-    private function getAvailableTechnicians($ticket, $excludeUserId = null)
+    private function getAvailableTechnicians($ticket, $excludeUserId = 0)
     {
-        return Role::where('name', 'technician')->first()->users->filter(function ($technician) use ($ticket, $excludeUserId) {
-            return $technician->roles->pluck('name')->intersect(['1', '2', '3'])->isNotEmpty() &&
-                   $technician->roles->pluck('name')->contains($ticket->complexity) &&
-                   (!$excludeUserId || $technician->id !== $excludeUserId);
-        });
+        $ticket->complexity = (string) $ticket->complexity;
+        return User::role($ticket->complexity)->where('id', '!=', $excludeUserId)->get();
     }
 
     private function findTechnicianWithLeastTickets($technicians)
@@ -368,6 +370,7 @@ class TicketController extends Controller
     private function assignTicketToTechnician($ticket, $technician)
     {
         $ticket->user_id = $technician->id;
+        $ticket->complexity = (int) $ticket->complexity;
         $ticket->save();
         $this->recordHistory($ticket->id, 'Asignado a ' . $technician->name . ' ' . $technician->lastname);
     }
@@ -407,7 +410,7 @@ class TicketController extends Controller
     {
         TicketHistory::create([
             'ticket_id' => $ticketId,
-            'user_id' => Auth::id(),
+            'user_id' => Auth::id() ?? User::where('email', 'noreply@mindsoft.biz')->first()->id,
             'action' => $action,
         ]);
     }
@@ -501,13 +504,9 @@ class TicketController extends Controller
             if (is_null($ticket->complexity)) {
                 $ticket->complexity = 2;
             }
-            Log::info('Ticket priority: ' . $ticket);
             $ticket->status = 1;
-            Log::info('Ticket status: ' . $ticket);
             $ticket->save();
-            Log::info('Ticket saved: ' . $ticket);
             $this->assignTicket($ticket);
-            Log::info('Ticket assigned: ' . $ticket);
 
             DB::commit();
             return ApiResponseClass::sendResponse(null, 'Marked ticket as needing human interaction and assign', 200);;
