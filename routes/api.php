@@ -25,8 +25,6 @@ Route::post('/classifiers/update-classifiers', [ComprehendController::class, 'up
 // Endpoint para listar clasificadores y versiones
 Route::get('/classifiers', [ComprehendController::class, 'listAllClassifiers']);
 
-// Endpoint para obtener el rendimiento de una versión específica
-Route::post('/classifier/{id}/performance', [ComprehendController::class, 'getClassifierPerformance']);
 Route::post('/forgot-password', [ResetPassword::class, 'store'])->name('password.reset');
 
 
