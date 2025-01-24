@@ -503,7 +503,7 @@ class TicketController extends Controller
             $this->assignTicket($ticket);
 
             DB::commit();
-            return ApiResponseClass::sendResponse(null, 'Marked ticket as needing human interaction and assign', 200);;
+            return ApiResponseClass::sendResponse(null, 'Marked ticket as needing human interaction and assign', 200);
         } catch (\Exception $ex) {
             DB::rollBack();
             return ApiResponseClass::sendResponse(null, 'Failed to mark ticket as needing human interaction and assign', 500);

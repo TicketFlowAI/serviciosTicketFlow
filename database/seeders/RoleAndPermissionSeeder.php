@@ -64,10 +64,10 @@ class RoleAndPermissionSeeder extends Seeder
         $superAdminRole->givePermissionTo($permissions);
 
         $excludedPermissions = [
-            'delete', 'view-reports', 'delete-surveys', 'edit-surveys', 
-            'create-survey-questions', 'edit-survey-questions', 'delete-survey-questions', 
-            'view-deleted-survey-questions', 'restore-survey-questions', 
-            'view-all-survey-questions', 'disable-two-factor-authentication', 
+            'delete', 'view-reports', 'delete-surveys', 'edit-surveys',
+            'create-survey-questions', 'edit-survey-questions', 'delete-survey-questions',
+            'view-deleted-survey-questions', 'restore-survey-questions',
+            'view-all-survey-questions', 'disable-two-factor-authentication',
             'update-classifiers', 'view-classifiers'
         ];
 
@@ -82,7 +82,7 @@ class RoleAndPermissionSeeder extends Seeder
 
         $technicianPermissions[] = 'view-survey-questions';
         $technicianPermissions[] = 'request-service-contracts';
-        $technicianPermissions[] = 'cancel-service-contracts'; 
+        $technicianPermissions[] = 'cancel-service-contracts';
 
         $technicianRole->givePermissionTo($technicianPermissions);
 
