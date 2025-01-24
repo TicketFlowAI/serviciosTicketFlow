@@ -30,7 +30,7 @@ To run this application, follow these steps:
 
 ## Security Vulnerabilities
 
-If you discover a security vulnerability within TicketFlowAI, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability within TicketFlowAI, please send an e-mail to the team via [vulnerabilities@ticketflowai.com](mailto:vulnerabilities@ticketflowai.com). All security vulnerabilities will be promptly addressed.
 
 ## License
 
