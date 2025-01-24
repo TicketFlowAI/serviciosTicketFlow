@@ -36,6 +36,17 @@ To run this application, follow these steps:
 8. Run `php artisan migrate` to run the database migrations.
 9. Run `php artisan db:seed` to seed the database.
 10. Navigate to `/app/Models/Message.php` and uncomment the code in the `booted` function to activate a notification flag for messages in ticket conversations.
+11. Configure the following CRON jobs in the server hosting the app:
+    ```sh
+    # Run the Laravel schedule every hour (can work up to 6 hours)
+    0 * * * * /usr/bin/php8.4 /home/example-user/htdocs/example.com/serviciosTicketFlow/artisan schedule:run
+
+    # Run the Comprehend execution every 3 minutes
+    */3 * * * * /usr/bin/php8.4 /home/example-user/htdocs/example.com/serviciosTicketFlow/artisan app:excecute-comprehend
+
+    # Run the Bedrock ticket check every 3 minutes
+    */3 * * * * /usr/bin/php8.4 /home/example-user/htdocs/example.com/serviciosTicketFlow/artisan app:check-tickets-bedrock
+    ```
 
 ## Front End
 
