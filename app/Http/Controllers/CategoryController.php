@@ -178,7 +178,7 @@ class CategoryController extends Controller
     {
         try {
             $category = $this->categoryRepositoryInterface->getById($id);
-            if ($category->services()->exists()) {
+            if ($category->service()->exists()) {
                 return ApiResponseClass::sendResponse(null, 'Cannot delete, services associated', 400);
             }
 
