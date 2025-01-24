@@ -34,4 +34,4 @@ If you discover a security vulnerability within TicketFlowAI, please send an e-m
 
 ## License
 
-The TicketFlowAI framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The TicketFlowAI framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT). We provide a free license in good faith, but for teams larger than 7 people, we recommend contacting us to set up a demo as a SAAS solution.
