@@ -8,6 +8,8 @@ use Aws\Credentials\Credentials;
 use Illuminate\Console\Command;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\TicketController;
 
 class CheckTicketsWithBedrock extends Command
 {
@@ -36,14 +38,15 @@ class CheckTicketsWithBedrock extends Command
 
         if ($tickets->isEmpty()) {
             $this->info('No tickets found with the required attributes.');
-            return;
         }
 
         $tickets2  = Ticket::whereNotNull('priority')
         ->whereNotNull('needsHumanInteraction')
         ->where('complexity','!=', 1)
-        ->where('user_id', null)
+        ->whereNull('user_id')
         ->get();
+
+        Log::info('Tickets encontrados para actualizar:', ['count' => $tickets2->count()]);
 
         if ($tickets2->isNotEmpty()) {
             foreach ($tickets2 as $ticket) {
