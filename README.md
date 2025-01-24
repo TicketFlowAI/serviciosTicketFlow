@@ -23,13 +23,19 @@ To run this application, follow these steps:
 
 1. Pull the repository.
 2. Copy the `.env.example` file to `.env` and fill in the required fields.
-3. Run `composer u` to update dependencies.
-4. Run `composer i` to install missing dependencies.
-5. Run `npm i` and `npm run build` to load the JavaScript files and dependencies for Swagger.
-6. Configure the link structure for resetting passwords in `AppServiceProvider.php`.
-7. Run `php artisan migrate` to run the database migrations.
-8. Run `php artisan db:seed` to seed the database.
-9. Navigate to `/app/Models/Message.php` and uncomment the code in the `booted` function to activate a notification flag for messages in ticket conversations.
+3. Add the following lines to your `.env` file with the appropriate paths:
+    ```env
+    AWS_BEDROCK_PROMPS_PATH="/home/example-user/htdocs/example.com/storage/app/private/promps/promps.json"
+    AWS_BASE_TEMP_PATH="/home/example-user/htdocs/example.com/storage/app/private/temp"
+    AWS_BEDROCK_CLASSIFIERS_PATH="/home/example-user/htdocs/example.com/config/classifiers.php"
+    ```
+4. Run `composer u` to update dependencies.
+5. Run `composer i` to install missing dependencies.
+6. Run `npm i` and `npm run build` to load the JavaScript files and dependencies for Swagger.
+7. Configure the link structure for resetting passwords in `AppServiceProvider.php`.
+8. Run `php artisan migrate` to run the database migrations.
+9. Run `php artisan db:seed` to seed the database.
+10. Navigate to `/app/Models/Message.php` and uncomment the code in the `booted` function to activate a notification flag for messages in ticket conversations.
 
 ## Front End
 
