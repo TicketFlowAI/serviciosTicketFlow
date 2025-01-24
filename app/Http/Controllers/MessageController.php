@@ -10,6 +10,7 @@ use App\Http\Resources\MessageResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @OA\Tag(
@@ -83,6 +84,9 @@ class MessageController extends Controller
     public function createAIMessage($ticket_id, $content)
     {
         $user = \App\Models\User::where('email', 'noreply@mindsoft.biz')->first();
+        if (!$user) {
+            return Log::error('User not found. You need to create a user matching the line above this one in Message contorller');
+        }
         $request = new StoreMessageRequest();
         $request->merge([
             'ticket_id' => $ticket_id,
