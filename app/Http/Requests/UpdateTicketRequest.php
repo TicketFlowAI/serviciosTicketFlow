@@ -23,13 +23,18 @@ class UpdateTicketRequest extends FormRequest
      */
     public function rules(): array
     {
+        $this->merge([
+            'needsHumanInteraction' => $this->input('needsHumanInteraction') === '' ? null : $this->input('needsHumanInteraction'),
+            'priority' => is_numeric($this->input('priority')) ? (int) $this->input('priority') : null,
+            'complexity' => is_numeric($this->input('complexity')) ? (int) $this->input('complexity') : null,
+        ]);
         return [
             'service_contract_id' => 'required|numeric',
             'title' => 'required|string',
-            'needsHumanInteraction' => 'required|boolean',
-            'status' => 'required|integer',
-            'priority' => 'required|integer|between:1,5',
-            'complexity' => 'required|integer|between:1,3',
+            'needsHumanInteraction' => 'nullable|boolean',
+            'status' => 'nullable|integer',
+            'priority' => 'nullable|integer|between:1,5',
+            'complexity' => 'nullable|integer|between:1,3',
         ];
     }
 

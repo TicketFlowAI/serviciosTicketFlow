@@ -194,6 +194,7 @@ class TicketController extends Controller
     {
         $updateDetails = [
             'title' => $request->title,
+            'service_contract_id' => $request->service_contract_id,
             'priority' => $request->priority,
             'needsHumanInteraction' => $request->needsHumanInteraction,
             'complexity' => $request->complexity,
