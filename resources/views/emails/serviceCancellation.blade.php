@@ -531,7 +531,7 @@
                                                                 <td align="left" style="padding:0;Margin:0">
                                                                     <p
                                                                         style="Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:27px;letter-spacing:0;color:#2D3142;font-size:18px">
-                                                                        Un saludo desde la nube,<br>Asistente Digital Mindsoft</p>
+                                                                        Un saludo desde la nube,<br>Mindy Bot<br>Asistente Digital Mindsoft</p>
                                                                 </td>
                                                             </tr>
                                                             <tr>

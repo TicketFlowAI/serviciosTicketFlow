@@ -57,8 +57,8 @@ class UserSeeder extends Seeder
             'company_id' => 2
         ])->assignRole('client');
         User::create([
-            'name' => 'Asistente',
-            'lastname' => 'Digital',
+            'name' => 'Mindy',
+            'lastname' => 'Bot',
             'email' => 'noreply@mindsoft.biz',
             'password' => Hash::make($this->defaultPassword),
             'company_id' => 1
